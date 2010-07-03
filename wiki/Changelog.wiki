@@ -1,7 +1,5 @@
 #summary Change log
 
-= Changelog =
-
 *2010-07-02:*
  * Linux and maemo5 now uses a telepathy observer component to listen for incoming calls. When there is an incoming call from the GV number, it will understand that this call is because of our dialing through GV. The intended result was to auto-accept the call. For the moment, it will just automatically dismiss the dialog box that allows the user to cancel the call.
  * Cached the numbers registered with GV
