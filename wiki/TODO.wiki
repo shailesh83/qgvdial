@@ -1,0 +1,11 @@
+#summary Features to be added, bugs to be fixed, R&D to be done
+
+*Planned features:*
+ * Desktop Skype integration
+ * Contacts integration from all available contact stores
+ * Auto-accept dialback phone call
+ * Convert the GV access class into a QtMobility connection manager so that anyone else can access it and create other interesting apps.
+ * Improve the menu bars and overall UI
+
+*R&D:*
+ * Find out how to use the telepathy observer component to auto-accept a call
