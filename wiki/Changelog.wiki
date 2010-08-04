@@ -1,5 +1,11 @@
 #summary Change log
 
+*2010-08-04:*
+ * Dial out directly works for telepathy CM: ring and spirit. sofiasip also works, but the GV announcer says that the call could not be completed.
+ * Dial out works is desktop skype: Windows and Linux
+ * Two different deb files for n900: One for old mobility and one for the new version
+ * Contacts now use the Google contacts API. This means lesser data to process on contacts refresh.
+
 *2010-07-19:*
  * Desktop Skype integration: If you have a Skype subscription and you use it as a callback phone with GV, then qgvdial will attempt to recognize this and behave just like the phone version: Dismiss the cancel window.
 
