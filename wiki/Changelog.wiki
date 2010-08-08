@@ -1,5 +1,10 @@
 #summary Change log
 
+*2010-08-07:*
+ * Provided a dbus listening service so that fcrochik's MyContacts can call out using that.
+ * Contacts using Google Contacts Data API. Additions, modifications and deletions all taken care of.
+ * Callbacks now work once again.
+
 *2010-08-04:*
  * Dial out directly works for telepathy CM: ring and spirit. sofiasip also works, but the GV announcer says that the call could not be completed.
  * Dial out works is desktop skype: Windows and Linux

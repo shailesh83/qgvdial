@@ -1,7 +1,6 @@
 #summary Features to be added, bugs to be fixed, R&D to be done
 
 *Planned features:*
- * Provide a dbus listening service so that "MyContacts" from fcrochik can call out using that.
  * Contacts integration from all available contact stores
  * Auto-accept dialback phone call in desktop skype
  * Auto-accept dialback phone call in phone
