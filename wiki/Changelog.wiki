@@ -1,5 +1,10 @@
 #summary Change log
 
+*2010-08-14:*
+ * Inbox how uses data API instead of screen scraping the website.
+ * Calls, sms and voicemail all work from the Inbox page.
+ * Contacts and Inbox page use the same interface to make calls and send texts.
+
 *2010-08-07:*
  * Provided a dbus listening service so that fcrochik's MyContacts can call out using that.
  * Contacts using Google Contacts Data API. Additions, modifications and deletions all taken care of.
