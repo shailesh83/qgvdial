@@ -18,8 +18,20 @@ void
 DialDigitButton::_i_clicked ()
 {
     if (!bDelete) {
-        emit charClicked (this->text()[0]);
+        emit charClicked (this->getChars()[0]);
     } else {
         emit charDeleted ();
     }
 }//DialDigitButton::_i_clicked
+
+void
+DialDigitButton::setChars (const QString &strCh)
+{
+    strChars = strCh;
+}//DialDigitButton::setChars
+
+QString
+DialDigitButton::getChars ()
+{
+    return (strChars);
+}//DialDigitButton::getChars

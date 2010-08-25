@@ -4,5 +4,6 @@
      <file alias="Phone.png">../icons/Phone.png</file>
      <file alias="Skype.png">../icons/Skype.png</file>
      <file alias="SMS.png">../icons/SMS.png</file>
+     <file alias="3.jpg">../icons/Untitled-3.jpg</file>
  </qresource>
 </RCC>
