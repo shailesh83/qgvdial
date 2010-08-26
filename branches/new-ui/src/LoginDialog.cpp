@@ -17,6 +17,10 @@ LoginDialog::~LoginDialog ()
 bool
 LoginDialog::getUserPass (QString &strUser, QString &strPass)
 {
+    if (QDialog::Accepted != this->result ()) {
+        return (false);
+    }
+
     strUser = ui->edUsername->text ();
     strPass = ui->edPassword->text ();
 

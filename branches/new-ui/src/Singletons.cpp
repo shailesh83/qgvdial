@@ -62,13 +62,6 @@ Singletons::getSkypeFactory ()
     return (skypeFactory);
 }//Singletons::getSkypeFactory
 
-//UniqueAppHelper &
-//Singletons::getUAH ()
-//{
-//    static UniqueAppHelper uniqueAppHelper;
-//    return (uniqueAppHelper);
-//}//Singletons::getUAH
-
 CallInitiatorFactory &
 Singletons::getCIFactory ()
 {

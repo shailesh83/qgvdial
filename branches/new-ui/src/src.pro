@@ -44,7 +44,15 @@ SOURCES  += main.cpp                    \
             InboxModel.cpp              \
             GVH_XMLJsonHandler.cpp      \
             DialDigitButton.cpp         \
-            PhoneNumberValidator.cpp
+            PhoneNumberValidator.cpp    \
+            GVContactsTable.cpp         \
+            CaptchaWidget.cpp           \
+            ContactsXmlHandler.cpp      \
+            DialCancelDlg.cpp           \
+            DlgSelectContactNumber.cpp  \
+            SMSEntryDeleteButton.cpp    \
+            SMSDlg.cpp \
+    ChildWindowBase.cpp
 
 HEADERS  += global.h                    \
             IObserver.h                 \
@@ -66,7 +74,15 @@ HEADERS  += global.h                    \
             InboxModel.h                \
             GVH_XMLJsonHandler.h        \
             DialDigitButton.h           \
-            PhoneNumberValidator.h
+            PhoneNumberValidator.h      \
+            GVContactsTable.h           \
+            CaptchaWidget.h             \
+            ContactsXmlHandler.h        \
+            DialCancelDlg.h             \
+            DlgSelectContactNumber.h    \
+            SMSEntryDeleteButton.h      \
+            SMSDlg.h \
+    ChildWindowBase.h
 
 FORMS    += MainWindow.ui               \
             LoginDialog.ui
@@ -74,30 +90,26 @@ FORMS    += MainWindow.ui               \
 RESOURCES += qgvdial.qrc
 
 # This is so that QtCreator can show these files in the files list.
-OTHER_FILES  += winrsrc.rc \
-                qtsingleapplication/inc/QtSingleApplication     \
-                qtsingleapplication/inc/QtLockedFile            \
-                qtsingleapplication/qtsinglecoreapplication.pri \
-                qtsingleapplication/qtsingleapplication.pri
+OTHER_FILES  += winrsrc.rc
 
 # In Linux and maemo, add the telepathy related sources and headers
 unix:!symbian {
-    HEADERS +=  TpObserver.h            \
+    HEADERS  += TpObserver.h            \
                 TpCalloutInitiator.h    \
                 QGVDbusServer.h
-    SOURCES +=  TpObserver.cpp          \
+    SOURCES  += TpObserver.cpp          \
                 TpCalloutInitiator.cpp  \
                 QGVDbusServer.cpp
 }
 
 # In desktop Linux, add the Skype client
 unix:!symbian:!maemo5 {
-    HEADERS += SkypeLinuxClient.h           \
-               SkypeObserver.h              \
-               DesktopSkypeCallInitiator.h
-    SOURCES += SkypeLinuxClient.cpp         \
-               SkypeObserver.cpp            \
-               DesktopSkypeCallInitiator.cpp
+    HEADERS  += SkypeLinuxClient.h              \
+                SkypeObserver.h                 \
+                DesktopSkypeCallInitiator.h
+    SOURCES  += SkypeLinuxClient.cpp            \
+                SkypeObserver.cpp               \
+                DesktopSkypeCallInitiator.cpp
 }
 
 win32 {

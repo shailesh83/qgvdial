@@ -2,7 +2,6 @@ INCLUDEPATH	 += $$PWD/inc
 DEPENDPATH   += $$PWD/inc
 
 HEADERS		 += $$PWD/inc/qtsinglecoreapplication.h     \
-                $$PWD/inc/qtlocalpeer.h                 \
                 $$PWD/inc/qtlockedfile.h                \
                 $$PWD/inc/qtlocalpeer.h
 
