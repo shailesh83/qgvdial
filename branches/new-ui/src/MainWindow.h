@@ -27,9 +27,13 @@ signals:
 
 public slots:
     void log (const QString &strText, int level = 10);
-    void setStatus (const QString &strText, int timeout = 0);
+    void setStatus (const QString &strText, int timeout = 3000);
 
 private slots:
+    // All initializations happen here
+    void on_btnContacts_clicked();
+    void init ();
+
     void on_actionE_xit_triggered();
     //! The Singleton Application class invokes this function
     void messageReceived (const QString &message);
@@ -82,6 +86,7 @@ private slots:
     void sendSMSDone (bool bOk, const QVariantList &arrParams);
 
 private:
+    void beginLogin ();
     void initContactsWidget ();
     void deinitContactsWidget ();
     bool getInfoFrom (const QString &strNumber,

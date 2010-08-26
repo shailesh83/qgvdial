@@ -4,12 +4,16 @@
 #include "global.h"
 #include <QtNetwork>
 
-class GVContactsTable : public QTreeView
+namespace Ui {
+    class ContactsWindow;
+}
+
+class GVContactsTable : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    GVContactsTable (QWidget *parent = 0);
+    GVContactsTable (QWidget *parent = 0, Qt::WindowFlags flags = 0);
     ~GVContactsTable ();
 
     void deinitModel ();
@@ -17,7 +21,14 @@ public:
 
     //! Use this to set the username and password for the contacts API login
     void setUserPass (const QString &strU, const QString &strP);
+
+    //! Use this to login
+    void loginSuccess ();
+    //! Use this to logout
+    void loggedOut ();
+
     bool convert (const ContactInfo &cInfo, GVContactInfo &gvcInfo);
+
 
 signals:
     //! Log emitter
@@ -35,10 +46,6 @@ signals:
 
 public slots:
     void refreshContacts ();
-    void updateMenu (QMenuBar *menuBar);
-
-    void loginSuccess ();
-    void loggedOut ();
 
 private slots:
     void activatedContact (const QModelIndex &);
@@ -75,6 +82,8 @@ private:
 
 
 private:
+    Ui::ContactsWindow *ui;
+
     //! Username and password for google authentication
     QString strUser, strPass;
     //! The authentication string returned by the contacts API
@@ -83,15 +92,8 @@ private:
     //! The network manager for contacts API
     QNetworkAccessManager nwMgr;
 
-    //! Refresh action for contacts
-    QAction         actRefresh;
-
-    //! Menu to hold the context menu for voicemail
+    //! Context menu for clicking on an item
     QMenu           mnuContext;
-    //! Place a call
-    QAction         actPlaceCall;
-    //! Send an SMS
-    QAction         actSendSMS;
 
     //! Mutex protecting the following variable
     QMutex          mutex;

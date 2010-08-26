@@ -43,55 +43,7 @@ MainWindow::MainWindow (QWidget *parent)
     QObject::connect (qApp, SIGNAL (messageReceived (const QString &)),
                       this, SLOT   (messageReceived (const QString &)));
 
-    // All init starts here:
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-    OsDependent &osd = Singletons::getRef().getOSD ();
-
-    dbMain.init ();
-    osd.initDialServer (this, SLOT (dialNow (const QString &)));
-
-    // Dialing handshake
-    QObject::connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
-                       this       , SLOT   (dialInProgress (const QString &)));
-    QObject::connect ( this       , SIGNAL (dialCanFinish ()),
-                      &webPage    , SLOT   (dialCanFinish ()));
-    QObject::connect (
-        &webPage, SIGNAL (dialAccessNumber (const QString &,
-                                            const QVariant &)),
-         this   , SLOT   (dialAccessNumber (const QString &,
-                                            const QVariant &)));
-
-    // Skype client factory log and status
-    SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
-    skypeFactory.setMainWidget (this);
-    QObject::connect (
-        &skypeFactory, SIGNAL (log(const QString &, int)),
-         this        , SLOT   (log(const QString &, int)));
-    QObject::connect (
-        &skypeFactory, SIGNAL (status(const QString &, int)),
-         this        , SLOT   (setStatus(const QString &, int)));
-
-    // Observer factory log and status
-    ObserverFactory &obF = Singletons::getRef().getObserverFactory ();
-    obF.init ();
-    QObject::connect (&obF , SIGNAL (log(const QString &, int)),
-                       this, SLOT   (log(const QString &, int)));
-    QObject::connect (&obF , SIGNAL (status(const QString &, int)),
-                       this, SLOT   (setStatus(const QString &, int)));
-
-    // webPage log and status
-    QObject::connect (&webPage, SIGNAL (log(const QString &, int)),
-                       this   , SLOT   (log(const QString &, int)));
-    QObject::connect (&webPage, SIGNAL (status(const QString &, int)),
-                       this   , SLOT   (setStatus(const QString &, int)));
-
-    // call initiator log status and init
-    CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
-    QObject::connect (&cif , SIGNAL (log(const QString &, int)),
-                       this, SLOT   (log(const QString &, int)));
-    QObject::connect (&cif , SIGNAL (status(const QString &, int)),
-                       this, SLOT   (setStatus(const QString &, int)));
+    QTimer::singleShot (1000, this, SLOT (init()));
 }//MainWindow::MainWindow
 
 MainWindow::~MainWindow ()
@@ -139,23 +91,82 @@ MainWindow::messageReceived (const QString &message)
 }//MainWindow::messageReceived
 
 void
-MainWindow::on_action_Login_triggered ()
+MainWindow::init ()
+{
+    GVAccess &webPage = Singletons::getRef().getGVAccess ();
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    OsDependent &osd = Singletons::getRef().getOSD ();
+
+    setStatus ("Initializing");
+
+    dbMain.init ();
+    osd.initDialServer (this, SLOT (dialNow (const QString &)));
+
+    // Dialing handshake
+    QObject::connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
+                       this       , SLOT   (dialInProgress (const QString &)));
+    QObject::connect ( this       , SIGNAL (dialCanFinish ()),
+                      &webPage    , SLOT   (dialCanFinish ()));
+    QObject::connect (
+        &webPage, SIGNAL (dialAccessNumber (const QString &,
+                                            const QVariant &)),
+         this   , SLOT   (dialAccessNumber (const QString &,
+                                            const QVariant &)));
+
+    // Skype client factory log and status
+    SkypeClientFactory &skypeFactory = Singletons::getRef().getSkypeFactory ();
+    skypeFactory.setMainWidget (this);
+    QObject::connect (
+        &skypeFactory, SIGNAL (log(const QString &, int)),
+         this        , SLOT   (log(const QString &, int)));
+    QObject::connect (
+        &skypeFactory, SIGNAL (status(const QString &, int)),
+         this        , SLOT   (setStatus(const QString &, int)));
+
+    // Observer factory log and status
+    ObserverFactory &obF = Singletons::getRef().getObserverFactory ();
+    obF.init ();
+    QObject::connect (&obF , SIGNAL (log(const QString &, int)),
+                       this, SLOT   (log(const QString &, int)));
+    QObject::connect (&obF , SIGNAL (status(const QString &, int)),
+                       this, SLOT   (setStatus(const QString &, int)));
+
+    // webPage log and status
+    QObject::connect (&webPage, SIGNAL (log(const QString &, int)),
+                       this   , SLOT   (log(const QString &, int)));
+    QObject::connect (&webPage, SIGNAL (status(const QString &, int)),
+                       this   , SLOT   (setStatus(const QString &, int)));
+
+    // call initiator log status and init
+    CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
+    QObject::connect (&cif , SIGNAL (log(const QString &, int)),
+                       this, SLOT   (log(const QString &, int)));
+    QObject::connect (&cif , SIGNAL (status(const QString &, int)),
+                       this, SLOT   (setStatus(const QString &, int)));
+
+    // If the cache has the username and password, begin login
+    if (dbMain.getUserPass (strUser, strPass))
+    {
+        beginLogin ();
+    }
+    else
+    {
+        setStatus ("No user credentials cached. Please log in");
+
+        strUser.clear ();
+        strPass.clear ();
+    }
+
+}//MainWindow::init
+
+void
+MainWindow::beginLogin ()
 {
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
 
     bool bOk = false;
     do // Begin cleanup block (not a loop)
     {
-        LoginDialog dlg (this);
-        if (QDialog::Rejected == dlg.exec ()) {
-            setStatus ("User cancelled login");
-            break;
-        }
-        if (!dlg.getUserPass (strUser, strPass)) {
-            setStatus ("Invalid username or password");
-            break;
-        }
-
 //@@UV: Uncomment
 //        pContactsView->setUserPass (strUser, strPass);
 
@@ -163,7 +174,7 @@ MainWindow::on_action_Login_triggered ()
         l += strUser;
         l += strPass;
 
-        log ("Beginning login");
+        setStatus ("Beginning login");
         // webPage.workCompleted -> this.loginCompleted
         if (!webPage.enqueueWork (GVAW_login, l, this,
                 SLOT (loginCompleted (bool, const QVariantList &))))
@@ -178,9 +189,35 @@ MainWindow::on_action_Login_triggered ()
     if (!bOk)
     {
         // Cleanup if any
+        strUser.clear ();
+        strPass.clear ();
+
 //@@UV: Uncomment
 //        enterNotLoggedIn ();
     }
+}//MainWindow::beginLogin
+
+void
+MainWindow::on_action_Login_triggered ()
+{
+    do // Begin cleanup block (not a loop)
+    {
+        if (!bLoggedIn) {
+            LoginDialog dlg (this);
+            if (QDialog::Rejected == dlg.exec ()) {
+                setStatus ("User cancelled login");
+                break;
+            }
+            if (!dlg.getUserPass (strUser, strPass)) {
+                setStatus ("Invalid username or password");
+                break;
+            }
+
+            beginLogin ();
+        } else {
+            //@@UV: Logout
+        }
+    } while (0); // End cleanup block (not a loop)
 }//MainWindow::on_action_Login_triggered
 
 void
@@ -213,10 +250,9 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         strSelfNumber = varList[varList.size()-1].toString ();
 
         initContactsWidget ();
-        ui->action_Login->setText ("Logout");
 
-//@@UV: Uncomment
-//        emit loginSuccess ();
+        ui->action_Login->setText ("Logout");
+        ui->btnContacts->setEnabled (true);
     }
 }//MainWindow::loginCompleted
 
@@ -296,6 +332,14 @@ MainWindow::initContactsWidget ()
         // Create the contact view
         pContactsView = new GVContactsTable ();
 
+        // Log and status
+        QObject::connect (
+            pContactsView, SIGNAL (log(const QString &, int)),
+            this         , SLOT   (log(const QString &, int)));
+        QObject::connect (
+            pContactsView, SIGNAL (status   (const QString &, int)),
+            this         , SLOT   (setStatus(const QString &, int)));
+
         // pContactsView.allContacts -> this.getContactsDone
         QObject::connect (pContactsView, SIGNAL (allContacts (bool)),
                           this         , SLOT   (getContactsDone (bool)));
@@ -311,11 +355,10 @@ MainWindow::initContactsWidget ()
                 SIGNAL (textANumber (const QString &, const QString &)),
             this         ,
                 SLOT   (textANumber (const QString &, const QString &)));
-        // Logged in and logged out for all
-        QObject::connect (this         , SIGNAL (loginSuccess ()),
-                          pContactsView, SLOT   (loginSuccess ()));
-        QObject::connect (this         , SIGNAL (loggedOut ()),
-                          pContactsView, SLOT   (loggedOut ()));
+
+        pContactsView->setUserPass (strUser, strPass);
+        pContactsView->loginSuccess ();
+        pContactsView->initModel ();
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::initContactsWidget
 
@@ -327,6 +370,8 @@ MainWindow::deinitContactsWidget ()
             log ("Contacts widget was NULL.");
             break;
         }
+
+        pContactsView->loggedOut ();
 
         pContactsView->deleteLater ();
         pContactsView = NULL;
@@ -641,3 +686,10 @@ MainWindow::sendSMSDone (bool bOk, const QVariantList &)
         setStatus ("SMS sent");
     }
 }//MainWindow::sendSMSDone
+
+void
+MainWindow::on_btnContacts_clicked ()
+{
+    initContactsWidget ();
+    pContactsView->show ();
+}//MainWindow::on_btnContacts_clicked

@@ -51,8 +51,8 @@ SOURCES  += main.cpp                    \
             DialCancelDlg.cpp           \
             DlgSelectContactNumber.cpp  \
             SMSEntryDeleteButton.cpp    \
-            SMSDlg.cpp \
-    ChildWindowBase.cpp
+            SMSDlg.cpp                  \
+            ChildWindowBase.cpp
 
 HEADERS  += global.h                    \
             IObserver.h                 \
@@ -81,11 +81,12 @@ HEADERS  += global.h                    \
             DialCancelDlg.h             \
             DlgSelectContactNumber.h    \
             SMSEntryDeleteButton.h      \
-            SMSDlg.h \
-    ChildWindowBase.h
+            SMSDlg.h                    \
+            ChildWindowBase.h
 
 FORMS    += MainWindow.ui               \
-            LoginDialog.ui
+            LoginDialog.ui              \
+            ContactsWidget.ui
 
 RESOURCES += qgvdial.qrc
 

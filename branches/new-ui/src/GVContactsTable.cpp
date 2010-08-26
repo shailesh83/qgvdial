@@ -1,46 +1,27 @@
 #include "global.h"
 #include "GVContactsTable.h"
-#include "Singletons.h"
+#include "ui_ContactsWidget.h"
 #include "CaptchaWidget.h"
+
+#include "Singletons.h"
 #include "ContactsXmlHandler.h"
 
-GVContactsTable::GVContactsTable (QWidget *parent)
-: QTreeView(parent)
+GVContactsTable::GVContactsTable (QWidget *parent, Qt::WindowFlags flags)
+: QMainWindow (parent, flags)
+, ui (new Ui::ContactsWindow)
 , nwMgr (this)
-, actRefresh("&Refresh", this)
-, mnuContext("Action", this)
-, actPlaceCall("Call", this)
-, actSendSMS("SMS", this)
 , mutex(QMutex::Recursive)
 , bLoggedIn(false)
 , bRefreshRequested (false)
 {
-    // Not modifyable
-    this->setEditTriggers (QAbstractItemView::NoEditTriggers);
-    // Only one item selectable at a time.
-    this->setSelectionMode (QAbstractItemView::SingleSelection);
-    // Alternating colors = on
-    this->setAlternatingRowColors (true);
-    // Don't show the (un)collapse sign
-    this->setRootIsDecorated (false);
-    // Hide the header
-    this->setHeaderHidden (true);
+    ui->setupUi (this);
 
-    // Prepare the menu actions
-    mnuContext.addAction (&actPlaceCall);
-    mnuContext.addAction (&actSendSMS);
+#ifdef Q_WS_MAEMO_5
+    this->setAttribute (Qt::WA_Maemo5StackedWindow);
+#endif
 
-    // actPlaceCall.triggered -> this.placeCall
-    QObject::connect (&actPlaceCall, SIGNAL (triggered ()),
-                       this        , SLOT   (placeCall ()));
-    // actSendSMS.triggered -> this.sendSMS
-    QObject::connect (&actSendSMS, SIGNAL (triggered ()),
-                       this      , SLOT   (sendSMS ()));
-
-    QKeySequence keyRefresh(Qt::ControlModifier + Qt::Key_R);
-    actRefresh.setShortcut (keyRefresh);
-    QObject::connect (&actRefresh, SIGNAL (triggered ()),
-                       this      , SLOT   (refreshContacts ()));
+    mnuContext.addAction (ui->actionCall);
+    mnuContext.addAction (ui->actionSend_Text);
 
     // this.activated -> this.activatedContact
     QObject::connect (
@@ -56,10 +37,10 @@ GVContactsTable::~GVContactsTable ()
 void
 GVContactsTable::deinitModel ()
 {
-    this->reset ();
+    ui->treeView->reset ();
 
-    QSqlTableModel *modelContacts = (QSqlTableModel *)this->model ();
-    this->setModel (NULL);
+    QSqlTableModel *modelContacts = (QSqlTableModel *)ui->treeView->model ();
+    ui->treeView->setModel (NULL);
     if (NULL != modelContacts)
     {
         delete modelContacts;
@@ -74,11 +55,11 @@ GVContactsTable::initModel ()
 
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QSqlTableModel *modelContacts = dbMain.newContactsModel ();
-    this->setModel (modelContacts);
+    ui->treeView->setModel (modelContacts);
     modelContacts->submitAll ();
 
-    this->hideColumn (1);
-    this->sortByColumn (0, Qt::AscendingOrder);
+    ui->treeView->hideColumn (1);
+    ui->treeView->sortByColumn (0, Qt::AscendingOrder);
 }//GVContactsTable::initModel
 
 QNetworkReply *
@@ -171,20 +152,6 @@ GVContactsTable::refreshContacts ()
     emit status ("Retrieving contacts", 0);
     getRequest (strUrl, this , SLOT (onGotContacts (QNetworkReply *)));
 }//GVContactsTable::refreshContactsFromContactsAPI
-
-void
-GVContactsTable::updateMenu (QMenuBar *menuBar)
-{
-    QMutexLocker locker(&mutex);
-    if (!bLoggedIn)
-    {
-        return;
-    }
-
-    menuBar->addAction (&actRefresh);
-    menuBar->addAction (&actPlaceCall);
-    menuBar->addAction (&actSendSMS);
-}//GVContactsTable::updateMenu
 
 void
 GVContactsTable::loginSuccess ()
@@ -410,7 +377,7 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
                 .arg (contactsHandler.getUsableContacts ());
     } while (0); // End cleanup block (not a loop)
 
-    QSqlTableModel *modelContacts = (QSqlTableModel *) this->model ();
+    QSqlTableModel *modelContacts = (QSqlTableModel *) ui->treeView->model ();
     if (rv) {
         emit status ("Contacts retrieved. Saving. This will take some time...");
         modelContacts->submitAll ();
@@ -436,7 +403,7 @@ GVContactsTable::gotOneContact (const ContactInfo &contactInfo)
     convert (contactInfo, gvContactInfo);
 
     QMutexLocker locker(&mutex);
-    QSqlTableModel *modelContacts = (QSqlTableModel *) this->model ();
+    QSqlTableModel *modelContacts = (QSqlTableModel *) ui->treeView->model ();
 
     if (contactInfo.bDeleted)
     {
