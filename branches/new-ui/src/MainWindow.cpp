@@ -26,6 +26,10 @@ MainWindow::MainWindow (QWidget *parent)
     ui->btnDelete->setDelete (true);
     ui->edNumber->setValidator (new PhoneNumberValidator (ui->edNumber));
 
+#ifdef Q_WS_MAEMO_5
+    this->setAttribute (Qt::WA_Maemo5StackedWindow);
+#endif
+
     // A systray icon if the OS supports it
     if (QSystemTrayIcon::isSystemTrayAvailable ())
     {
@@ -325,12 +329,12 @@ MainWindow::initContactsWidget ()
 {
     do { // Begin cleanup block (not a loop)
         if (NULL != pContactsView) {
-            log ("Contacts widget it already active");
+            log ("Contacts widget is already active");
             break;
         }
 
         // Create the contact view
-        pContactsView = new GVContactsTable ();
+        pContactsView = new GVContactsTable (this);
 
         // Log and status
         QObject::connect (
