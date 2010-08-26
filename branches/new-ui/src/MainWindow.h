@@ -92,6 +92,7 @@ private:
     bool getInfoFrom (const QString &strNumber,
                       const QString &strNameLink,
                       GVContactInfo &info);
+    void closeEvent (QCloseEvent *event);
 
 private:
     Ui::MainWindow *ui;

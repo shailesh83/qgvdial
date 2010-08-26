@@ -697,3 +697,10 @@ MainWindow::on_btnContacts_clicked ()
     initContactsWidget ();
     pContactsView->show ();
 }//MainWindow::on_btnContacts_clicked
+
+void
+MainWindow::closeEvent (QCloseEvent *event)
+{
+    deinitContactsWidget ();
+    QMainWindow::closeEvent (event);
+}//MainWindow::closeEvent
