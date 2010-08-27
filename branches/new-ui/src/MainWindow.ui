@@ -252,9 +252,8 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="icon">
-            <iconset resource="qgvdial.qrc">
-             <normaloff>:/3.jpg</normaloff>:/3.jpg</iconset>
+           <property name="text">
+            <string>3</string>
            </property>
            <property name="iconSize">
             <size>
@@ -393,9 +392,27 @@
    </slots>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="qgvdial.qrc"/>
- </resources>
+ <tabstops>
+  <tabstop>edNumber</tabstop>
+  <tabstop>btnCall</tabstop>
+  <tabstop>btnDelete</tabstop>
+  <tabstop>btnContacts</tabstop>
+  <tabstop>btnHistory</tabstop>
+  <tabstop>cbDialMethod</tabstop>
+  <tabstop>btn1</tabstop>
+  <tabstop>btn2</tabstop>
+  <tabstop>btn3</tabstop>
+  <tabstop>btn4</tabstop>
+  <tabstop>btn5</tabstop>
+  <tabstop>btn6</tabstop>
+  <tabstop>btn7</tabstop>
+  <tabstop>btn8</tabstop>
+  <tabstop>btn9</tabstop>
+  <tabstop>btnStarPlus</tabstop>
+  <tabstop>btn0</tabstop>
+  <tabstop>btnHash</tabstop>
+ </tabstops>
+ <resources/>
  <connections>
   <connection>
    <sender>btn0</sender>

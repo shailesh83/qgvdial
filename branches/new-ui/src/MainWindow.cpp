@@ -27,6 +27,30 @@ MainWindow::MainWindow (QWidget *parent)
     // Additional UI initializations:
     ui->btnDelete->setDelete (true);
     ui->edNumber->setValidator (new PhoneNumberValidator (ui->edNumber));
+    ui->wgtDialpad->setStyleSheet (
+"QPushButton {"
+"   border: 2px solid #8f8f91;"
+"   border-radius: 6px;"
+"   background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+"                                   stop: 0 #f6f7fa,"
+"                                   stop: 1 #dadbde);"
+#ifdef Q_WS_MAEMO_5
+"   min-width: 120px;"
+#else
+"   min-width: 80px;"
+#endif
+"   color: black;"
+"}"
+"QPushButton:pressed {"
+"   background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
+"                                   stop: 0 #dadbde, stop: 1 #f6f7fa);"
+"}"
+"QPushButton:flat {"
+"   border: none; /* no border for a flat push button */"
+"}"
+"QPushButton:default {"
+"   border-color: navy; /* make the default button prominent */"
+"}");
 
 #ifdef Q_WS_MAEMO_5
     this->setAttribute (Qt::WA_Maemo5StackedWindow);
