@@ -353,6 +353,15 @@ void
 MainWindow::on_actionE_xit_triggered ()
 {
     this->close ();
+
+    for (QMap<QString,QString>::iterator i  = mapVmail.begin ();
+                                         i != mapVmail.end ();
+                                         i++)
+    {
+        QFile::remove (i.value ());
+    }
+    mapVmail.clear ();
+
     qApp->quit ();
 }//MainWindow::on_actionE_xit_triggered
 
@@ -462,7 +471,6 @@ MainWindow::initInboxWidget ()
         QObject::connect (
             pInboxView, SIGNAL(textANumber (const QString &, const QString &)),
             this      , SLOT  (textANumber (const QString &, const QString &)));
-        //@@UV: Add this slot
         // pInboxView.retrieveVoicemail -> this.retrieveVoicemail
         QObject::connect (
             pInboxView, SIGNAL(retrieveVoicemail (const QString &)),
@@ -470,6 +478,7 @@ MainWindow::initInboxWidget ()
 
         pInboxView->loginSuccess ();
         pInboxView->initModel ();
+        pInboxView->refreshHistory ();
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::initInboxWidget
 
@@ -810,7 +819,6 @@ void
 MainWindow::on_btnHistory_clicked ()
 {
     initInboxWidget ();
-    pInboxView->refreshHistory ();
     pInboxView->show ();
 }//MainWindow::on_btnHistory_clicked
 
@@ -974,3 +982,71 @@ MainWindow::getDialSettings (bool                 &bDialout   ,
 
     return (rv);
 }//MainWindow::getDialSettings
+
+void
+MainWindow::retrieveVoicemail (const QString &strVmailLink)
+{
+    GVAccess &webPage = Singletons::getRef().getGVAccess ();
+
+    do // Begin cleanup block (not a loop)
+    {
+        if (mapVmail.contains (strVmailLink))
+        {
+            setStatus ("Playing cached vmail");
+            //@@UV: Fix this
+//            vmailPlayer.play (mapVmail[strVmailLink]);
+            break;
+        }
+
+        QString strTemplate = QDir::tempPath ()
+                            + QDir::separator ()
+                            + "qgv_XXXXXX.tmp.mp3";
+        QTemporaryFile tempFile (strTemplate);
+        if (!tempFile.open ())
+        {
+            log ("Failed to get a temp file name");
+            break;
+        }
+        QString strTemp = QFileInfo (tempFile.fileName ()).absoluteFilePath ();
+        tempFile.close ();
+
+        QVariantList l;
+        l += strVmailLink;
+        l += strTemp;
+        if (!webPage.enqueueWork (GVAW_playVmail, l, this,
+                SLOT (onVmailDownloaded (bool, const QVariantList &))))
+        {
+            log ("Failed to play Voice mail", 3);
+            break;
+        }
+    } while (0); // End cleanup block (not a loop)
+}//MainWindow::retrieveVoicemail
+
+void
+MainWindow::onVmailDownloaded (bool bOk, const QVariantList &arrParams)
+{
+    QString strFilename = arrParams[1].toString ();
+    if (bOk)
+    {
+        QString strVmailLink = arrParams[0].toString ();
+        if (!mapVmail.contains (strVmailLink))
+        {
+            mapVmail[strVmailLink] = strFilename;
+            setStatus ("Voicemail downloaded");
+        }
+        else
+        {
+            setStatus ("Voicemail already existed. Using cached vmail");
+            if (strFilename != mapVmail[strVmailLink]) {
+                QFile::remove (strFilename);
+            }
+        }
+
+        //@@UV: Need to fix this
+//        vmailPlayer.play (mapVmail[strVmailLink]);
+    }
+    else
+    {
+        QFile::remove (strFilename);
+    }
+}//MainWindow::onVmailDownloaded

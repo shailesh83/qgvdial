@@ -98,6 +98,11 @@ private slots:
     //! Invoked every time a new registered phone is retrieved
     void gotAllRegisteredPhones (bool bOk, const QVariantList &arrParams);
 
+    //! Invoked by the inbox page when a voice mail is to be downloaded
+    void retrieveVoicemail (const QString &strVmailLink);
+    //! Invoked by GVAccess when the voice mail download has completed
+    void onVmailDownloaded (bool bOk, const QVariantList &arrParams);
+
 private:
     void doLogin ();
 
@@ -145,6 +150,9 @@ private:
 
     //! The users registered numbers
     GVRegisteredNumberArray arrNumbers;
+
+    //! Map between the voice mail link and its temp file name
+    QMap<QString,QString> mapVmail;
 };
 
 #endif // MAINWINDOW_H
