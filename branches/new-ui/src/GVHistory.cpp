@@ -134,7 +134,7 @@ GVHistory::getHistoryDone (bool, const QVariantList &)
     ui->treeView->hideColumn (5);
     ui->treeView->sortByColumn (2);
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 5; i++)
     {
         ui->treeView->resizeColumnToContents (i);
     }

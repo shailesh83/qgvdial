@@ -19,6 +19,7 @@ MainWindow::MainWindow (QWidget *parent)
 , icoGoogle (":/Google.png")
 , pSystray (NULL)
 , pContactsView (NULL)
+, pInboxView (NULL)
 , bLoggedIn (false)
 {
     ui->setupUi(this);
@@ -257,10 +258,13 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         strSelfNumber = varList[varList.size()-1].toString ();
         // Prepare then contacts widget for usage
         initContactsWidget ();
+        // Prepare the inbox widget for usage
+        initInboxWidget ();
 
         // Allow access to buttons and widgets
         ui->action_Login->setText ("Logout");
         ui->btnContacts->setEnabled (true);
+        ui->btnHistory->setEnabled (true);
         ui->cbDialMethod->setEnabled (true);
         bLoggedIn = true;
 
@@ -292,13 +296,13 @@ MainWindow::logoutCompleted (bool, const QVariantList &)
 {
     // This clears out the table and the view as well
     deinitContactsWidget ();
+    deinitInboxWidget ();
 
-//@@UV: Make a deinit for history
-//    pGVHistory->deinitModel ();
     arrNumbers.clear ();
 
     ui->action_Login->setText ("Login...");
     ui->btnContacts->setEnabled (false);
+    ui->btnHistory->setEnabled (false);
     ui->cbDialMethod->setEnabled (false);
 
     bLoggedIn = false;
@@ -429,6 +433,63 @@ MainWindow::deinitContactsWidget ()
         pContactsView = NULL;
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::deinitContactsWidget
+
+void
+MainWindow::initInboxWidget ()
+{
+    do { // Begin cleanup block (not a loop)
+        if (NULL != pInboxView) {
+            log ("Inbox widget is already active");
+            break;
+        }
+
+        // Create the contact view
+        pInboxView = new GVHistory (this);
+
+        // Log and status
+        QObject::connect (
+            pInboxView, SIGNAL (log(const QString &, int)),
+            this      , SLOT   (log(const QString &, int)));
+        QObject::connect (
+            pInboxView, SIGNAL (status   (const QString &, int)),
+            this      , SLOT   (setStatus(const QString &, int)));
+
+        // pInboxView.call -> this.call
+        QObject::connect (
+            pInboxView, SIGNAL(callNumber(const QString &, const QString &)),
+            this      , SLOT  (callNumber(const QString &, const QString &)));
+        // pInboxView.SMS -> this.SMS
+        QObject::connect (
+            pInboxView, SIGNAL(textANumber (const QString &, const QString &)),
+            this      , SLOT  (textANumber (const QString &, const QString &)));
+        //@@UV: Add this slot
+        // pInboxView.retrieveVoicemail -> this.retrieveVoicemail
+        QObject::connect (
+            pInboxView, SIGNAL(retrieveVoicemail (const QString &)),
+            this      , SLOT  (retrieveVoicemail (const QString &)));
+
+        pInboxView->loginSuccess ();
+        pInboxView->initModel ();
+    } while (0); // End cleanup block (not a loop)
+}//MainWindow::initInboxWidget
+
+void
+MainWindow::deinitInboxWidget ()
+{
+    do { // Begin cleanup block (not a loop)
+        if (NULL == pInboxView) {
+            log ("Inbox widget was NULL.");
+            break;
+        }
+
+        pInboxView->deinitModel ();
+
+        pInboxView->loggedOut ();
+
+        pInboxView->deleteLater ();
+        pInboxView = NULL;
+    } while (0); // End cleanup block (not a loop)
+}//MainWindow::deinitInboxWidget
 
 bool
 MainWindow::getInfoFrom (const QString &strNumber,
@@ -746,9 +807,18 @@ MainWindow::on_btnContacts_clicked ()
 }//MainWindow::on_btnContacts_clicked
 
 void
+MainWindow::on_btnHistory_clicked ()
+{
+    initInboxWidget ();
+    pInboxView->refreshHistory ();
+    pInboxView->show ();
+}//MainWindow::on_btnHistory_clicked
+
+void
 MainWindow::closeEvent (QCloseEvent *event)
 {
     deinitContactsWidget ();
+    deinitInboxWidget ();
     QMainWindow::closeEvent (event);
 }//MainWindow::closeEvent
 

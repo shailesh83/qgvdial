@@ -7,7 +7,7 @@ ContactsTreeView::ContactsTreeView (QWidget *parent)
 
 void
 ContactsTreeView::selectionChanged (const QItemSelection &selected,
-                                    const QItemSelection &deselected)
+                                    const QItemSelection & /*deselected*/)
 {
     QModelIndexList listModels = selected.indexes ();
     if (0 == listModels.size ())

@@ -4,6 +4,7 @@
 #include <QtGui>
 
 #include "GVContactsTable.h"
+#include "GVHistory.h"
 #include "SMSDlg.h"
 
 // Required for Symbian (QSystemTrayIcon)
@@ -31,8 +32,10 @@ public slots:
     void setStatus (const QString &strText, int timeout = 3000);
 
 private slots:
-    // All initializations happen here
+    void on_btnHistory_clicked();
     void on_btnContacts_clicked();
+
+    // All initializations happen here
     void init ();
 
     void on_actionE_xit_triggered();
@@ -97,8 +100,13 @@ private slots:
 
 private:
     void doLogin ();
+
     void initContactsWidget ();
     void deinitContactsWidget ();
+
+    void initInboxWidget ();
+    void deinitInboxWidget ();
+
     bool getInfoFrom (const QString &strNumber,
                       const QString &strNameLink,
                       GVContactInfo &info);
@@ -118,6 +126,8 @@ private:
     QSystemTrayIcon *pSystray;
     //! Contacts table widget
     GVContactsTable *pContactsView;
+    //! Contacts table widget
+    GVHistory       *pInboxView;
     //! SMS Window
     SMSDlg          dlgSMS;
 
