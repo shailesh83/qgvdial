@@ -67,6 +67,9 @@ private slots:
     // Invoked when one contact is parsed out of the XML
     void gotOneContact (const ContactInfo &contactInfo);
 
+    //! Status sink for this window for status bar
+    void setStatus(const QString &strText, int timeout = 2000);
+
 private:
     void contextMenuEvent (QContextMenuEvent * event);
 

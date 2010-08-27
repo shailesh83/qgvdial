@@ -6,11 +6,12 @@
 #include "DialCancelDlg.h"
 #include "DlgSelectContactNumber.h"
 
-#include "Singletons.h"
 #include "PhoneNumberValidator.h"
 
 #include <iostream>
 using namespace std;
+
+#define CB_TEXT_BUILDER "%1 : %2"
 
 MainWindow::MainWindow (QWidget *parent)
 : QMainWindow (parent)
@@ -151,7 +152,9 @@ MainWindow::init ()
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass))
     {
-        beginLogin ();
+        QVariantList l;
+        logoutCompleted (true, l);
+        doLogin ();
     }
     else
     {
@@ -159,22 +162,20 @@ MainWindow::init ()
 
         strUser.clear ();
         strPass.clear ();
-    }
 
+        on_action_Login_triggered ();
+    }
 }//MainWindow::init
 
 void
-MainWindow::beginLogin ()
+MainWindow::doLogin ()
 {
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
+    QVariantList l;
 
     bool bOk = false;
     do // Begin cleanup block (not a loop)
     {
-//@@UV: Uncomment
-//        pContactsView->setUserPass (strUser, strPass);
-
-        QVariantList l;
         l += strUser;
         l += strPass;
 
@@ -196,10 +197,10 @@ MainWindow::beginLogin ()
         strUser.clear ();
         strPass.clear ();
 
-//@@UV: Uncomment
-//        enterNotLoggedIn ();
+        l.clear ();
+        logoutCompleted (true, l);
     }
-}//MainWindow::beginLogin
+}//MainWindow::doLogin
 
 void
 MainWindow::on_action_Login_triggered ()
@@ -207,7 +208,7 @@ MainWindow::on_action_Login_triggered ()
     do // Begin cleanup block (not a loop)
     {
         if (!bLoggedIn) {
-            LoginDialog dlg (this);
+            LoginDialog dlg (strUser, strPass, this);
             if (QDialog::Rejected == dlg.exec ()) {
                 setStatus ("User cancelled login");
                 break;
@@ -217,9 +218,9 @@ MainWindow::on_action_Login_triggered ()
                 break;
             }
 
-            beginLogin ();
+            doLogin ();
         } else {
-            //@@UV: Logout
+            doLogout ();
         }
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::on_action_Login_triggered
@@ -245,20 +246,65 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
             this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
         msgBox->show ();
 
-        ui->action_Login->setText ("Login...");
+        QVariantList l;
+        logoutCompleted (true, l);
     }
     else
     {
         setStatus ("User logged in");
 
+        // Save the users GV number returned by the login completion
         strSelfNumber = varList[varList.size()-1].toString ();
-
+        // Prepare then contacts widget for usage
         initContactsWidget ();
 
+        // Allow access to buttons and widgets
         ui->action_Login->setText ("Logout");
         ui->btnContacts->setEnabled (true);
+        ui->cbDialMethod->setEnabled (true);
+        bLoggedIn = true;
+
+        // Fill up the combobox on the main page
+        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+        if ((!dbMain.getRegisteredNumbers (arrNumbers)) ||
+            (0 == arrNumbers.size ()))
+        {
+            refreshRegisteredNumbers ();
+        }
+        else
+        {
+            fillCallbackNumbers (false);
+        }
     }
 }//MainWindow::loginCompleted
+
+void
+MainWindow::doLogout ()
+{
+    GVAccess &webPage = Singletons::getRef().getGVAccess ();
+    QVariantList l;
+    webPage.enqueueWork (GVAW_logout, l, this,
+                         SLOT (logoutCompleted (bool, const QVariantList &)));
+}//MainWindow::doLogout
+
+void
+MainWindow::logoutCompleted (bool, const QVariantList &)
+{
+    // This clears out the table and the view as well
+    deinitContactsWidget ();
+
+//@@UV: Make a deinit for history
+//    pGVHistory->deinitModel ();
+    arrNumbers.clear ();
+
+    ui->action_Login->setText ("Login...");
+    ui->btnContacts->setEnabled (false);
+    ui->cbDialMethod->setEnabled (false);
+
+    bLoggedIn = false;
+
+    setStatus ("Logout complete");
+}//MainWindow::logoutCompleted
 
 void
 MainWindow::systray_activated (QSystemTrayIcon::ActivationReason reason)
@@ -374,6 +420,8 @@ MainWindow::deinitContactsWidget ()
             log ("Contacts widget was NULL.");
             break;
         }
+
+        pContactsView->deinitModel ();
 
         pContactsView->loggedOut ();
 
@@ -518,12 +566,11 @@ MainWindow::dialNow (const QString &strTarget)
     do // Begin cleanup block (not a loop)
     {
         GVRegisteredNumber gvRegNumber;
-        //@@UV: Uncomment
-//        if (!pGVSettings->getDialSettings (bDialout, gvRegNumber, ci))
-//        {
-//            setStatus ("Unable to dial out because settings are not valid");
-//            break;
-//        }
+        if (!getDialSettings (bDialout, gvRegNumber, ci))
+        {
+            setStatus ("Unable to dial out because settings are not valid");
+            break;
+        }
 
         GVAccess &webPage = Singletons::getRef().getGVAccess ();
         QVariantList l;
@@ -704,3 +751,156 @@ MainWindow::closeEvent (QCloseEvent *event)
     deinitContactsWidget ();
     QMainWindow::closeEvent (event);
 }//MainWindow::closeEvent
+
+bool
+MainWindow::refreshRegisteredNumbers ()
+{
+    GVAccess &webPage = Singletons::getRef().getGVAccess ();
+
+    bool rv = false;
+    do { // Begin cleanup block (not a loop)
+        if (!bLoggedIn)
+        {
+            log ("Not logged in. Will not refresh registered numbers.");
+            break;
+        }
+
+        ui->cbDialMethod->clear ();
+        ui->cbDialMethod->setEnabled (false);
+        arrNumbers.clear ();
+
+        QVariantList l;
+        QObject::connect(
+            &webPage, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
+             this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
+        if (!webPage.enqueueWork (GVAW_getRegisteredPhones, l, this,
+                SLOT (gotAllRegisteredPhones (bool, const QVariantList &))))
+        {
+            QObject::disconnect(
+                &webPage,
+                    SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
+                 this   ,
+                    SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
+            emit log ("Failed to retrieve registered contacts!!", 3);
+            break;
+        }
+
+        rv = true;
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
+}//MainWindow::refreshRegisteredNumbers
+
+void
+MainWindow::gotRegisteredPhone (const GVRegisteredNumber &info)
+{
+    QString msg = QString("\"%1\"=\"%2\"")
+                    .arg (info.strDisplayName)
+                    .arg (info.strNumber);
+    emit log (msg);
+
+    arrNumbers += info;
+}//MainWindow::gotRegisteredPhone
+
+void
+MainWindow::gotAllRegisteredPhones (bool bOk, const QVariantList &)
+{
+    GVAccess &webPage = Singletons::getRef().getGVAccess ();
+    QObject::disconnect(
+        &webPage, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
+         this   , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
+
+    do { // Begin cleanup block (not a loop)
+        if (!bOk)
+        {
+            QMessageBox *msgBox = new QMessageBox(
+                    QMessageBox::Critical,
+                    "Error",
+                    "Failed to retrieve registered phones",
+                    QMessageBox::Close);
+            msgBox->setModal (false);
+            QObject::connect (
+                    msgBox, SIGNAL (buttonClicked (QAbstractButton *)),
+                    this  , SLOT   (msgBox_buttonClicked (QAbstractButton *)));
+            msgBox->show ();
+            setStatus ("Failed to retrieve all registered phones");
+            break;
+        }
+
+        this->fillCallbackNumbers (true);
+
+        setStatus ("GV callbacks retrieved.");
+    } while (0); // End cleanup block (not a loop)
+}//MainWindow::gotAllRegisteredPhones
+
+void
+MainWindow::fillCallbackNumbers (bool bSave)
+{
+    // Set the correct callback
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    QString strCallback;
+    bool bGotCallback = dbMain.getCallback (strCallback);
+    ui->cbDialMethod->clear ();
+    ui->cbDialMethod->setEnabled (true);
+    for (int i = 0; i < arrNumbers.size (); i++)
+    {
+        QString strText = QString (CB_TEXT_BUILDER)
+                            .arg (arrNumbers[i].strDisplayName)
+                            .arg (arrNumbers[i].strNumber);
+        ui->cbDialMethod->addItem (strText);
+
+        if ((bGotCallback) && (strCallback == arrNumbers[i].strNumber))
+        {
+            ui->cbDialMethod->setCurrentIndex (i);
+        }
+    }
+
+    // Store the callouts in the same widget as the callbacks
+    CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
+    CalloutInitiatorList listCi = cif.getInitiators ();
+    foreach (CalloutInitiator *ci, listCi) {
+        void * store = ci;
+        QString strText = QString (CB_TEXT_BUILDER)
+                            .arg (ci->name ())
+                            .arg (ci->selfNumber ());
+        ui->cbDialMethod->addItem (strText, QVariant::fromValue (store));
+    }
+
+    if (bSave)
+    {
+        // Save all callbacks into the cache
+        dbMain.putRegisteredNumbers (arrNumbers);
+    }
+}//MainWindow::fillCallbackNumbers
+
+bool
+MainWindow::getDialSettings (bool                 &bDialout   ,
+                             GVRegisteredNumber   &gvRegNumber,
+                             CalloutInitiator    *&initiator  )
+{
+    initiator = NULL;
+
+    bool rv = false;
+    do { // Begin cleanup block (not a loop)
+        int index = ui->cbDialMethod->currentIndex ();
+        if (index < arrNumbers.size ())
+        {
+            gvRegNumber = arrNumbers[index];
+            bDialout = false;
+        }
+        else
+        {
+            QVariant var = ui->cbDialMethod->itemData (index);
+            if ((!var.isValid ()) || (var.isNull ()))
+            {
+                emit log ("Invalid variant in callout numbers");
+                break;
+            }
+            initiator = (CalloutInitiator *) var.value<void *> ();
+            bDialout = true;
+        }
+        rv = true;
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
+}//MainWindow::getDialSettings

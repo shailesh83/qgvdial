@@ -2,11 +2,14 @@
 #include "LoginDialog.h"
 #include "ui_LoginDialog.h"
 
-LoginDialog::LoginDialog (QWidget *parent)
+LoginDialog::LoginDialog (QString &strU, QString &strP, QWidget *parent)
 : QDialog(parent)
 , ui(new Ui::LoginDialog)
 {
     ui->setupUi(this);
+
+    ui->edUsername->setText (strU);
+    ui->edPassword->setText (strP);
 }//LoginDialog::LoginDialog
 
 LoginDialog::~LoginDialog ()

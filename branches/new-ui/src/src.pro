@@ -52,7 +52,8 @@ SOURCES  += main.cpp                    \
             DlgSelectContactNumber.cpp  \
             SMSEntryDeleteButton.cpp    \
             SMSDlg.cpp                  \
-            ChildWindowBase.cpp
+            ChildWindowBase.cpp         \
+            GVHistory.cpp
 
 HEADERS  += global.h                    \
             IObserver.h                 \
@@ -82,11 +83,13 @@ HEADERS  += global.h                    \
             DlgSelectContactNumber.h    \
             SMSEntryDeleteButton.h      \
             SMSDlg.h                    \
-            ChildWindowBase.h
+            ChildWindowBase.h           \
+            GVHistory.h
 
 FORMS    += MainWindow.ui               \
             LoginDialog.ui              \
-            ContactsWidget.ui
+            ContactsWidget.ui \
+    InboxWidget.ui
 
 RESOURCES += qgvdial.qrc
 

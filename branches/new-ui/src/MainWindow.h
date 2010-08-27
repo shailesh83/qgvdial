@@ -8,6 +8,7 @@
 
 // Required for Symbian (QSystemTrayIcon)
 #include "OsDependent.h"
+#include "Singletons.h"
 
 namespace Ui {
     class MainWindow;
@@ -41,6 +42,10 @@ private slots:
     void on_action_Login_triggered();
     //! Called when the web component completes login - with success or failure
     void loginCompleted (bool bOk, const QVariantList &arrParams);
+    //! Called when the logout button is clicked
+    void doLogout ();
+    //! Called when the web component completes logoff - with success or failure
+    void logoutCompleted (bool bOk, const QVariantList &arrParams);
     //! Invoked when the system ray is clicked
     void systray_activated (QSystemTrayIcon::ActivationReason reason);
     //! Invoked when a message box is closed. Purely a cleanup function.
@@ -85,14 +90,25 @@ private slots:
     //! Invoked whenever the SMS has been sent
     void sendSMSDone (bool bOk, const QVariantList &arrParams);
 
+    //! Invoked every time a new registered phone is retrieved
+    void gotRegisteredPhone (const GVRegisteredNumber &info);
+    //! Invoked every time a new registered phone is retrieved
+    void gotAllRegisteredPhones (bool bOk, const QVariantList &arrParams);
+
 private:
-    void beginLogin ();
+    void doLogin ();
     void initContactsWidget ();
     void deinitContactsWidget ();
     bool getInfoFrom (const QString &strNumber,
                       const QString &strNameLink,
                       GVContactInfo &info);
     void closeEvent (QCloseEvent *event);
+
+    bool refreshRegisteredNumbers ();
+    void fillCallbackNumbers (bool bSave = true);
+    bool getDialSettings (bool                 &bDialout   ,
+                          GVRegisteredNumber   &gvRegNumber,
+                          CalloutInitiator    *&initiator  );
 
 private:
     Ui::MainWindow *ui;
@@ -116,6 +132,9 @@ private:
 
     //! Set this flag if the user cancels the dialed number
     bool            bDialCancelled;
+
+    //! The users registered numbers
+    GVRegisteredNumberArray arrNumbers;
 };
 
 #endif // MAINWINDOW_H

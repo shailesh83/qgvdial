@@ -23,10 +23,15 @@ GVContactsTable::GVContactsTable (QWidget *parent, Qt::WindowFlags flags)
     mnuContext.addAction (ui->actionCall);
     mnuContext.addAction (ui->actionSend_Text);
 
-    // this.activated -> this.activatedContact
+    // treeView.activated -> this.activatedContact
     QObject::connect (
-        this, SIGNAL (activated        (const QModelIndex &)),
-        this, SLOT   (activatedContact (const QModelIndex &)));
+        ui->treeView, SIGNAL (activated        (const QModelIndex &)),
+        this        , SLOT   (activatedContact (const QModelIndex &)));
+
+    // The status must be shown on this window as well
+    QObject::connect (
+        this, SIGNAL (status    (const QString &, int)),
+        this, SLOT   (setStatus (const QString &, int)));
 }//GVContactsTable::GVContactsTable
 
 GVContactsTable::~GVContactsTable ()
@@ -452,3 +457,9 @@ GVContactsTable::convert (const ContactInfo &cInfo, GVContactInfo &gvcInfo)
 
     return (true);
 }//GVContactsTable::convert
+
+void
+GVContactsTable::setStatus (const QString &strText, int timeout)
+{
+    ui->statusbar->showMessage (strText, timeout);
+}//GVContactsTable::setStatus

@@ -12,7 +12,7 @@ class LoginDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit LoginDialog(QWidget *parent = 0);
+    explicit LoginDialog (QString &strU, QString &strP, QWidget *parent = 0);
     ~LoginDialog();
 
     bool getUserPass (QString &strUser, QString &strPass);
