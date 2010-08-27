@@ -18,6 +18,7 @@ GVContactsTable::GVContactsTable (QWidget *parent, Qt::WindowFlags flags)
 
 #ifdef Q_WS_MAEMO_5
     this->setAttribute (Qt::WA_Maemo5StackedWindow);
+    this->setAttribute (Qt::WA_Maemo5AutoOrientation);
 #endif
 
     mnuContext.addAction (ui->actionCall);

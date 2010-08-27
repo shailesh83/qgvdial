@@ -30,6 +30,10 @@ MainWindow::MainWindow (QWidget *parent)
 
 #ifdef Q_WS_MAEMO_5
     this->setAttribute (Qt::WA_Maemo5StackedWindow);
+    this->setAttribute (Qt::WA_Maemo5AutoOrientation);
+
+    QObject::connect(QApplication::desktop(), SIGNAL(resized(int)),
+                     this                   , SLOT  (orientationChanged()));
 #endif
 
     // A systray icon if the OS supports it
@@ -103,7 +107,7 @@ MainWindow::init ()
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     OsDependent &osd = Singletons::getRef().getOSD ();
 
-    setStatus ("Initializing");
+    setStatus ("Initializing...");
 
     dbMain.init ();
     osd.initDialServer (this, SLOT (dialNow (const QString &)));
@@ -180,7 +184,7 @@ MainWindow::doLogin ()
         l += strUser;
         l += strPass;
 
-        setStatus ("Beginning login");
+        setStatus ("Logging in...", 0);
         // webPage.workCompleted -> this.loginCompleted
         if (!webPage.enqueueWork (GVAW_login, l, this,
                 SLOT (loginCompleted (bool, const QVariantList &))))
@@ -225,6 +229,37 @@ MainWindow::on_action_Login_triggered ()
         }
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::on_action_Login_triggered
+
+void
+MainWindow::orientationChanged ()
+{
+    QRect screenGeometry = QApplication::desktop()->screenGeometry();
+    if (screenGeometry.width() > screenGeometry.height()) {
+        ui->gridMain->removeWidget (ui->wgtDialpad);
+        ui->gridMain->addWidget (ui->wgtDialpad, 0, 1);
+
+#ifdef Q_WS_MAEMO_5
+    if (NULL != pContactsView) {
+        pContactsView->setAttribute (Qt::WA_Maemo5LandscapeOrientation);
+    }
+    if (NULL != pInboxView) {
+        pInboxView->setAttribute (Qt::WA_Maemo5LandscapeOrientation);
+    }
+#endif
+    } else {
+        ui->gridMain->removeWidget (ui->wgtDialpad);
+        ui->gridMain->addWidget (ui->wgtDialpad, 1, 0);
+
+#ifdef Q_WS_MAEMO_5
+    if (NULL != pContactsView) {
+        pContactsView->setAttribute (Qt::WA_Maemo5PortraitOrientation);
+    }
+    if (NULL != pInboxView) {
+        pInboxView->setAttribute (Qt::WA_Maemo5PortraitOrientation);
+    }
+#endif
+    }
+}//MainWindow::orientationChanged
 
 void
 MainWindow::loginCompleted (bool bOk, const QVariantList &varList)

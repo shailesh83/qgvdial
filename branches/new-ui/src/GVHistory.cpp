@@ -17,6 +17,7 @@ GVHistory::GVHistory (QWidget *parent, Qt::WindowFlags flags)
 
 #ifdef Q_WS_MAEMO_5
     this->setAttribute (Qt::WA_Maemo5StackedWindow);
+    this->setAttribute (Qt::WA_Maemo5AutoOrientation);
 #endif
 
     // Connect the log to this classes log.
@@ -96,7 +97,7 @@ GVHistory::refreshHistory ()
     QObject::connect (
         &webPage, SIGNAL (oneHistoryEvent (const GVHistoryEvent &)),
          this   , SLOT   (oneHistoryEvent (const GVHistoryEvent &)));
-    emit status ("Retrieving history events...");
+    emit status ("Retrieving Inbox...", 0);
     if (!webPage.enqueueWork (GVAW_getInbox, l, this,
             SLOT (getHistoryDone (bool, const QVariantList &))))
     {
@@ -121,6 +122,8 @@ GVHistory::oneHistoryEvent (const GVHistoryEvent &hevent)
 void
 GVHistory::getHistoryDone (bool, const QVariantList &)
 {
+    emit status ("Inbox retrieved. Sorting...", 0);
+
     GVAccess &webPage = Singletons::getRef().getGVAccess ();
     QObject::disconnect (
         &webPage, SIGNAL (oneHistoryEvent (const GVHistoryEvent &)),
@@ -145,6 +148,8 @@ GVHistory::getHistoryDone (bool, const QVariantList &)
     {
         dbMain.setLastInboxUpdate (dtUpdate);
     }
+
+    emit status ("Inbox ready");
 }//GVHistory::getHistoryDone
 
 void

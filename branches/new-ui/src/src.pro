@@ -55,7 +55,8 @@ SOURCES  += main.cpp                    \
             ChildWindowBase.cpp         \
             GVHistory.cpp \
     ContactsTreeView.cpp \
-    InboxTreeView.cpp
+    InboxTreeView.cpp \
+    VMailDialog.cpp
 
 HEADERS  += global.h                    \
             IObserver.h                 \
@@ -88,12 +89,14 @@ HEADERS  += global.h                    \
             ChildWindowBase.h           \
             GVHistory.h \
     ContactsTreeView.h \
-    InboxTreeView.h
+    InboxTreeView.h \
+    VMailDialog.h
 
 FORMS    += MainWindow.ui               \
             LoginDialog.ui              \
             ContactsWidget.ui           \
-            InboxWidget.ui
+            InboxWidget.ui \
+    VMailDialog.ui
 
 RESOURCES += qgvdial.qrc
 

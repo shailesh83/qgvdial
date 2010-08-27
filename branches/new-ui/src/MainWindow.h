@@ -43,6 +43,10 @@ private slots:
     void messageReceived (const QString &message);
     //! Invoked when the user clicks Login
     void on_action_Login_triggered();
+
+    //! Invoked on rotation
+    void orientationChanged ();
+
     //! Called when the web component completes login - with success or failure
     void loginCompleted (bool bOk, const QVariantList &arrParams);
     //! Called when the logout button is clicked
