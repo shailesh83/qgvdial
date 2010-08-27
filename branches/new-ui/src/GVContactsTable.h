@@ -49,8 +49,6 @@ public slots:
 
 private slots:
     void activatedContact (const QModelIndex &);
-    void selectionChanged (const QItemSelection &selected,
-                           const QItemSelection &deselected);
 
     //! Invoked when the place call action is triggered
     void placeCall ();
@@ -109,9 +107,6 @@ private:
 
     //! Is the contacts refresh an update process?
     bool            bRefreshIsUpdate;
-
-    //! The link to the current contact
-    QString         strSavedLink;
 };
 
 #endif // __GVCONTACTSTABLE_H__

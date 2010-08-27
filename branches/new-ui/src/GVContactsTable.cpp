@@ -23,6 +23,11 @@ GVContactsTable::GVContactsTable (QWidget *parent, Qt::WindowFlags flags)
     mnuContext.addAction (ui->actionCall);
     mnuContext.addAction (ui->actionSend_Text);
 
+    // Connect the log to this classes log.
+    QObject::connect (
+        ui->treeView, SIGNAL (log(const QString &, int)),
+        this        , SIGNAL (log(const QString &, int)));
+
     // treeView.activated -> this.activatedContact
     QObject::connect (
         ui->treeView, SIGNAL (activated        (const QModelIndex &)),
@@ -136,7 +141,7 @@ GVContactsTable::refreshContacts ()
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QString strUrl;
 
-    strSavedLink.clear ();
+    ui->treeView->strSavedLink.clear ();
     strUrl = QString ("http://www.google.com/m8/feeds/contacts/%1/full"
                       "?max-results=10000")
                         .arg (strUser);
@@ -189,25 +194,6 @@ GVContactsTable::activatedContact (const QModelIndex &)
 }//GVContactsTable::activatedContact
 
 void
-GVContactsTable::selectionChanged (const QItemSelection &selected,
-                                   const QItemSelection &/*deselected*/)
-{
-    QModelIndexList listModels = selected.indexes ();
-    if (0 == listModels.size ())
-    {
-        strSavedLink.clear ();
-        return;
-    }
-    QModelIndex linkIndex = listModels[0].model()->index (listModels[0].row(),
-                                                          1);
-    strSavedLink = linkIndex.data(Qt::EditRole).toString();
-    if (strSavedLink.isEmpty ())
-    {
-        emit log ("Failed to get contact information", 3);
-    }
-}//GVContactsTable::selectionChanged
-
-void
 GVContactsTable::contextMenuEvent (QContextMenuEvent * event)
 {
     mnuContext.popup (event->globalPos ());
@@ -217,9 +203,9 @@ void
 GVContactsTable::placeCall ()
 {
     QMutexLocker locker(&mutex);
-    if (0 != strSavedLink.size ())
+    if (0 != ui->treeView->strSavedLink.size ())
     {
-        emit callNumber (QString (), strSavedLink);
+        emit callNumber (QString (), ui->treeView->strSavedLink);
     }
     else
     {
@@ -231,9 +217,9 @@ void
 GVContactsTable::sendSMS ()
 {
     QMutexLocker locker(&mutex);
-    if (0 != strSavedLink.size ())
+    if (0 != ui->treeView->strSavedLink.size ())
     {
-        emit textANumber (QString(), strSavedLink);
+        emit textANumber (QString(), ui->treeView->strSavedLink);
     }
     else
     {

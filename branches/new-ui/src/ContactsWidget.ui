@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>250</height>
+    <height>255</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,7 +22,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QTreeView" name="treeView">
+     <widget class="ContactsTreeView" name="treeView">
       <property name="editTriggers">
        <set>QAbstractItemView::NoEditTriggers</set>
       </property>
@@ -81,6 +81,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ContactsTreeView</class>
+   <extends>QTreeView</extends>
+   <header>ContactsTreeView.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
