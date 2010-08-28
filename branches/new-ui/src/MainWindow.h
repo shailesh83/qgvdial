@@ -127,6 +127,8 @@ private:
                           GVRegisteredNumber   &gvRegNumber,
                           CalloutInitiator    *&initiator  );
 
+    void playVmail (const QString &strFile);
+
 private:
     Ui::MainWindow *ui;
 

@@ -1046,8 +1046,7 @@ MainWindow::retrieveVoicemail (const QString &strVmailLink)
         if (mapVmail.contains (strVmailLink))
         {
             setStatus ("Playing cached vmail");
-            //@@UV: Fix this
-//            vmailPlayer.play (mapVmail[strVmailLink]);
+            playVmail (mapVmail[strVmailLink]);
             break;
         }
 
@@ -1095,16 +1094,22 @@ MainWindow::onVmailDownloaded (bool bOk, const QVariantList &arrParams)
             }
         }
 
-        VMailDialog *dlgVmail = new VMailDialog (this);
-        dlgVmail->setAttribute (Qt::WA_DeleteOnClose);
-        QObject::connect (dlgVmail, SIGNAL (log (const QString &, int)),
-                          this    , SLOT   (log (const QString &, int)));
-        QObject::connect (dlgVmail, SIGNAL (status (const QString &, int)),
-                          this    , SLOT   (setStatus (const QString &, int)));
-        dlgVmail->play (mapVmail[strVmailLink]);
+        playVmail (mapVmail[strVmailLink]);
     }
     else
     {
         QFile::remove (strFilename);
     }
 }//MainWindow::onVmailDownloaded
+
+void
+MainWindow::playVmail (const QString &strFile)
+{
+    VMailDialog *dlgVmail = new VMailDialog (this);
+    dlgVmail->setAttribute (Qt::WA_DeleteOnClose);
+    QObject::connect (dlgVmail, SIGNAL (log (const QString &, int)),
+                      this    , SLOT   (log (const QString &, int)));
+    QObject::connect (dlgVmail, SIGNAL (status (const QString &, int)),
+                      this    , SLOT   (setStatus (const QString &, int)));
+    dlgVmail->play (strFile);
+}//MainWindow::playVmail
