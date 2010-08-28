@@ -5,6 +5,7 @@
 #include "LoginDialog.h"
 #include "DialCancelDlg.h"
 #include "DlgSelectContactNumber.h"
+#include "VMailDialog.h"
 
 #include "PhoneNumberValidator.h"
 
@@ -27,38 +28,31 @@ MainWindow::MainWindow (QWidget *parent)
     // Additional UI initializations:
     ui->btnDelete->setDelete (true);
     ui->edNumber->setValidator (new PhoneNumberValidator (ui->edNumber));
-    ui->wgtDialpad->setStyleSheet (
-"QPushButton {"
-"   border: 2px solid #8f8f91;"
-"   border-radius: 6px;"
-"   background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-"                                   stop: 0 #f6f7fa,"
-"                                   stop: 1 #dadbde);"
-#ifdef Q_WS_MAEMO_5
-"   min-width: 120px;"
-#else
-"   min-width: 80px;"
-#endif
-"   color: black;"
-"}"
-"QPushButton:pressed {"
-"   background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,"
-"                                   stop: 0 #dadbde, stop: 1 #f6f7fa);"
-"}"
-"QPushButton:flat {"
-"   border: none; /* no border for a flat push button */"
-"}"
-"QPushButton:default {"
-"   border-color: navy; /* make the default button prominent */"
-"}");
 
+    QString strDialpadFile;
+    QFile fDialpad_Style;
 #ifdef Q_WS_MAEMO_5
     this->setAttribute (Qt::WA_Maemo5StackedWindow);
     this->setAttribute (Qt::WA_Maemo5AutoOrientation);
 
     QObject::connect(QApplication::desktop(), SIGNAL(resized(int)),
                      this                   , SLOT  (orientationChanged()));
+
+    strDialpadFile = "./dialpad_maemo.qss";
+    if (!QFileInfo(strDialpadFile).exists ()) {
+        strDialpadFile = ":/dialpad_maemo.qss";
+    }
+#else
+    strDialpadFile = "./dialpad_desktop.qss";
+    if (!QFileInfo(strDialpadFile).exists ()) {
+        strDialpadFile = ":/dialpad_desktop.qss";
+    }
 #endif
+
+    fDialpad_Style.setFileName (strDialpadFile);
+    if (fDialpad_Style.open (QIODevice::ReadOnly)) {
+        ui->wgtDialpad->setStyleSheet (fDialpad_Style.readAll ());
+    }
 
     // A systray icon if the OS supports it
     if (QSystemTrayIcon::isSystemTrayAvailable ())
@@ -1101,8 +1095,13 @@ MainWindow::onVmailDownloaded (bool bOk, const QVariantList &arrParams)
             }
         }
 
-        //@@UV: Need to fix this
-//        vmailPlayer.play (mapVmail[strVmailLink]);
+        VMailDialog *dlgVmail = new VMailDialog (this);
+        dlgVmail->setAttribute (Qt::WA_DeleteOnClose);
+        QObject::connect (dlgVmail, SIGNAL (log (const QString &, int)),
+                          this    , SLOT   (log (const QString &, int)));
+        QObject::connect (dlgVmail, SIGNAL (status (const QString &, int)),
+                          this    , SLOT   (setStatus (const QString &, int)));
+        dlgVmail->play (mapVmail[strVmailLink]);
     }
     else
     {
