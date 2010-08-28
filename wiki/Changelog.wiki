@@ -1,5 +1,10 @@
 #summary Change log
 
+*2010-08-28
+ * Revamped the entire UI.
+ * Auto-rotation
+ * Initial support for QT CSS
+
 *2010-08-14:*
  * Inbox how uses data API instead of screen scraping the website.
  * Calls, sms and voicemail all work from the Inbox page.

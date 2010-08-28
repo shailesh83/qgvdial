@@ -1,6 +1,7 @@
 #summary Features to be added, bugs to be fixed, R&D to be done
 
 *Planned features:*
+ * More QT CSS
  * fcrochik has given some interface. Need to look at that and see what it does.
  * Contacts integration from all available contact stores
  * Auto-accept dialback phone call in desktop skype
