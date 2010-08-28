@@ -1,6 +1,6 @@
 #summary Change log
 
-*2010-08-28
+*2010-08-28*
  * Revamped the entire UI.
  * Auto-rotation
  * Initial support for QT CSS
