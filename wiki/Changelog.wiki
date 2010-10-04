@@ -1,5 +1,9 @@
 #summary Change log
 
+*2010-10-04*
+ * Windows build now uses VS 2010 and QT 4.7 with qtmobility 1.1
+ * Inbox view changed. Should now be much faster to load and less quirky to display.
+
 *2010-08-28*
  * Revamped the entire UI.
  * Auto-rotation
