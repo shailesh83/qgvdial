@@ -6,7 +6,10 @@ Rectangle {
 
     Row {
         id: row
-        height: 20; width: parent.width
+
+        width: parent.width
+        height: 20
+
         spacing: 0
 
         Text {
@@ -44,8 +47,19 @@ Rectangle {
     }
 
     ListView {
-        width: parent.width; height: (parent.height - row.height)
+        width: parent.width
+        height: (parent.height - row.height)
         y: row.height
+
+        function calcRowHeight() {
+            var h = 12 * myModel.count;
+            console.debug ("height = " + h);
+            return (20);
+        }
+
+//        onAdd: {
+//            height: calcRowHeight ();
+//        }
 
         model: ListModel {
             id: myModel

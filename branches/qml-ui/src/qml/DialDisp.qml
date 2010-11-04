@@ -13,17 +13,32 @@ Rectangle {
     Column {
         anchors.fill: parent
 
-        ComboBoxPhones {
-            lstItems: ["a", "b"]
-            currSelected: 0
+        Rectangle {
+            color: "black"
+            width: parent.width
+            height: (parent.height / 5)
+
+            MyButton {
+                id: btnPhones
+                mainText: "a"
+                anchors.fill: parent
+                radius: ((height / 10.0) + (width / 60.0))
+
+                onClicked: {
+                    var comp = Qt.createComponent ("ComboBoxPhones.qml");
+                    var sprite = comp.createObject (wDisp.parent);
+                    sprite.width = width;
+                    sprite.height = 100;
+                    sprite.y = y + height;
+                }
+            }
         }
 
         TextEdit {
             id: txtNum
+            width: parent.width
 
             color: "white"
-            width: wDisp.width
-            height: (wDisp.height * 60 / 400)
             textFormat: TextEdit.PlainText
             cursorVisible: true
             wrapMode: TextEdit.WrapAnywhere
@@ -32,6 +47,8 @@ Rectangle {
                 pointSize: (Code.btnFontPoint()/3);
                 bold: true
             }
+
+            height: (parent * 4 / 5)
         }// TextEdit
     }// Flow
 }// Rectangle

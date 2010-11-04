@@ -1,29 +1,90 @@
 import Qt 4.7
-import "helper.js" as Code
 
-Item {
-    id: cbNumbers
-    height: (parent.height / 5)
+Rectangle {
+    id: listOfPhones
+    height: 200
 
-    width: parent.width
+    Row {
+        id: row
 
-    // List of items
-//    property list<string> lstItems
-    property variant lstItems
-    // Currently selected item
-    property int currSelected: -1
+        width: parent.width
+        height: 20
 
-    MyButton {
-        id: btn
-        mainText: (currSelected==-1?"...":lstItems[currSelected])
-        radius: ((cbNumbers.height / 10.0) + (cbNumbers.width / 60.0))
+        spacing: 0
 
-        onClicked: {
-            var comp = Qt.createComponent ("Cb_dropdown.qml");
-            var sprite = comp.createObject (cbNumbers.parent.parent.parent);
-            sprite.width = btn.width;
-//            sprite.height = 100;
-            sprite.y = btn.y + btn.height;
+        Text {
+            id: txtTitle
+            width: (parent.width - exitRect.width - 1)
+            height: parent.height
+            text: "Phone list"
+            font.pointSize: 12; font.bold: true
+        }
+
+        Rectangle {
+            id: exitRect
+            width: 20
+            height: parent.height
+            border.color: "black"
+            color: "red"
+            smooth: true
+            radius: ((height + width) / 20);
+
+            Text {
+                text: "X"
+
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+
+                font.pointSize: 10
+                font.bold: true
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: listOfPhones.destroy();
+            }
         }
     }
-}// Item
+
+    ListView {
+        width: parent.width
+        height: (parent.height - row.height)
+        y: row.height
+
+        function calcRowHeight() {
+            var h = 12 * myModel.count;
+            console.debug ("height = " + h);
+            return (20);
+        }
+
+//        onAdd: {
+//            height: calcRowHeight ();
+//        }
+
+        model: ListModel {
+            id: myModel
+            ListElement {
+                name: "a";
+                number: "+1 aaa bbb cccc"
+            }//ListElement
+            ListElement {
+                name: "b";
+                number: "+1 AAA BBB CCCC"
+            }//ListElement
+        }//ListModel
+
+        delegate: Text {
+            id: textDelegate
+            text: name + " : " + number;
+            font.pointSize: 10
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    console.debug ("Clicked: " + text);
+                }
+            }
+        }
+
+    }//ListView
+}//Component: listOfPhones
