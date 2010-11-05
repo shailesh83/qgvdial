@@ -2,7 +2,9 @@ import Qt 4.7
 
 Rectangle {
     id: listOfPhones
-    height: 200
+    color: "black"
+    property alias model: listView.model
+    signal selectionChanged(int iIndex)
 
     Row {
         id: row
@@ -17,6 +19,7 @@ Rectangle {
             width: (parent.width - exitRect.width - 1)
             height: parent.height
             text: "Phone list"
+            color: "white"
             font.pointSize: 12; font.bold: true
         }
 
@@ -24,7 +27,7 @@ Rectangle {
             id: exitRect
             width: 20
             height: parent.height
-            border.color: "black"
+            border.color: "grey"
             color: "red"
             smooth: true
             radius: ((height + width) / 20);
@@ -47,41 +50,24 @@ Rectangle {
     }
 
     ListView {
+        id: listView
         width: parent.width
         height: (parent.height - row.height)
         y: row.height
 
-        function calcRowHeight() {
-            var h = 12 * myModel.count;
-            console.debug ("height = " + h);
-            return (20);
-        }
-
-//        onAdd: {
-//            height: calcRowHeight ();
-//        }
-
-        model: ListModel {
-            id: myModel
-            ListElement {
-                name: "a";
-                number: "+1 aaa bbb cccc"
-            }//ListElement
-            ListElement {
-                name: "b";
-                number: "+1 AAA BBB CCCC"
-            }//ListElement
-        }//ListModel
-
         delegate: Text {
             id: textDelegate
             text: name + " : " + number;
+            color: "white"
             font.pointSize: 10
 
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
                     console.debug ("Clicked: " + text);
+                    console.debug ("current selection = " + index);
+                    listOfPhones.selectionChanged(index);
+                    listOfPhones.destroy();
                 }
             }
         }

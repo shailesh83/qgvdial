@@ -10,6 +10,23 @@ Rectangle {
     width: Code.calcFlowChildWidth();
     height: Code.calcFlowChildHeight();
 
+    ListModel {
+        id: myModel
+        ListElement {
+            name: "all";
+            number: "+1 aaa bbb cccc"
+        }//ListElement
+        ListElement {
+            name: "b";
+            number: "+1 AAA BBB CCCC"
+        }//ListElement
+    }//ListModel
+
+
+    function randomSlot(iIndex) {
+        btnPhones.mainText = myModel.get(iIndex).name;
+    }
+
     Column {
         anchors.fill: parent
 
@@ -20,16 +37,18 @@ Rectangle {
 
             MyButton {
                 id: btnPhones
-                mainText: "a"
+                mainText: myModel.get(0).name;
                 anchors.fill: parent
                 radius: ((height / 10.0) + (width / 60.0))
 
                 onClicked: {
                     var comp = Qt.createComponent ("ComboBoxPhones.qml");
-                    var sprite = comp.createObject (wDisp.parent);
-                    sprite.width = width;
-                    sprite.height = 100;
-                    sprite.y = y + height;
+                    var cbBox = comp.createObject (wDisp.parent);
+                    cbBox.model = myModel;
+                    cbBox.width = width;
+                    cbBox.height = cbBox.model.count * 30;
+                    cbBox.y = y + height;
+                    cbBox.selectionChanged.connect(randomSlot);
                 }
             }
         }
