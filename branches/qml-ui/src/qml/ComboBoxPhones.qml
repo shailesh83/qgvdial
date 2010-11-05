@@ -4,13 +4,22 @@ Rectangle {
     id: listOfPhones
     color: "black"
     property alias model: listView.model
+
     signal selectionChanged(int iIndex)
+    signal sigHeightChanged(int iHeight);
+
+    function calcFontHeight () {
+        var h = (listView.height / 3);
+        if (h < 1) h = 1;
+        sigHeightChanged(h);
+        return h;
+    }
 
     Row {
         id: row
 
         width: parent.width
-        height: 20
+        height: (listOfPhones.height / 3)
 
         spacing: 0
 
@@ -20,7 +29,8 @@ Rectangle {
             height: parent.height
             text: "Phone list"
             color: "white"
-            font.pointSize: 12; font.bold: true
+            font.pointSize: calcFontHeight ();
+            font.bold: true
         }
 
         Rectangle {
@@ -38,7 +48,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
 
-                font.pointSize: 10
+                font.pointSize: calcFontHeight ();
                 font.bold: true
             }
 
@@ -59,13 +69,11 @@ Rectangle {
             id: textDelegate
             text: name + " : " + number;
             color: "white"
-            font.pointSize: 10
+            font.pointSize: calcFontHeight ();
 
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    console.debug ("Clicked: " + text);
-                    console.debug ("current selection = " + index);
                     listOfPhones.selectionChanged(index);
                     listOfPhones.destroy();
                 }
