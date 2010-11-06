@@ -26,6 +26,7 @@ Rectangle {
         btnPhones.mainText = myModel.get(iIndex).name;
     }
     function slotCbBoxDestroy () {
+        Code.cbBox.destroy ();
         Code.cbBox = null;
     }
 

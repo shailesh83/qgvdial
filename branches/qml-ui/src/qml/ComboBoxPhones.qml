@@ -13,23 +13,13 @@ Rectangle {
 
     Timer {
         id: cbBoxCleanupTimer
-        interval: 1000
-        onTriggered: {
-            listOfPhones.sigDestructor();
-        }
+        interval: 500
+        onTriggered: listOfPhones.sigDestructor();
     }// Timer
 
     function killSelf () {
         listOfPhones.alive = false;
         cbBoxCleanupTimer.restart ();
-    }
-
-    function calcFontPoint () {
-        var pt = Math.max(listOfPhones.width,listOfPhones.height);
-        pt = pt / 20;
-        if (pt < 1) pt = 1;
-        sigHeightChanged(pt);
-        return pt;
     }
 
     states: [
@@ -40,6 +30,14 @@ Rectangle {
             PropertyChanges { target: listView; opacity: 0 }
         }
     ]
+
+    function calcFontPoint () {
+        var pt = Math.max(listOfPhones.width,listOfPhones.height);
+        pt = pt / 20;
+        if (pt < 1) pt = 1;
+        sigHeightChanged(pt);
+        return pt;
+    }
 
     ListView {
         id: listView
