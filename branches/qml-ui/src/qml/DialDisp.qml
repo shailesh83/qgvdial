@@ -37,17 +37,6 @@ Rectangle {
             width: parent.width
             height: (parent.height / 5)
 
-            Timer {
-                id: cbBoxCleanupTimer
-                interval: 1000
-                onTriggered: {
-                    if (Code.cbBox != null) {
-                        Code.cbBox.destroy();
-                        Code.cbBox = null;
-                    }
-                }
-            }// Timer
-
             MyButton {
                 id: btnPhones
                 mainText: myModel.get(0).name;
@@ -69,8 +58,7 @@ Rectangle {
                         Code.cbBox.sigDestructor.connect(slotCbBoxDestroy);
                         Code.cbBox.alive = true;
                     } else {
-                        Code.cbBox.alive = false;
-                        cbBoxCleanupTimer.restart();
+                        Code.cbBox.killSelf ();
                     }
                 }
             }

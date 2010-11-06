@@ -11,6 +11,19 @@ Rectangle {
     signal sigHeightChanged(int iHeight)
     signal sigDestructor
 
+    Timer {
+        id: cbBoxCleanupTimer
+        interval: 1000
+        onTriggered: {
+            listOfPhones.sigDestructor();
+        }
+    }// Timer
+
+    function killSelf () {
+        listOfPhones.alive = false;
+        cbBoxCleanupTimer.restart ();
+    }
+
     function calcFontPoint () {
         var pt = Math.max(listOfPhones.width,listOfPhones.height);
         pt = pt / 20;
@@ -34,7 +47,7 @@ Rectangle {
 
         // Display smoothly
         Behavior on opacity {
-            NumberAnimation { properties:"opacity"; duration: 300 }
+            NumberAnimation { properties:"opacity"; duration: 400 }
         }
 
         delegate: Rectangle {
@@ -68,8 +81,7 @@ Rectangle {
                 anchors.fill: parent
                 onClicked: {
                     listOfPhones.selectionChanged(index);
-                    listOfPhones.sigDestructor();
-                    listOfPhones.destroy();
+                    killSelf ();
                 }
             }
         }
