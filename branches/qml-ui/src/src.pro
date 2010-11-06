@@ -105,7 +105,14 @@ FORMS    += MainWindow.ui               \
 RESOURCES += qgvdial.qrc
 
 # This is so that QtCreator can show these files in the files list.
-OTHER_FILES  += winrsrc.rc
+OTHER_FILES  += winrsrc.rc              \
+                qml/MyButton.qml        \
+                qml/MainView.qml        \
+                qml/Keypad.qml          \
+                qml/helper.js           \
+                qml/DigitButton.qml     \
+                qml/DialDisp.qml        \
+                qml/ComboBoxPhones.qml
 
 # In Linux and maemo, add the telepathy related sources and headers
 unix:!symbian {
@@ -161,7 +168,7 @@ maemo5 {
         PREFIX = ../maemo/debian/qgvdial/usr
         message(Build using qtcreator)
     }
-    
+
     message(maemo5 install)
     OPTPREFIX  = $$PREFIX/../opt/qgvdial
     BINDIR     = $$OPTPREFIX/bin
@@ -170,7 +177,7 @@ maemo5 {
 
     DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
-    INSTALLS += target desktop icon qss
+    INSTALLS += target desktop icon qss qml
 
     target.path =$$BINDIR
 
@@ -182,6 +189,15 @@ maemo5 {
 
     qss.path = $$BINDIR/stylesheets
     qss.files += ./stylesheets/dialpad_maemo.qss
+
+    qml.path = $$BINDIR/qml
+    qml.files += qml/MyButton.qml        \
+                 qml/MainView.qml        \
+                 qml/Keypad.qml          \
+                 qml/helper.js           \
+                 qml/DigitButton.qml     \
+                 qml/DialDisp.qml        \
+                 qml/ComboBoxPhones.qml
 }
 
 # Installation for Linux
@@ -192,11 +208,22 @@ unix:!symbian:!maemo5 {
 
     DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
-    INSTALLS += target icon
+    INSTALLS += target icon qss qml
 
     target.path =$$BINDIR
 
     icon.path = $$DATADIR/qgvdial
     icon.files += qgvdial.png
-}
 
+    qss.path = $$BINDIR/stylesheets
+    qss.files += ./stylesheets/dialpad_maemo.qss
+
+    qml.path = $$BINDIR/qml
+    qml.files += qml/MyButton.qml        \
+                 qml/MainView.qml        \
+                 qml/Keypad.qml          \
+                 qml/helper.js           \
+                 qml/DigitButton.qml     \
+                 qml/DialDisp.qml        \
+                 qml/ComboBoxPhones.qml
+}
