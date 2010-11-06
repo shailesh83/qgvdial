@@ -22,9 +22,11 @@ Rectangle {
         }//ListElement
     }//ListModel
 
-
-    function randomSlot(iIndex) {
+    function slotSelectionChanged(iIndex) {
         btnPhones.mainText = myModel.get(iIndex).name;
+    }
+    function slotCbBoxDestroy () {
+        Code.cbBox = null;
     }
 
     Column {
@@ -42,13 +44,22 @@ Rectangle {
                 radius: ((height / 10.0) + (width / 60.0))
 
                 onClicked: {
-                    var comp = Qt.createComponent ("ComboBoxPhones.qml");
-                    var cbBox = comp.createObject (wDisp.parent);
-                    cbBox.model = myModel;
-                    cbBox.width = width;
-                    cbBox.height = cbBox.model.count * 30;
-                    cbBox.y = y + height;
-                    cbBox.selectionChanged.connect(randomSlot);
+                    if (Code.compCbBox == null) {
+                        Code.compCbBox = Qt.createComponent("ComboBoxPhones.qml");
+                    }
+
+                    if (Code.cbBox == null) {
+                        Code.cbBox = Code.compCbBox.createObject(wDisp.parent);
+                        Code.cbBox.model  = myModel;
+                        Code.cbBox.width  = width;
+                        Code.cbBox.height = Code.cbBox.model.count * 30;
+                        Code.cbBox.y      = height;
+                        Code.cbBox.selectionChanged.connect(slotSelectionChanged);
+                        Code.cbBox.sigDestructor.connect(slotCbBoxDestroy);
+                    } else {
+                        Code.cbBox.destroy ();
+                        Code.cbBox = null;
+                    }
                 }
             }
         }

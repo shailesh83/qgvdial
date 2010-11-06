@@ -1,4 +1,5 @@
 import Qt 4.7
+import "helper.js" as Code
 
 Rectangle {
     id: listOfPhones
@@ -6,20 +7,23 @@ Rectangle {
     property alias model: listView.model
 
     signal selectionChanged(int iIndex)
-    signal sigHeightChanged(int iHeight);
+    signal sigHeightChanged(int iHeight)
+    signal sigDestructor
 
-    function calcFontHeight () {
-        var h = (listView.height / 3);
-        if (h < 1) h = 1;
-        sigHeightChanged(h);
-        return h;
+    function calcFontPoint () {
+        var pt = (listOfPhones.width + listOfPhones.height) / 2;
+        pt = pt / 10;
+        if (pt < 1) pt = 1;
+        console.debug ("pt = " + pt);
+        sigHeightChanged(pt);
+        return pt;
     }
 
     Row {
         id: row
 
         width: parent.width
-        height: (listOfPhones.height / 3)
+        height: (parent.height / 3)
 
         spacing: 0
 
@@ -29,13 +33,12 @@ Rectangle {
             height: parent.height
             text: "Phone list"
             color: "white"
-            font.pointSize: calcFontHeight ();
-            font.bold: true
+            font.pointSize: calcFontPoint ();
         }
 
         Rectangle {
             id: exitRect
-            width: 20
+            width: (txtX.font.pointSize + 3)
             height: parent.height
             border.color: "grey"
             color: "red"
@@ -43,18 +46,21 @@ Rectangle {
             radius: ((height + width) / 20);
 
             Text {
+                id: txtX
                 text: "X"
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
 
-                font.pointSize: calcFontHeight ();
-                font.bold: true
+                font.pointSize: calcFontPoint ();
             }
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: listOfPhones.destroy();
+                onClicked: {
+                    listOfPhones.sigDestructor();
+                    listOfPhones.destroy();
+                }
             }
         }
     }
@@ -69,16 +75,16 @@ Rectangle {
             id: textDelegate
             text: name + " : " + number;
             color: "white"
-            font.pointSize: calcFontHeight ();
+            font.pointSize: calcFontPoint ();
 
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
                     listOfPhones.selectionChanged(index);
+                    listOfPhones.sigDestructor();
                     listOfPhones.destroy();
                 }
             }
         }
-
     }//ListView
 }//Component: listOfPhones
