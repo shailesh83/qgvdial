@@ -5,6 +5,7 @@ Rectangle {
     id: listOfPhones
     color: "black"
     property alias model: listView.model
+    property bool alive: false
 
     signal selectionChanged(int iIndex)
     signal sigHeightChanged(int iHeight)
@@ -18,15 +19,50 @@ Rectangle {
         return pt;
     }
 
+    states: [
+        State{ name: "AliveState"; when: alive == true
+            PropertyChanges { target: listView; opacity: 1 }
+        },
+        State{ name: "DeadState"; when: alive == false
+            PropertyChanges { target: listView; opacity: 0 }
+        }
+    ]
+
     ListView {
         id: listView
         anchors.fill: parent
 
-        delegate: Text {
-            id: textDelegate
-            text: name + " : " + number;
-            color: "white"
-            font.pointSize: calcFontPoint ();
+        // Display smoothly
+        Behavior on opacity {
+            NumberAnimation { properties:"opacity"; duration: 300 }
+        }
+
+        delegate: Rectangle {
+            id: rectDelegate
+            color: "black"
+            border.color: "grey"
+            width: listView.width
+            height: (txtName.height + txtNumber.height)
+
+            Column {
+                Text {
+                    id: txtName
+                    text: name
+                    color: "white"
+                    width: listView.width
+                    font.pointSize: calcFontPoint ();
+                    elide: Text.ElideMiddle
+                }
+
+                Text {
+                    id: txtNumber
+                    text: number;
+                    color: "white"
+                    width: listView.width
+                    font.pointSize: calcFontPoint ();
+                    elide: Text.ElideMiddle
+                }
+            }// Column
 
             MouseArea {
                 anchors.fill: parent
