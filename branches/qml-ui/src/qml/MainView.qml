@@ -5,6 +5,9 @@ Rectangle {
     color: "black"
     width: 250; height: 400
 
+    property variant landscape: wMainView.width > wMainView.height
+    property variant rotationDelta: landscape? -90 : 0
+
     Flow {
         anchors.fill: parent
         spacing: 2
@@ -12,10 +15,12 @@ Rectangle {
         DialDisp {
             id: wDisp
             color: wMainView.color
+            rotation: rotationDelta
         }//DialDisp
 
         Keypad {
             color: wMainView.color
+            rotation: rotationDelta
             onBtnClick: {
                 var origStart = wDisp.tEd.selectionStart;
                 var result = wDisp.tEd.text.substr(0,origStart);

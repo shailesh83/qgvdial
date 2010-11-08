@@ -50,11 +50,13 @@ Rectangle {
                     }
 
                     if (Code.cbBox == null) {
-                        Code.cbBox = Code.compCbBox.createObject(wDisp.parent);
+                        Code.cbBox = Code.compCbBox.createObject(wDisp);
                         Code.cbBox.model  = myModel;
                         Code.cbBox.width  = btnPhones.width;
                         Code.cbBox.height = wDisp.height - btnPhones.height;
-                        Code.cbBox.y      = btnPhones.height;
+
+                        Code.cbBox.y = btnPhones.height;
+
                         Code.cbBox.selectionChanged.connect(slotSelectionChanged);
                         Code.cbBox.sigDestructor.connect(slotCbBoxDestroy);
                         Code.cbBox.alive = true;
