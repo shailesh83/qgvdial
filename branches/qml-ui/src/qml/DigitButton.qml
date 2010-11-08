@@ -21,6 +21,7 @@ Item {
     MyButton {
         id: btn
         mainText: digButton.mainText
+        anchors.fill: parent
 
         onClicked: (digButton.isDel?digButton.delClicked():digButton.clicked(mainText));
 

@@ -3,14 +3,13 @@ import "helper.js" as Code
 
 Rectangle {
     id: button
-    anchors.fill: parent
     border.color: "black"
     smooth: true
     radius: ((height + width) / 20);
 
     // Main text in the button
     property string mainText: "2"
-    property Text someText: mText
+    property alias textFont: mText.font
 
     // Button emits clicks, but we also mention what is the text to display
     signal clicked(string strText)
