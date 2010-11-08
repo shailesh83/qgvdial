@@ -16,6 +16,9 @@ Rectangle {
             id: wDisp
             color: wMainView.color
             rotation: rotationDelta
+
+            width: parent.width
+            height: 180
         }//DialDisp
 
         Keypad {
@@ -29,6 +32,52 @@ Rectangle {
                 wDisp.tEd.text = result;
                 wDisp.tEd.cursorPosition = origStart + strText.length;
             }
+
+            width: parent.width
+            height: 180
         }//Keypad
+
+        Row {
+            width: parent.width
+            height: 40
+            rotation: rotationDelta
+
+            MyButton {
+                id: btnCall
+                mainText: "Call / Text"
+
+                width: parent.width * 2 / 3
+                height: parent.height
+            }
+            MyButton {
+                id: btnDel
+                mainText: "\u2190"
+
+                width: parent.width / 3
+                height: parent.height
+            }
+        }
+
+        Row {
+            width: parent.width
+            height: 40
+            rotation: rotationDelta
+
+            MyButton {
+                id: btnContacts
+                mainText: "Contacts"
+
+                width: parent.width / 2
+                height: parent.height
+            }
+            MyButton {
+                id: btnInbox
+                mainText: "Inbox"
+
+                width: parent.width / 2
+                height: parent.height
+            }
+        }
+
     }//Flow
 }//Rectangle
