@@ -3,9 +3,7 @@ import "helper.js" as Code
 
 Rectangle {
     id: wDialer
-    color: "white"
-    width: Code.calcFlowChildWidth();
-    height: Code.calcFlowChildHeight();
+    color: "black"
 
     signal btnClick(string strText)
 
@@ -13,7 +11,6 @@ Rectangle {
         id: layoutGrid
         anchors.fill: parent
         rows: 4; columns: 3
-        spacing: wDialer.parent.spacing
 
         DigitButton { mainText: "1"; subText: ""
             onClicked: btnClick(strText); }

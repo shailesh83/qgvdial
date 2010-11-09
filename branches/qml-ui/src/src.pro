@@ -1,4 +1,4 @@
-QT      *= core gui webkit sql xml script
+QT      *= core gui webkit sql xml script declarative
 TARGET   = qgvdial
 TEMPLATE = app
 
@@ -99,8 +99,8 @@ FORMS    += MainWindow.ui               \
             LoginDialog.ui              \
             ContactsWidget.ui           \
             InboxWidget.ui              \
-            VMailDialog.ui \
-    WebWidget.ui
+            VMailDialog.ui              \
+            WebWidget.ui
 
 RESOURCES += qgvdial.qrc
 
@@ -112,7 +112,9 @@ OTHER_FILES  += winrsrc.rc              \
                 qml/helper.js           \
                 qml/DigitButton.qml     \
                 qml/DialDisp.qml        \
-                qml/ComboBoxPhones.qml
+                qml/ComboBoxPhones.qml  \
+                qml/CallText.qml        \
+                qml/ContactsInbox.qml
 
 # In Linux and maemo, add the telepathy related sources and headers
 unix:!symbian {

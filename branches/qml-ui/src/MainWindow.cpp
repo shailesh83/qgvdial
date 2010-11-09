@@ -22,6 +22,9 @@ struct DialOutContext {
 MainWindow::MainWindow (QWidget *parent)
 : QMainWindow (parent)
 , ui (new Ui::MainWindow)
+, pDialDisp (NULL)
+, pKeypad (NULL)
+, pCallText (NULL)
 , icoGoogle (":/Google.png")
 , pSystray (NULL)
 , pContactsView (NULL)
@@ -34,37 +37,16 @@ MainWindow::MainWindow (QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Additional UI initializations:
-    ui->btnDelete->setDelete (true);
-    ui->edNumber->setValidator (new PhoneNumberValidator (ui->edNumber));
-
-    QString strDialpadFile;
-    QFile fDialpad_Style;
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setDefaultWindowAttributes (this);
 
 #ifdef Q_WS_MAEMO_5
     QObject::connect(QApplication::desktop(), SIGNAL(resized(int)),
                      this                   , SLOT  (orientationChanged()));
-
-    strDialpadFile = "./stylesheets/dialpad_maemo.qss";
-    if (!QFileInfo(strDialpadFile).exists ()) {
-        strDialpadFile = ":/dialpad_maemo.qss";
-    }
-#else
-    strDialpadFile = "./stylesheets/dialpad_desktop.qss";
-    if (!QFileInfo(strDialpadFile).exists ()) {
-        strDialpadFile = ":/dialpad_desktop.qss";
-    }
 #endif
 
     pWebWidget->hide ();
     osd.setDefaultWindowAttributes (pWebWidget);
-
-    fDialpad_Style.setFileName (strDialpadFile);
-    if (fDialpad_Style.open (QIODevice::ReadOnly)) {
-        ui->wgtDialpad->setStyleSheet (fDialpad_Style.readAll ());
-    }
 
     // A systray icon if the OS supports it
     if (QSystemTrayIcon::isSystemTrayAvailable ())
@@ -180,6 +162,29 @@ MainWindow::init ()
         &dlgSMS, SIGNAL (sendSMS (const QStringList &, const QString &)),
          this  , SLOT   (sendSMS (const QStringList &, const QString &)));
 
+    // Load the QML components
+    pDialDisp = new QDeclarativeView (this);
+    pKeypad   = new QDeclarativeView (this);
+    pCallText = new QDeclarativeView (this);
+
+    //@@UV: Fix this
+#define QML_PREFIX "../src/"
+    pDialDisp->setSource (QUrl::fromLocalFile (QML_PREFIX "./qml/DialDisp.qml"));
+    pKeypad->setSource (QUrl::fromLocalFile (QML_PREFIX "./qml/Keypad.qml"));
+    pCallText->setSource (QUrl::fromLocalFile (QML_PREFIX "./qml/CallText.qml"));
+
+    // Replace the keypad widget with our own widget.
+    if (NULL != ui->wgtKeypad) {
+        delete ui->wgtKeypad;
+    }
+    ui->wgtKeypad = pKeypad;
+    ui->gridMain->addWidget (ui->wgtKeypad, 0, 1);
+    ui->wgtKeypad->show ();
+
+    // Additional UI initializations:
+    //@@UV: Need this for later
+//    ui->edNumber->setValidator (new PhoneNumberValidator (ui->edNumber));
+
     // If the cache has the username and password, begin login
     if (dbMain.getUserPass (strUser, strPass))
     {
@@ -294,10 +299,11 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
 
         // Allow access to buttons and widgets
         ui->action_Login->setText ("Logout");
-        ui->btnContacts->setEnabled (true);
-        ui->btnHistory->setEnabled (true);
-        ui->cbDialMethod->setEnabled (true);
-        ui->btnCall->setEnabled (true);
+        //@@UV: Fix this later
+//        ui->btnContacts->setEnabled (true);
+//        ui->btnHistory->setEnabled (true);
+//        ui->cbDialMethod->setEnabled (true);
+//        ui->btnCall->setEnabled (true);
         bLoggedIn = true;
 
         // Save the user name and password that was used to login
@@ -321,11 +327,11 @@ MainWindow::orientationChanged ()
 {
     QRect screenGeometry = QApplication::desktop()->screenGeometry();
     if (screenGeometry.width() > screenGeometry.height()) {
-        ui->gridMain->removeWidget (ui->wgtDialpad);
-        ui->gridMain->addWidget (ui->wgtDialpad, 0, 1);
+        ui->gridMain->removeWidget (ui->wgtKeypad);
+        ui->gridMain->addWidget (ui->wgtKeypad, 0, 1);
     } else {
-        ui->gridMain->removeWidget (ui->wgtDialpad);
-        ui->gridMain->addWidget (ui->wgtDialpad, 1, 0);
+        ui->gridMain->removeWidget (ui->wgtKeypad);
+        ui->gridMain->addWidget (ui->wgtKeypad, 1, 0);
     }
 }//MainWindow::orientationChanged
 
@@ -348,10 +354,11 @@ MainWindow::logoutCompleted (bool, const QVariantList &)
     arrNumbers.clear ();
 
     ui->action_Login->setText ("Login...");
-    ui->btnContacts->setEnabled (false);
-    ui->btnHistory->setEnabled (false);
-    ui->cbDialMethod->setEnabled (false);
-    ui->btnCall->setEnabled (false);
+    //@UV: Fix this later
+//    ui->btnContacts->setEnabled (false);
+//    ui->btnHistory->setEnabled (false);
+//    ui->cbDialMethod->setEnabled (false);
+//    ui->btnCall->setEnabled (false);
 
     bLoggedIn = false;
 
@@ -384,18 +391,6 @@ MainWindow::msgBox_buttonClicked (QAbstractButton *button)
         button->parent()->deleteLater ();
     }
 }//MainWindow::msgBox_buttonClicked
-
-void
-MainWindow::charClicked (QChar ch)
-{
-    ui->edNumber->insert (ch);
-}//MainWindow::charClicked
-
-void
-MainWindow::charDeleted ()
-{
-    ui->edNumber->backspace ();
-}//MainWindow::charDeleted
 
 void
 MainWindow::on_actionE_xit_triggered ()
@@ -955,7 +950,8 @@ MainWindow::sendSMSDone (bool bOk, const QVariantList &params)
 void
 MainWindow::on_btnCall_clicked ()
 {
-    QString strNum = ui->edNumber->text();
+    //@@UV: Fix this later
+    QString strNum; // = ui->edNumber->text();
     if (0 == strNum.size()) {
         setStatus ("No number entered");
         return;
@@ -1011,8 +1007,9 @@ MainWindow::refreshRegisteredNumbers ()
             break;
         }
 
-        ui->cbDialMethod->clear ();
-        ui->cbDialMethod->setEnabled (false);
+        //@@UV: Fix this
+//        ui->cbDialMethod->clear ();
+//        ui->cbDialMethod->setEnabled (false);
         arrNumbers.clear ();
 
         QVariantList l;
@@ -1086,18 +1083,21 @@ MainWindow::fillCallbackNumbers (bool bSave)
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QString strCallback;
     bool bGotCallback = dbMain.getCallback (strCallback);
-    ui->cbDialMethod->clear ();
-    ui->cbDialMethod->setEnabled (true);
+    //@@UV: Fix this
+//    ui->cbDialMethod->clear ();
+//    ui->cbDialMethod->setEnabled (true);
     for (int i = 0; i < arrNumbers.size (); i++)
     {
         QString strText = QString (CB_TEXT_BUILDER)
                             .arg (arrNumbers[i].strDisplayName)
                             .arg (arrNumbers[i].strNumber);
-        ui->cbDialMethod->addItem (strText);
+        //@@UV: Fix this
+//        ui->cbDialMethod->addItem (strText);
 
         if ((bGotCallback) && (strCallback == arrNumbers[i].strNumber))
         {
-            ui->cbDialMethod->setCurrentIndex (i);
+            //@@UV: Fix this
+//            ui->cbDialMethod->setCurrentIndex (i);
         }
     }
 
@@ -1109,7 +1109,8 @@ MainWindow::fillCallbackNumbers (bool bSave)
         QString strText = QString (CB_TEXT_BUILDER)
                             .arg (ci->name ())
                             .arg (ci->selfNumber ());
-        ui->cbDialMethod->addItem (strText, QVariant::fromValue (store));
+        //@@UV: Fix this
+//        ui->cbDialMethod->addItem (strText, QVariant::fromValue (store));
     }
 
     if (bSave)
@@ -1128,7 +1129,8 @@ MainWindow::getDialSettings (bool                 &bDialout   ,
 
     bool rv = false;
     do { // Begin cleanup block (not a loop)
-        int index = ui->cbDialMethod->currentIndex ();
+        //@@UV: Fix this
+        int index = 0; // = ui->cbDialMethod->currentIndex ();
         if (index < arrNumbers.size ())
         {
             gvRegNumber = arrNumbers[index];
@@ -1136,7 +1138,8 @@ MainWindow::getDialSettings (bool                 &bDialout   ,
         }
         else
         {
-            QVariant var = ui->cbDialMethod->itemData (index);
+            //@@UV: Fix this
+            QVariant var; // = ui->cbDialMethod->itemData (index);
             if ((!var.isValid ()) || (var.isNull ()))
             {
                 qWarning ("Invalid variant in callout numbers");

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QtGui>
+#include <QDeclarativeView>
 
 #include "GVContactsTable.h"
 #include "GVHistory.h"
@@ -61,11 +62,6 @@ private slots:
     void systray_activated (QSystemTrayIcon::ActivationReason reason);
     //! Invoked when a message box is closed. Purely a cleanup function.
     void msgBox_buttonClicked (QAbstractButton *button);
-
-    //! Character clicked from the dialpad
-    void charClicked (QChar ch);
-    //! Delete clicked from dialpad
-    void charDeleted ();
 
     //! Invoked after all contacts have been parsed
     void getContactsDone (bool bOk);
@@ -138,6 +134,13 @@ private:
 
 private:
     Ui::MainWindow *ui;
+
+    //! The QML view for the dialer
+    QDeclarativeView *pDialDisp;
+    //! The QML view for the keypad
+    QDeclarativeView *pKeypad;
+    //! The QML view for the call and text buttons
+    QDeclarativeView *pCallText;
 
     // Tray, icons, widgets
     QIcon           icoGoogle;

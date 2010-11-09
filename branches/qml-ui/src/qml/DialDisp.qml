@@ -7,9 +7,6 @@ Rectangle {
     // Expose the text edit as a property
     property TextEdit tEd: txtNum
 
-    width: Code.calcFlowChildWidth();
-    height: Code.calcFlowChildHeight();
-
     ListModel {
         id: myModel
         ListElement {
