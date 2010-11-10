@@ -12,13 +12,19 @@ Rectangle {
         anchors.fill: parent
         spacing: 2
 
+        function calcH() {
+            var h = parent.height / 2;
+
+            return (h);
+        }
+
         DialDisp {
             id: wDisp
             color: wMainView.color
             rotation: rotationDelta
 
             width: parent.width
-            height: 180
+            height: calcH();
         }//DialDisp
 
         Keypad {
@@ -34,7 +40,7 @@ Rectangle {
             }
 
             width: parent.width
-            height: 180
+            height: calcH();
         }//Keypad
 
         CallText {
