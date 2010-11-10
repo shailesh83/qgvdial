@@ -4,6 +4,7 @@ import "helper.js" as Code
 Rectangle {
     id: wDialer
     color: "black"
+    anchors.fill: parent
 
     signal btnClick(string strText)
 
