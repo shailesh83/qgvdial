@@ -172,6 +172,9 @@ MainWindow::init ()
     pDialDisp->setSource (QUrl::fromLocalFile (QML_PREFIX "./qml/DialDisp.qml"));
     pKeypad->setSource (QUrl::fromLocalFile (QML_PREFIX "./qml/Keypad.qml"));
     pCallText->setSource (QUrl::fromLocalFile (QML_PREFIX "./qml/CallText.qml"));
+    pDialDisp->setResizeMode (QDeclarativeView::SizeRootObjectToView);
+    pKeypad->setResizeMode (QDeclarativeView::SizeRootObjectToView);
+    pCallText->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
     // Replace the keypad widget with our own widget.
     if (NULL != ui->wgtKeypad) {
