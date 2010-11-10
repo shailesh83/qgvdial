@@ -57,8 +57,8 @@ SOURCES  += main.cpp                    \
             GVHistory.cpp               \
             ContactsTreeView.cpp        \
             InboxTreeView.cpp           \
-            VMailDialog.cpp \
-    WebWidget.cpp
+            VMailDialog.cpp             \
+            WebWidget.cpp
 
 HEADERS  += global.h                    \
             IObserver.h                 \
@@ -105,16 +105,17 @@ FORMS    += MainWindow.ui               \
 RESOURCES += qgvdial.qrc
 
 # This is so that QtCreator can show these files in the files list.
-OTHER_FILES  += winrsrc.rc              \
-                qml/MyButton.qml        \
-                qml/MainView.qml        \
-                qml/Keypad.qml          \
-                qml/helper.js           \
-                qml/DigitButton.qml     \
-                qml/DialDisp.qml        \
-                qml/ComboBoxPhones.qml  \
-                qml/CallText.qml        \
-                qml/ContactsInbox.qml
+OTHER_FILES  += winrsrc.rc                  \
+                ../qml/MyButton.qml         \
+                ../qml/MainView_p.qml       \
+                ../qml/MainView_l.qml       \
+                ../qml/Keypad.qml           \
+                ../qml/helper.js            \
+                ../qml/DigitButton.qml      \
+                ../qml/DialDisp.qml         \
+                ../qml/ComboBoxPhones.qml   \
+                ../qml/CallText.qml         \
+                ../qml/ContactsInbox.qml
 
 # In Linux and maemo, add the telepathy related sources and headers
 unix:!symbian {

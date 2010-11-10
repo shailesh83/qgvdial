@@ -6,5 +6,6 @@
      <file alias="SMS.png">../icons/SMS.png</file>
      <file alias="dialpad_maemo.qss">../src/stylesheets/dialpad_maemo.qss</file>
      <file alias="dialpad_desktop.qss">../src/stylesheets/dialpad_desktop.qss</file>
+     <file alias="MainView_p.qml">../qml/MainView_p.qml</file>
  </qresource>
 </RCC>
