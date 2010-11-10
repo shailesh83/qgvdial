@@ -8,15 +8,26 @@ Rectangle {
     property variant landscape: wMainView.width > wMainView.height
     property variant rotationDelta: landscape? -90 : 0
 
+    function doDel () {
+        var origStart = wDisp.tEd.selectionStart;
+        var sel = wDisp.tEd.selectionEnd - origStart;
+        var result = wDisp.tEd.text.substr(0,origStart);
+        if (sel == 0) {
+            result = result.substr(0,origStart-1);
+        }
+        result += wDisp.tEd.text.substr(wDisp.tEd.selectionEnd);
+        wDisp.tEd.text = result;
+
+        if (origStart > result.length) {
+            origStart = result.length;
+        }
+
+        wDisp.tEd.cursorPosition = origStart;
+    }
+
     Flow {
         anchors.fill: parent
         spacing: 2
-
-        function calcH() {
-            var h = parent.height / 2;
-
-            return (h);
-        }
 
         DialDisp {
             id: wDisp
@@ -24,12 +35,16 @@ Rectangle {
             rotation: rotationDelta
 
             width: parent.width
-            height: calcH();
+            height: wMainView.height * (4 / 9)
         }//DialDisp
 
         Keypad {
             color: wMainView.color
             rotation: rotationDelta
+
+            width: parent.width
+            height: wMainView.height * (4 / 9)
+
             onBtnClick: {
                 var origStart = wDisp.tEd.selectionStart;
                 var result = wDisp.tEd.text.substr(0,origStart);
@@ -39,20 +54,16 @@ Rectangle {
                 wDisp.tEd.cursorPosition = origStart + strText.length;
             }
 
-            width: parent.width
-            height: calcH();
+            onBtnDelClick: doDel()
         }//Keypad
 
-        CallText {
+        ActionButtons {
+            id: btnSpecial
             width: parent.width
-            height: 40
+            height: wMainView.height * (1 / 9)
             rotation: rotationDelta
-        }
 
-        ContactsInbox {
-            width: parent.width
-            height: 40
-            rotation: rotationDelta
+            onSigDel: doDel()
         }
     }//Flow
 }//Rectangle
