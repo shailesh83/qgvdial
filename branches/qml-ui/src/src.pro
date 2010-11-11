@@ -179,7 +179,7 @@ maemo5 {
 
     DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
-    INSTALLS += target desktop icon qss qml
+    INSTALLS += target desktop icon qss
 
     target.path =$$BINDIR
 
@@ -191,15 +191,6 @@ maemo5 {
 
     qss.path = $$BINDIR/stylesheets
     qss.files += ./stylesheets/dialpad_maemo.qss
-
-    qml.path = $$BINDIR/qml
-    qml.files += qml/MyButton.qml        \
-                 qml/MainView.qml        \
-                 qml/Keypad.qml          \
-                 qml/helper.js           \
-                 qml/DigitButton.qml     \
-                 qml/DialDisp.qml        \
-                 qml/ComboBoxPhones.qml
 }
 
 # Installation for Linux
@@ -210,7 +201,7 @@ unix:!symbian:!maemo5 {
 
     DEFINES += DATADIR=\"$$DATADIR\" PKGDATADIR=\"$$PKGDATADIR\"
 
-    INSTALLS += target icon qss qml
+    INSTALLS += target icon qss
 
     target.path =$$BINDIR
 
@@ -219,13 +210,4 @@ unix:!symbian:!maemo5 {
 
     qss.path = $$BINDIR/stylesheets
     qss.files += ./stylesheets/dialpad_maemo.qss
-
-    qml.path = $$BINDIR/qml
-    qml.files += qml/MyButton.qml        \
-                 qml/MainView.qml        \
-                 qml/Keypad.qml          \
-                 qml/helper.js           \
-                 qml/DigitButton.qml     \
-                 qml/DialDisp.qml        \
-                 qml/ComboBoxPhones.qml
 }

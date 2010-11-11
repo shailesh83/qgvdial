@@ -167,6 +167,12 @@ MainWindow::init ()
                       this              , SLOT   (dialNow (QString)));
     QObject::connect (this->rootObject(), SIGNAL (sigText (QString)),
                       this              , SLOT   (sendSMS (QString)));
+    QObject::connect (
+        this->rootObject(), SIGNAL (sigContacts ()),
+        this              , SLOT   (on_btnContacts_clicked ()));
+    QObject::connect (
+        this->rootObject(), SIGNAL (sigInbox ()),
+        this              , SLOT   (on_btnHistory_clicked ()));
 
     // Additional UI initializations:
     //@@UV: Need this for later

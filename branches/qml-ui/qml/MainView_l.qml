@@ -1,52 +1,106 @@
 import Qt 4.7
+import "helper.js" as Code
 
 Rectangle {
-    id: wMainView
+    id: window
     color: "black"
-    width: 250; height: 400
+    width: 400; height: 250
 
-    property variant landscape: wMainView.width > wMainView.height
+    signal sigCall(string strNumber)
+    signal sigText(string strNumber)
+    signal sigContacts
+    signal sigInbox
+
+    property variant selectedOri: Orientation.UnknownOrientation
+    property variant activeOri: selectedOri == Orientation.UnknownOrientation ? runtime.orientation : selectedOri
+    state: "orientation " + activeOri
+
+    property bool landscape: window.width > window.height
     property variant rotationDelta: landscape? -90 : 0
 
-    Flow {
+    // initial state is portrait
+    property real baseWidth: landscape ? window.height : window.width
+    property real baseHeight: landscape ? window.width : window.height
+
+    states: [
+        State {
+            name: "orientation " + Orientation.Landscape
+            PropertyChanges {
+                target: main
+                rotation: Code.getAngle(Orientation.Landscape) + rotationDelta
+                width: baseHeight
+                height: baseWidth
+            }
+        },
+        State {
+            name: "orientation " + Orientation.PortraitInverted
+            PropertyChanges {
+                target: main
+                rotation: Code.getAngle(Orientation.PortraitInverted) + rotationDelta
+                width: baseWidth
+                height: baseHeight
+            }
+        },
+        State {
+            name: "orientation " + Orientation.LandscapeInverted
+            PropertyChanges {
+                target: main
+                rotation: Code.getAngle(Orientation.LandscapeInverted) + rotationDelta
+                width: baseHeight
+                height: baseWidth
+            }
+        }
+    ]
+
+    Row {
+        id: main
+
         anchors.fill: parent
         spacing: 2
 
-        DialDisp {
-            id: wDisp
-            color: wMainView.color
-            rotation: rotationDelta
+        Column {
+            width: parent.width / 2
+            height: parent.height
 
-            width: parent.width
-            height: 180
-        }//DialDisp
+            DialDisp {
+                id: wDisp
+                color: window.color
+
+                width: parent.width
+                height: parent.height * (4 / 5)
+            }//DialDisp
+
+            ActionButtons {
+                id: btnSpecial
+                width: parent.width
+                height: window.height * (1 / 5)
+
+                onSigCall: window.sigCall(wDisp.txtEd.text)
+                onSigText: window.sigText(wDisp.txtEd.text)
+                onSigContacts: window.sigContacts()
+                onSigInbox: window.sigInbox()
+
+                onSigDel: Code.doDel()
+            }
+        }
 
         Keypad {
-            color: wMainView.color
-            rotation: rotationDelta
+            color: window.color
+
+            width: parent.width / 2
+            height: parent.height
+
             onBtnClick: {
-                var origStart = wDisp.tEd.selectionStart;
-                var result = wDisp.tEd.text.substr(0,origStart);
+                var origStart = wDisp.txtEd.selectionStart;
+                var result = wDisp.txtEd.text.substr(0,origStart);
                 result += strText;
-                result += wDisp.tEd.text.substr(wDisp.tEd.selectionEnd);
-                wDisp.tEd.text = result;
-                wDisp.tEd.cursorPosition = origStart + strText.length;
+                result += wDisp.txtEd.text.substr(wDisp.txtEd.selectionEnd);
+                wDisp.txtEd.text = result;
+                wDisp.txtEd.cursorPosition = origStart + strText.length;
             }
 
-            width: parent.width
-            height: 180
+            onBtnDelClick: Code.doDel()
         }//Keypad
 
-        CallText {
-            width: parent.width
-            height: 40
-            rotation: rotationDelta
-        }
-
-        ContactsInbox {
-            width: parent.width
-            height: 40
-            rotation: rotationDelta
-        }
     }//Flow
 }//Rectangle

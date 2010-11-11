@@ -36,3 +36,38 @@ function btnSubTextFontPoint () {
     m = (m == 0 ? 1 : m);
     return (m);
 }
+
+// Deletion in the MainView
+function doDel () {
+    var origStart = wDisp.txtEd.selectionStart;
+    var sel = wDisp.txtEd.selectionEnd - origStart;
+    var result = wDisp.txtEd.text.substr(0,origStart);
+    if (sel == 0) {
+        result = result.substr(0,origStart-1);
+    }
+    result += wDisp.txtEd.text.substr(wDisp.txtEd.selectionEnd);
+    wDisp.txtEd.text = result;
+
+    if (origStart > result.length) {
+        origStart = result.length;
+    }
+
+    wDisp.txtEd.cursorPosition = origStart;
+}
+
+
+function getAngle(orientation) {
+    var angle;
+    if (orientation == Orientation.Portrait) {
+        angle = 0;
+    } else if (orientation == Orientation.Landscape) {
+        angle = 90;
+    } else if (orientation == Orientation.PortraitInverted) {
+        angle = 180;
+    } else if (orientation == Orientation.LandscapeInverted) {
+        angle = 270;
+    } else {
+        angle = 0;
+    }
+    return angle;
+}
