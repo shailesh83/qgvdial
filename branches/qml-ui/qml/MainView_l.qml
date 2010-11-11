@@ -11,8 +11,8 @@ Rectangle {
     signal sigContacts
     signal sigInbox
 
-    property variant selectedOri: Orientation.UnknownOrientation
-    property variant activeOri: selectedOri == Orientation.UnknownOrientation ? runtime.orientation : selectedOri
+    property string selectedOri: "UnknownOrientation"
+    property variant activeOri: selectedOri == "UnknownOrientation" ? Code.getOriName(runtime.orientation) : selectedOri
     state: "orientation " + activeOri
 
     property bool landscape: window.width > window.height
@@ -24,28 +24,37 @@ Rectangle {
 
     states: [
         State {
-            name: "orientation " + Orientation.Landscape
+            name: "orientation " + "Portrait"
             PropertyChanges {
                 target: main
-                rotation: Code.getAngle(Orientation.Landscape) + rotationDelta
-                width: baseHeight
-                height: baseWidth
-            }
-        },
-        State {
-            name: "orientation " + Orientation.PortraitInverted
-            PropertyChanges {
-                target: main
-                rotation: Code.getAngle(Orientation.PortraitInverted) + rotationDelta
+                rotation: Code.getAngle("Portrait") + rotationDelta
                 width: baseWidth
                 height: baseHeight
             }
         },
         State {
-            name: "orientation " + Orientation.LandscapeInverted
+            name: "orientation " + "Landscape"
             PropertyChanges {
                 target: main
-                rotation: Code.getAngle(Orientation.LandscapeInverted) + rotationDelta
+                rotation: Code.getAngle("Landscape") + rotationDelta
+                width: baseHeight
+                height: baseWidth
+            }
+        },
+        State {
+            name: "orientation " + "PortraitInverted"
+            PropertyChanges {
+                target: main
+                rotation: Code.getAngle("PortraitInverted") + rotationDelta
+                width: baseWidth
+                height: baseHeight
+            }
+        },
+        State {
+            name: "orientation " + "LandscapeInverted"
+            PropertyChanges {
+                target: main
+                rotation: Code.getAngle("LandscapeInverted") + rotationDelta
                 width: baseHeight
                 height: baseWidth
             }

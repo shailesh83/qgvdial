@@ -1,50 +1,54 @@
 import Qt 4.7
 
-Row {
+Rectangle {
     signal sigCall
     signal sigText
     signal sigContacts
     signal sigInbox
     signal sigDel
 
-    MyButton {
-        id: btnCall
-        mainText: "\u2706/\u270D"
+    Row {
+        anchors.fill: parent
 
-        width: parent.width * (7 / 16)
-        height: parent.height
+        MyButton {
+            id: btnCall
+            mainText: "\u2706/\u270D"
 
-        onClicked: sigCall()
-        onPressHold: sigText()
-    }
+            width: parent.width * (7 / 16)
+            height: parent.height
 
-    MyButton {
-        id: btnContacts
-        mainText: "\u2625"
+            onClicked: sigCall()
+            onPressHold: sigText()
+        }
 
-        width: parent.width * (3 / 16)
-        height: parent.height
+        MyButton {
+            id: btnContacts
+            mainText: "\u2625"
 
-        onClicked: sigContacts()
-    }
+            width: parent.width * (3 / 16)
+            height: parent.height
 
-    MyButton {
-        id: btnInbox
-        mainText: "\u25D4"
+            onClicked: sigContacts()
+        }
 
-        width: parent.width * (3 / 16)
-        height: parent.height
+        MyButton {
+            id: btnInbox
+            mainText: "\u25D4"
 
-        onClicked: sigInbox()
-    }
+            width: parent.width * (3 / 16)
+            height: parent.height
 
-    MyButton {
-        id: btnDel
-        mainText: "\u232B"
+            onClicked: sigInbox()
+        }
 
-        width: parent.width * (3 / 16)
-        height: parent.height
+        MyButton {
+            id: btnDel
+            mainText: "\u232B"
 
-        onClicked: sigDel()
+            width: parent.width * (3 / 16)
+            height: parent.height
+
+            onClicked: sigDel()
+        }
     }
 }

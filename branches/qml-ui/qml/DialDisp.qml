@@ -31,7 +31,7 @@ Rectangle {
         anchors.fill: parent
 
         Rectangle {
-            color: "black"
+            color: wDisp.color
             width: parent.width
             height: (parent.height / 5)
 

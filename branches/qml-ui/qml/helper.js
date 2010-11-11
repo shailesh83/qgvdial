@@ -55,19 +55,30 @@ function doDel () {
     wDisp.txtEd.cursorPosition = origStart;
 }
 
+function getOriName (ori) {
+    var name = "UnknownOrientation";
+    if (ori == Orientation.Portrait) {
+        name = "Portrait";
+    } else if (ori == Orientation.Landscape) {
+        name = "Landscape";
+    } else if (ori == Orientation.PortraitInverted) {
+        name = "PortraitInverted";
+    } else if (ori == Orientation.LandscapeInverted) {
+        name = "LandscapeInverted";
+    }
+    return name;
+}
 
 function getAngle(orientation) {
-    var angle;
-    if (orientation == Orientation.Portrait) {
+    var angle = 0;
+    if (orientation == "Portrait") {
         angle = 0;
-    } else if (orientation == Orientation.Landscape) {
+    } else if (orientation == "Landscape") {
         angle = 90;
-    } else if (orientation == Orientation.PortraitInverted) {
+    } else if (orientation == "PortraitInverted") {
         angle = 180;
-    } else if (orientation == Orientation.LandscapeInverted) {
+    } else if (orientation == "LandscapeInverted") {
         angle = 270;
-    } else {
-        angle = 0;
     }
     return angle;
 }

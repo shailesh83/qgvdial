@@ -33,16 +33,24 @@ MainWindow::MainWindow (QWidget *parent)
 , bDialCancelled (false)
 {
 //    ui->setupUi(this);
+
     this->setSource (QUrl ("qrc:/MainView_p.qml"));
+    QGraphicsObject *rootItem = this->rootObject ();
+#ifdef Q_WS_MAEMO_5
+    QObject::connect(QApplication::desktop(), SIGNAL(resized(int)),
+                     this                   , SLOT  (orientationChanged()));
+    rootItem->setProperty ("height", 400);
+    rootItem->setProperty ("width", 800);
+#endif
     this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
+
+    bool bTest =
+    rootItem->setProperty ("selectedOri", "Portrait");
+    qDebug () << "orienteation set has" << (bTest?"succeeded":"failed");
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setDefaultWindowAttributes (this);
 
-#ifdef Q_WS_MAEMO_5
-    QObject::connect(QApplication::desktop(), SIGNAL(resized(int)),
-                     this                   , SLOT  (orientationChanged()));
-#endif
 
     pWebWidget->hide ();
     osd.setDefaultWindowAttributes (pWebWidget);
@@ -166,7 +174,7 @@ MainWindow::init ()
     QObject::connect (this->rootObject(), SIGNAL (sigCall (QString)),
                       this              , SLOT   (dialNow (QString)));
     QObject::connect (this->rootObject(), SIGNAL (sigText (QString)),
-                      this              , SLOT   (sendSMS (QString)));
+                      this              , SLOT   (textANumber (QString)));
     QObject::connect (
         this->rootObject(), SIGNAL (sigContacts ()),
         this              , SLOT   (on_btnContacts_clicked ()));
