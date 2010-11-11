@@ -17,7 +17,7 @@ namespace Ui {
     class MainWindow;
 }
 
-class MainWindow : public QMainWindow
+class MainWindow : public QDeclarativeView
 {
     Q_OBJECT
 
@@ -43,6 +43,7 @@ private slots:
     // All initializations happen here
     void init ();
 
+    // Invoked when the application is supposed to exit
     void on_actionE_xit_triggered();
     //! The Singleton Application class invokes this function
     void messageReceived (const QString &message);
@@ -122,6 +123,8 @@ private:
     bool getInfoFrom (const QString &strNumber,
                       const QString &strNameLink,
                       GVContactInfo &info);
+
+    void keyPressEvent (QKeyEvent *event);
     void closeEvent (QCloseEvent *event);
 
     bool refreshRegisteredNumbers ();
@@ -133,14 +136,7 @@ private:
     void playVmail (const QString &strFile);
 
 private:
-    Ui::MainWindow *ui;
-
-    //! The QML view for the dialer
-    QDeclarativeView *pDialDisp;
-    //! The QML view for the keypad
-    QDeclarativeView *pKeypad;
-    //! The QML view for the call and text buttons
-    QDeclarativeView *pCallText;
+//    Ui::MainWindow *ui;
 
     // Tray, icons, widgets
     QIcon           icoGoogle;

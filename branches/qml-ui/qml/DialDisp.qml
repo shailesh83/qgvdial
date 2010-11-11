@@ -5,7 +5,7 @@ Rectangle {
     id: wDisp
 
     // Expose the text edit as a property
-    property TextEdit tEd: txtNum
+    property alias txtEd: txtNum
 
     ListModel {
         id: myModel

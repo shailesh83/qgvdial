@@ -20,11 +20,8 @@ struct DialOutContext {
 };
 
 MainWindow::MainWindow (QWidget *parent)
-: QMainWindow (parent)
-, ui (new Ui::MainWindow)
-, pDialDisp (NULL)
-, pKeypad (NULL)
-, pCallText (NULL)
+: QDeclarativeView (parent)
+//, ui (new Ui::MainWindow)
 , icoGoogle (":/Google.png")
 , pSystray (NULL)
 , pContactsView (NULL)
@@ -35,7 +32,9 @@ MainWindow::MainWindow (QWidget *parent)
 , bCallInProgress (false)
 , bDialCancelled (false)
 {
-    ui->setupUi(this);
+//    ui->setupUi(this);
+    this->setSource (QUrl ("qrc:/MainView_p.qml"));
+    this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setDefaultWindowAttributes (this);
@@ -70,7 +69,8 @@ MainWindow::MainWindow (QWidget *parent)
 
 MainWindow::~MainWindow ()
 {
-    delete ui;
+    //@@UV: Fix this
+//    delete ui;
 }//MainWindow::~MainWindow
 
 void
@@ -101,7 +101,7 @@ void
 MainWindow::setStatus(const QString &strText, int timeout /* = 0*/)
 {
     qDebug () << strText;
-    ui->statusBar->showMessage (strText, timeout);
+//    ui->statusBar->showMessage (strText, timeout);
 }//MainWindow::setStatus
 
 void
@@ -162,27 +162,11 @@ MainWindow::init ()
         &dlgSMS, SIGNAL (sendSMS (const QStringList &, const QString &)),
          this  , SLOT   (sendSMS (const QStringList &, const QString &)));
 
-    // Load the QML components
-    pDialDisp = new QDeclarativeView (this);
-    pKeypad   = new QDeclarativeView (this);
-    pCallText = new QDeclarativeView (this);
-
-    //@@UV: Fix this
-#define QML_PREFIX "../src/"
-    pDialDisp->setSource (QUrl::fromLocalFile (QML_PREFIX "./qml/DialDisp.qml"));
-    pKeypad->setSource (QUrl::fromLocalFile (QML_PREFIX "./qml/Keypad.qml"));
-    pCallText->setSource (QUrl::fromLocalFile (QML_PREFIX "./qml/CallText.qml"));
-    pDialDisp->setResizeMode (QDeclarativeView::SizeRootObjectToView);
-    pKeypad->setResizeMode (QDeclarativeView::SizeRootObjectToView);
-    pCallText->setResizeMode (QDeclarativeView::SizeRootObjectToView);
-
-    // Replace the keypad widget with our own widget.
-    if (NULL != ui->wgtKeypad) {
-        delete ui->wgtKeypad;
-    }
-    ui->wgtKeypad = pKeypad;
-    ui->gridMain->addWidget (ui->wgtKeypad, 0, 1);
-    ui->wgtKeypad->show ();
+    // Call or text a number
+    QObject::connect (this->rootObject(), SIGNAL (sigCall (QString)),
+                      this              , SLOT   (dialNow (QString)));
+    QObject::connect (this->rootObject(), SIGNAL (sigText (QString)),
+                      this              , SLOT   (sendSMS (QString)));
 
     // Additional UI initializations:
     //@@UV: Need this for later
@@ -301,8 +285,8 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         initInboxWidget ();
 
         // Allow access to buttons and widgets
-        ui->action_Login->setText ("Logout");
         //@@UV: Fix this later
+//        ui->action_Login->setText ("Logout");
 //        ui->btnContacts->setEnabled (true);
 //        ui->btnHistory->setEnabled (true);
 //        ui->cbDialMethod->setEnabled (true);
@@ -330,11 +314,11 @@ MainWindow::orientationChanged ()
 {
     QRect screenGeometry = QApplication::desktop()->screenGeometry();
     if (screenGeometry.width() > screenGeometry.height()) {
-        ui->gridMain->removeWidget (ui->wgtKeypad);
-        ui->gridMain->addWidget (ui->wgtKeypad, 0, 1);
+//        ui->gridMain->removeWidget (ui->wgtKeypad);
+//        ui->gridMain->addWidget (ui->wgtKeypad, 0, 1);
     } else {
-        ui->gridMain->removeWidget (ui->wgtKeypad);
-        ui->gridMain->addWidget (ui->wgtKeypad, 1, 0);
+//        ui->gridMain->removeWidget (ui->wgtKeypad);
+//        ui->gridMain->addWidget (ui->wgtKeypad, 1, 0);
     }
 }//MainWindow::orientationChanged
 
@@ -356,8 +340,8 @@ MainWindow::logoutCompleted (bool, const QVariantList &)
 
     arrNumbers.clear ();
 
-    ui->action_Login->setText ("Login...");
     //@UV: Fix this later
+//    ui->action_Login->setText ("Login...");
 //    ui->btnContacts->setEnabled (false);
 //    ui->btnHistory->setEnabled (false);
 //    ui->cbDialMethod->setEnabled (false);
@@ -990,11 +974,22 @@ MainWindow::on_btnHistory_clicked ()
 }//MainWindow::on_btnHistory_clicked
 
 void
+MainWindow::keyPressEvent (QKeyEvent *event)
+{
+    if ((Qt::Key_Q == event->key ()) &&
+        (Qt::ControlModifier == event->modifiers ())) {
+        on_actionE_xit_triggered ();
+    } else {
+        QDeclarativeView::keyPressEvent (event);
+    }
+}//MainWindow::keyPressEvent
+
+void
 MainWindow::closeEvent (QCloseEvent *event)
 {
     deinitContactsWidget ();
     deinitInboxWidget ();
-    QMainWindow::closeEvent (event);
+    QDeclarativeView::closeEvent (event);
 }//MainWindow::closeEvent
 
 bool

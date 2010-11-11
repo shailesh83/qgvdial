@@ -14,7 +14,6 @@
      <file alias="helper.js">../qml/helper.js</file>
      <file alias="DialDisp.qml">../qml/DialDisp.qml</file>
      <file alias="ComboBoxPhones.qml">../qml/ComboBoxPhones.qml</file>
-     <file alias="CallText.qml">../qml/CallText.qml</file>
-     <file alias="ContactsInbox.qml">../qml/ContactsInbox.qml</file>
+     <file alias="ActionButtons.qml">../qml/ActionButtons.qml</file>
  </qresource>
 </RCC>
