@@ -6,11 +6,9 @@ Rectangle {
 
     // Expose the text edit as a property
     property alias txtEd: txtNum
-    property ListModel model
 
-
-    function slotSelectionChanged(iIndex) {
-        btnPhones.mainText = myModel.get(iIndex).name;
+    function slotSelectionChanged(index, name) {
+        btnPhones.mainText = name;
     }
     function slotCbBoxDestroy () {
         Code.cbBox.destroy ();
@@ -27,7 +25,7 @@ Rectangle {
 
             MyButton {
                 id: btnPhones
-                mainText: model.get(0).name;
+                mainText: currentPhoneName;
                 anchors.fill: parent
                 radius: ((height / 10.0) + (width / 60.0))
 
@@ -38,7 +36,6 @@ Rectangle {
 
                     if (Code.cbBox == null) {
                         Code.cbBox = Code.compCbBox.createObject(wDisp);
-                        Code.cbBox.model  = wDisp.model;
                         Code.cbBox.width  = btnPhones.width;
                         Code.cbBox.height = wDisp.height - btnPhones.height;
 

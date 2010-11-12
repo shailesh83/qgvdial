@@ -1,6 +1,5 @@
 #include "global.h"
 #include "MainWindow.h"
-#include "ui_MainWindow.h"
 
 #include "LoginDialog.h"
 #include "DialCancelDlg.h"
@@ -28,6 +27,7 @@ MainWindow::MainWindow (QWidget *parent)
 , pWebWidget (new WebWidget (this, Qt::Window))
 , bLoggedIn (false)
 , modelRegNumber (this)
+, indRegPhone (0)
 , mtxDial (QMutex::Recursive)
 , bCallInProgress (false)
 , bDialCancelled (false)
@@ -36,8 +36,6 @@ MainWindow::MainWindow (QWidget *parent)
     QObject::connect(QApplication::desktop(), SIGNAL(resized(int)),
                      this                   , SLOT  (orientationChanged()));
 #endif
-
-    modelRegNumber.insertRow (RNT_Callback, "blah", "12223334444");
 
     // This must be done at least once so that the initial qml is loaded.
     // Even if it is desktop, this must be done: The function takes care of
@@ -322,6 +320,11 @@ MainWindow::orientationChanged ()
 
     QDeclarativeContext *ctx = this->rootContext();
     ctx->setContextProperty ("myModel", &modelRegNumber);
+    RegNumData data;
+    if (!modelRegNumber.getAt (indRegPhone, data)) {
+        data.strName = "<Unknown>";
+    }
+    ctx->setContextProperty ("currentPhoneName", data.strName);
 
     if (bLandscape) {
         this->setSource (QUrl ("qrc:/MainView_l.qml"));
@@ -729,7 +732,7 @@ MainWindow::dialNow (const QString &strTarget)
         }
         else
         {
-            l += gvRegNumber.strNumber;
+            l += gvRegNumber.strDescription;
             l += QString (gvRegNumber.chType);
             if (!webPage.enqueueWork (GVAW_dialCallback, l, this,
                     SLOT (dialComplete (bool, const QVariantList &))))
@@ -1056,8 +1059,8 @@ void
 MainWindow::gotRegisteredPhone (const GVRegisteredNumber &info)
 {
     QString msg = QString("\"%1\"=\"%2\"")
-                    .arg (info.strDisplayName)
-                    .arg (info.strNumber);
+                    .arg (info.strName)
+                    .arg (info.strDescription);
     qDebug () << msg;
 
     arrNumbers += info;
@@ -1101,34 +1104,23 @@ MainWindow::fillCallbackNumbers (bool bSave)
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QString strCallback;
     bool bGotCallback = dbMain.getCallback (strCallback);
-    //@@UV: Fix this
-//    ui->cbDialMethod->clear ();
-//    ui->cbDialMethod->setEnabled (true);
+    if (bGotCallback) {
+        indRegPhone = strCallback.toInt ();
+    }
+
+    modelRegNumber.clear ();
     for (int i = 0; i < arrNumbers.size (); i++)
     {
-        QString strText = QString (CB_TEXT_BUILDER)
-                            .arg (arrNumbers[i].strDisplayName)
-                            .arg (arrNumbers[i].strNumber);
-        //@@UV: Fix this
-//        ui->cbDialMethod->addItem (strText);
-
-        if ((bGotCallback) && (strCallback == arrNumbers[i].strNumber))
-        {
-            //@@UV: Fix this
-//            ui->cbDialMethod->setCurrentIndex (i);
-        }
+        modelRegNumber.insertRow (arrNumbers[i].strName,
+                                  arrNumbers[i].strDescription,
+                                  arrNumbers[i].chType);
     }
 
     // Store the callouts in the same widget as the callbacks
     CallInitiatorFactory& cif = Singletons::getRef().getCIFactory ();
     CalloutInitiatorList listCi = cif.getInitiators ();
     foreach (CalloutInitiator *ci, listCi) {
-        void * store = ci;
-        QString strText = QString (CB_TEXT_BUILDER)
-                            .arg (ci->name ())
-                            .arg (ci->selfNumber ());
-        //@@UV: Fix this
-//        ui->cbDialMethod->addItem (strText, QVariant::fromValue (store));
+        modelRegNumber.insertRow (ci->name (), ci->selfNumber (), ci);
     }
 
     if (bSave)

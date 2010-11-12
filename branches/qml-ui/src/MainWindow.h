@@ -14,10 +14,6 @@
 #include "OsDependent.h"
 #include "Singletons.h"
 
-namespace Ui {
-    class MainWindow;
-}
-
 class MainWindow : public QDeclarativeView
 {
     Q_OBJECT
@@ -137,8 +133,6 @@ private:
     void playVmail (const QString &strFile);
 
 private:
-//    Ui::MainWindow *ui;
-
     // Tray, icons, widgets
     QIcon           icoGoogle;
     QSystemTrayIcon *pSystray;
@@ -160,7 +154,10 @@ private:
     //! Our own GV phone number
     QString         strSelfNumber;
 
+    //! Model for registered phone numbers
     RegNumberModel  modelRegNumber;
+    //! Index of the registered phone currently in use
+    int             indRegPhone;
 
 ///////////////////////////////////////////////////////////////////////////////
 // This block of variable is protected by the one mutex in it

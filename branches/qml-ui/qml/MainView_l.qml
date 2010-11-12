@@ -29,8 +29,6 @@ Rectangle {
             DialDisp {
                 id: wDisp
 
-                model: myModel
-
                 color: window.color
                 width: parent.width
                 height: parent.height * (3 / 4)

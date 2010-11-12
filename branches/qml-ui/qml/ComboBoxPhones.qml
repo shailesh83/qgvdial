@@ -4,10 +4,9 @@ import "helper.js" as Code
 Rectangle {
     id: listOfPhones
     color: "black"
-    property alias model: listView.model
     property bool alive: false
 
-    signal selectionChanged(int iIndex)
+    signal selectionChanged(int iIndex, string name)
     signal sigHeightChanged(int iHeight)
     signal sigDestructor
 
@@ -48,6 +47,7 @@ Rectangle {
             NumberAnimation { properties:"opacity"; duration: 400 }
         }
 
+        model: myModel
         delegate: Rectangle {
             id: rectDelegate
             color: "black"
@@ -67,7 +67,7 @@ Rectangle {
 
                 Text {
                     id: txtNumber
-                    text: number;
+                    text: description
                     color: "white"
                     width: listView.width
                     font.pointSize: calcFontPoint ();
@@ -78,10 +78,10 @@ Rectangle {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    listOfPhones.selectionChanged(index);
+                    listOfPhones.selectionChanged(index, name);
                     killSelf ();
                 }
-            }
-        }
+            }// MouseArea
+        }// delegate Rectangle
     }//ListView
 }//Component: listOfPhones

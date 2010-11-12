@@ -97,8 +97,7 @@ HEADERS  += global.h                    \
             WebWidget.h                 \
             RegNumberModel.h
 
-FORMS    += MainWindow.ui               \
-            LoginDialog.ui              \
+FORMS    += LoginDialog.ui              \
             ContactsWidget.ui           \
             InboxWidget.ui              \
             VMailDialog.ui              \
