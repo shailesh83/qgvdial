@@ -10,6 +10,7 @@ Rectangle {
     signal sigText(string strNumber)
     signal sigContacts
     signal sigInbox
+    signal sigSelChanged (int index)
 
     property bool landscape: window.width > window.height
     property variant rotationDelta: landscape? -90 : 0
@@ -32,6 +33,8 @@ Rectangle {
                 color: window.color
                 width: parent.width
                 height: parent.height * (3 / 4)
+
+                onSigSelChanged: sigSelChanged (index)
             }//DialDisp
 
             ActionButtons {

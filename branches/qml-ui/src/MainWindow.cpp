@@ -320,11 +320,7 @@ MainWindow::orientationChanged ()
 
     QDeclarativeContext *ctx = this->rootContext();
     ctx->setContextProperty ("myModel", &modelRegNumber);
-    RegNumData data;
-    if (!modelRegNumber.getAt (indRegPhone, data)) {
-        data.strName = "<Unknown>";
-    }
-    ctx->setContextProperty ("currentPhoneName", data.strName);
+    onRegPhoneSelectionChange (indRegPhone);
 
     if (bLandscape) {
         this->setSource (QUrl ("qrc:/MainView_l.qml"));
@@ -342,6 +338,8 @@ MainWindow::orientationChanged ()
     QObject::connect (gObj, SIGNAL (sigContacts ()),
                       this, SLOT   (on_btnContacts_clicked ()));
     QObject::connect (gObj, SIGNAL (sigInbox ()),
+                      this, SLOT   (on_btnHistory_clicked ()));
+    QObject::connect (gObj, SIGNAL (sigSelChanged (int)),
                       this, SLOT   (on_btnHistory_clicked ()));
 }//MainWindow::orientationChanged
 
@@ -1104,9 +1102,6 @@ MainWindow::fillCallbackNumbers (bool bSave)
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     QString strCallback;
     bool bGotCallback = dbMain.getCallback (strCallback);
-    if (bGotCallback) {
-        indRegPhone = strCallback.toInt ();
-    }
 
     modelRegNumber.clear ();
     for (int i = 0; i < arrNumbers.size (); i++)
@@ -1123,11 +1118,17 @@ MainWindow::fillCallbackNumbers (bool bSave)
         modelRegNumber.insertRow (ci->name (), ci->selfNumber (), ci);
     }
 
+    if (bGotCallback) {
+        indRegPhone = strCallback.toInt ();
+    }
+
     if (bSave)
     {
         // Save all callbacks into the cache
         dbMain.putRegisteredNumbers (arrNumbers);
     }
+
+    onRegPhoneSelectionChange (indRegPhone);
 }//MainWindow::fillCallbackNumbers
 
 bool
@@ -1255,3 +1256,16 @@ MainWindow::on_actionLogs_triggered ()
 {
     //
 }//MainWindow::on_actionLogs_triggered
+
+void
+MainWindow::onRegPhoneSelectionChange (int index)
+{
+    indRegPhone = index;
+
+    QDeclarativeContext *ctx = this->rootContext();
+    RegNumData data;
+    if (!modelRegNumber.getAt (indRegPhone, data)) {
+        data.strName = "<Unknown>";
+    }
+    ctx->setContextProperty ("currentPhoneName", data.strName);
+}//MainWindow::onRegPhoneSelectionChange

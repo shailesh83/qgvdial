@@ -108,6 +108,8 @@ private slots:
     //! Invoked by GVAccess when the voice mail download has completed
     void onVmailDownloaded (bool bOk, const QVariantList &arrParams);
 
+    void onRegPhoneSelectionChange (int index);
+
 private:
     void doLogin ();
 

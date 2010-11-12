@@ -4,11 +4,14 @@ import "helper.js" as Code
 Rectangle {
     id: wDisp
 
+    signal sigSelChanged (int index)
+
     // Expose the text edit as a property
     property alias txtEd: txtNum
 
     function slotSelectionChanged(index, name) {
         btnPhones.mainText = name;
+        wDisp.sigSelChanged(index);
     }
     function slotCbBoxDestroy () {
         Code.cbBox.destroy ();

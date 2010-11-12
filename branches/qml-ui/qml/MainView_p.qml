@@ -10,6 +10,7 @@ Rectangle {
     signal sigText(string strNumber)
     signal sigContacts
     signal sigInbox
+    signal sigSelChanged (int index)
 
     property bool landscape: window.width > window.height
 
@@ -38,6 +39,8 @@ Rectangle {
 
                 width: parent.width
                 height: parent.height * (4 / 9)
+
+                onSigSelChanged: sigSelChanged (index)
             }//DialDisp
 
             Keypad {
