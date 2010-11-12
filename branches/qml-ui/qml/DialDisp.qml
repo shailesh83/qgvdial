@@ -38,7 +38,7 @@ Rectangle {
 
                     if (Code.cbBox == null) {
                         Code.cbBox = Code.compCbBox.createObject(wDisp);
-                        Code.cbBox.model  = model;
+                        Code.cbBox.model  = wDisp.model;
                         Code.cbBox.width  = btnPhones.width;
                         Code.cbBox.height = wDisp.height - btnPhones.height;
 
