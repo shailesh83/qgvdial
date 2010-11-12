@@ -17,6 +17,8 @@ Rectangle {
     property real baseWidth: landscape ? window.height : window.width
     property real baseHeight: landscape ? window.width : window.height
 
+    property ListModel model: myModel
+
     Rectangle {
         color: "black"
 
@@ -35,6 +37,8 @@ Rectangle {
             DialDisp {
                 id: wDisp
                 color: window.color
+
+                model: window.model
 
                 width: parent.width
                 height: parent.height * (4 / 9)

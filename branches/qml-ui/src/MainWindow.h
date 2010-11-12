@@ -2,12 +2,13 @@
 #define MAINWINDOW_H
 
 #include <QtGui>
-#include <QDeclarativeView>
+#include <QtDeclarative>
 
 #include "GVContactsTable.h"
 #include "GVHistory.h"
 #include "SMSDlg.h"
 #include "WebWidget.h"
+#include "RegNumberModel.h"
 
 // Required for Symbian (QSystemTrayIcon)
 #include "OsDependent.h"
@@ -158,6 +159,8 @@ private:
     QString         strPass;
     //! Our own GV phone number
     QString         strSelfNumber;
+
+    RegNumberModel  modelRegNumber;
 
 ///////////////////////////////////////////////////////////////////////////////
 // This block of variable is protected by the one mutex in it

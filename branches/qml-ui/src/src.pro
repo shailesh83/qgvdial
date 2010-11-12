@@ -58,7 +58,8 @@ SOURCES  += main.cpp                    \
             ContactsTreeView.cpp        \
             InboxTreeView.cpp           \
             VMailDialog.cpp             \
-            WebWidget.cpp
+            WebWidget.cpp               \
+            RegNumberModel.cpp
 
 HEADERS  += global.h                    \
             IObserver.h                 \
@@ -92,8 +93,9 @@ HEADERS  += global.h                    \
             GVHistory.h                 \
             ContactsTreeView.h          \
             InboxTreeView.h             \
-            VMailDialog.h \
-    WebWidget.h
+            VMailDialog.h               \
+            WebWidget.h                 \
+            RegNumberModel.h
 
 FORMS    += MainWindow.ui               \
             LoginDialog.ui              \

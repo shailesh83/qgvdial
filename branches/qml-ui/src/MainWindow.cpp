@@ -27,6 +27,7 @@ MainWindow::MainWindow (QWidget *parent)
 , pInboxView (NULL)
 , pWebWidget (new WebWidget (this, Qt::Window))
 , bLoggedIn (false)
+, modelRegNumber (this)
 , mtxDial (QMutex::Recursive)
 , bCallInProgress (false)
 , bDialCancelled (false)
@@ -35,6 +36,8 @@ MainWindow::MainWindow (QWidget *parent)
     QObject::connect(QApplication::desktop(), SIGNAL(resized(int)),
                      this                   , SLOT  (orientationChanged()));
 #endif
+
+    modelRegNumber.insertRow (RNT_Callback, "blah", "12223334444");
 
     // This must be done at least once so that the initial qml is loaded.
     // Even if it is desktop, this must be done: The function takes care of
@@ -306,33 +309,37 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
 void
 MainWindow::orientationChanged ()
 {
-    QRect screenGeometry = QApplication::desktop()->screenGeometry();
-    bool bLandscape = (screenGeometry.width() > screenGeometry.height());
+    QDesktopWidget *dWgt = QApplication::desktop();
+    bool bLandscape = false;
+
+    if (NULL != dWgt) {
+        QRect screenGeometry = dWgt->screenGeometry();
+        bLandscape = (screenGeometry.width() > screenGeometry.height());
+    }
 #ifndef Q_WS_MAEMO_5
     bLandscape = false;
 #endif
+
+    QDeclarativeContext *ctx = this->rootContext();
+    ctx->setContextProperty ("myModel", &modelRegNumber);
+
     if (bLandscape) {
         this->setSource (QUrl ("qrc:/MainView_l.qml"));
-//        ui->gridMain->removeWidget (ui->wgtKeypad);
-//        ui->gridMain->addWidget (ui->wgtKeypad, 0, 1);
     } else {
         this->setSource (QUrl ("qrc:/MainView_p.qml"));
-//        ui->gridMain->removeWidget (ui->wgtKeypad);
-//        ui->gridMain->addWidget (ui->wgtKeypad, 1, 0);
     }
     this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
     // Call or text a number
-    QObject::connect (this->rootObject(), SIGNAL (sigCall (QString)),
-                      this              , SLOT   (dialNow (QString)));
-    QObject::connect (this->rootObject(), SIGNAL (sigText (QString)),
-                      this              , SLOT   (textANumber (QString)));
-    QObject::connect (
-        this->rootObject(), SIGNAL (sigContacts ()),
-        this              , SLOT   (on_btnContacts_clicked ()));
-    QObject::connect (
-        this->rootObject(), SIGNAL (sigInbox ()),
-        this              , SLOT   (on_btnHistory_clicked ()));
+    QGraphicsObject *gObj = this->rootObject();
+    QObject::connect (gObj, SIGNAL (sigCall (QString)),
+                      this, SLOT   (dialNow (QString)));
+    QObject::connect (gObj, SIGNAL (sigText (QString)),
+                      this, SLOT   (textANumber (QString)));
+    QObject::connect (gObj, SIGNAL (sigContacts ()),
+                      this, SLOT   (on_btnContacts_clicked ()));
+    QObject::connect (gObj, SIGNAL (sigInbox ()),
+                      this, SLOT   (on_btnHistory_clicked ()));
 }//MainWindow::orientationChanged
 
 void
