@@ -39,18 +39,11 @@ MainWindow::MainWindow (QWidget *parent)
 #ifdef Q_WS_MAEMO_5
     QObject::connect(QApplication::desktop(), SIGNAL(resized(int)),
                      this                   , SLOT  (orientationChanged()));
-    rootItem->setProperty ("height", 400);
-    rootItem->setProperty ("width", 800);
 #endif
     this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
-    bool bTest =
-    rootItem->setProperty ("selectedOri", "Portrait");
-    qDebug () << "orienteation set has" << (bTest?"succeeded":"failed");
-
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setDefaultWindowAttributes (this);
-
 
     pWebWidget->hide ();
     osd.setDefaultWindowAttributes (pWebWidget);
