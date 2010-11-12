@@ -34,7 +34,7 @@ Rectangle {
                 width: parent.width
                 height: parent.height * (3 / 4)
 
-                onSigSelChanged: sigSelChanged (index)
+                onSigSelChanged: window.sigSelChanged (index)
             }//DialDisp
 
             ActionButtons {

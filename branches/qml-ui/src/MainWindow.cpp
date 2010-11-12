@@ -340,7 +340,7 @@ MainWindow::orientationChanged ()
     QObject::connect (gObj, SIGNAL (sigInbox ()),
                       this, SLOT   (on_btnHistory_clicked ()));
     QObject::connect (gObj, SIGNAL (sigSelChanged (int)),
-                      this, SLOT   (on_btnHistory_clicked ()));
+                      this, SLOT   (onRegPhoneSelectionChange (int)));
 }//MainWindow::orientationChanged
 
 void
@@ -1140,25 +1140,20 @@ MainWindow::getDialSettings (bool                 &bDialout   ,
 
     bool rv = false;
     do { // Begin cleanup block (not a loop)
-        //@@UV: Fix this
-        int index = 0; // = ui->cbDialMethod->currentIndex ();
-        if (index < arrNumbers.size ())
-        {
-            gvRegNumber = arrNumbers[index];
-            bDialout = false;
+        RegNumData data;
+        if (modelRegNumber.getAt (indRegPhone, data)) {
+            qDebug ("Invalid registered phone index");
+            break;
         }
-        else
-        {
-            //@@UV: Fix this
-            QVariant var; // = ui->cbDialMethod->itemData (index);
-            if ((!var.isValid ()) || (var.isNull ()))
-            {
-                qWarning ("Invalid variant in callout numbers");
-                break;
-            }
-            initiator = (CalloutInitiator *) var.value<void *> ();
-            bDialout = true;
+
+        gvRegNumber.chType = data.chType;
+        gvRegNumber.strName = data.strName;
+        gvRegNumber.strDescription = data.strDesc;
+        bDialout = (data.type == RNT_Callout);
+        if (bDialout) {
+            initiator = (CalloutInitiator *) data.pCtx;
         }
+
         rv = true;
     } while (0); // End cleanup block (not a loop)
 
@@ -1261,6 +1256,9 @@ void
 MainWindow::onRegPhoneSelectionChange (int index)
 {
     indRegPhone = index;
+
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    dbMain.putCallback (QString("%1").arg (indRegPhone));
 
     QDeclarativeContext *ctx = this->rootContext();
     RegNumData data;

@@ -40,7 +40,7 @@ Rectangle {
                 width: parent.width
                 height: parent.height * (4 / 9)
 
-                onSigSelChanged: sigSelChanged (index)
+                onSigSelChanged: window.sigSelChanged (index)
             }//DialDisp
 
             Keypad {
