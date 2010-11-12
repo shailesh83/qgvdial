@@ -11,10 +11,6 @@ Rectangle {
     signal sigContacts
     signal sigInbox
 
-    property string selectedOri: "UnknownOrientation"
-    property variant activeOri: selectedOri == "UnknownOrientation" ? Code.getOriName(runtime.orientation) : selectedOri
-    state: "orientation " + activeOri
-
     property bool landscape: window.width > window.height
     property variant rotationDelta: landscape? -90 : 0
 
@@ -22,50 +18,9 @@ Rectangle {
     property real baseWidth: landscape ? window.height : window.width
     property real baseHeight: landscape ? window.width : window.height
 
-    states: [
-        State {
-            name: "orientation " + "Portrait"
-            PropertyChanges {
-                target: main
-                rotation: Code.getAngle("Portrait") + rotationDelta
-                width: baseWidth
-                height: baseHeight
-            }
-        },
-        State {
-            name: "orientation " + "Landscape"
-            PropertyChanges {
-                target: main
-                rotation: Code.getAngle("Landscape") + rotationDelta
-                width: baseHeight
-                height: baseWidth
-            }
-        },
-        State {
-            name: "orientation " + "PortraitInverted"
-            PropertyChanges {
-                target: main
-                rotation: Code.getAngle("PortraitInverted") + rotationDelta
-                width: baseWidth
-                height: baseHeight
-            }
-        },
-        State {
-            name: "orientation " + "LandscapeInverted"
-            PropertyChanges {
-                target: main
-                rotation: Code.getAngle("LandscapeInverted") + rotationDelta
-                width: baseHeight
-                height: baseWidth
-            }
-        }
-    ]
-
     Row {
         id: main
-
         anchors.fill: parent
-        spacing: 2
 
         Column {
             width: parent.width / 2
@@ -73,16 +28,16 @@ Rectangle {
 
             DialDisp {
                 id: wDisp
-                color: window.color
 
+                color: window.color
                 width: parent.width
-                height: parent.height * (4 / 5)
+                height: parent.height * (3 / 4)
             }//DialDisp
 
             ActionButtons {
-                id: btnSpecial
+                color: window.color
                 width: parent.width
-                height: window.height * (1 / 5)
+                height: window.height * (1 / 4)
 
                 onSigCall: window.sigCall(wDisp.txtEd.text)
                 onSigText: window.sigText(wDisp.txtEd.text)
@@ -95,7 +50,6 @@ Rectangle {
 
         Keypad {
             color: window.color
-
             width: parent.width / 2
             height: parent.height
 

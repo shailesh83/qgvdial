@@ -18,7 +18,7 @@ Rectangle {
     property real baseHeight: landscape ? window.width : window.height
 
     Rectangle {
-        color: "white"
+        color: "black"
 
         width: baseWidth
         height: baseHeight

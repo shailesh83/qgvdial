@@ -21,7 +21,6 @@ struct DialOutContext {
 
 MainWindow::MainWindow (QWidget *parent)
 : QDeclarativeView (parent)
-//, ui (new Ui::MainWindow)
 , icoGoogle (":/Google.png")
 , pSystray (NULL)
 , pContactsView (NULL)
@@ -32,14 +31,15 @@ MainWindow::MainWindow (QWidget *parent)
 , bCallInProgress (false)
 , bDialCancelled (false)
 {
-//    ui->setupUi(this);
-
-    this->setSource (QUrl ("qrc:/MainView_p.qml"));
 #ifdef Q_WS_MAEMO_5
     QObject::connect(QApplication::desktop(), SIGNAL(resized(int)),
                      this                   , SLOT  (orientationChanged()));
 #endif
-    this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
+
+    // This must be done at least once so that the initial qml is loaded.
+    // Even if it is desktop, this must be done: The function takes care of
+    // making it portrait for non-maemo.
+    orientationChanged ();
 
     OsDependent &osd = Singletons::getRef().getOSD ();
     osd.setDefaultWindowAttributes (this);
@@ -100,8 +100,8 @@ MainWindow::log (const QString &strText, int level /*= 10*/)
 void
 MainWindow::setStatus(const QString &strText, int timeout /* = 0*/)
 {
+    //@@UV: Fix
     qDebug () << strText;
-//    ui->statusBar->showMessage (strText, timeout);
 }//MainWindow::setStatus
 
 void
@@ -161,18 +161,6 @@ MainWindow::init ()
     QObject::connect (
         &dlgSMS, SIGNAL (sendSMS (const QStringList &, const QString &)),
          this  , SLOT   (sendSMS (const QStringList &, const QString &)));
-
-    // Call or text a number
-    QObject::connect (this->rootObject(), SIGNAL (sigCall (QString)),
-                      this              , SLOT   (dialNow (QString)));
-    QObject::connect (this->rootObject(), SIGNAL (sigText (QString)),
-                      this              , SLOT   (textANumber (QString)));
-    QObject::connect (
-        this->rootObject(), SIGNAL (sigContacts ()),
-        this              , SLOT   (on_btnContacts_clicked ()));
-    QObject::connect (
-        this->rootObject(), SIGNAL (sigInbox ()),
-        this              , SLOT   (on_btnHistory_clicked ()));
 
     // Additional UI initializations:
     //@@UV: Need this for later
@@ -319,13 +307,32 @@ void
 MainWindow::orientationChanged ()
 {
     QRect screenGeometry = QApplication::desktop()->screenGeometry();
-    if (screenGeometry.width() > screenGeometry.height()) {
+    bool bLandscape = (screenGeometry.width() > screenGeometry.height());
+#ifndef Q_WS_MAEMO_5
+    bLandscape = false;
+#endif
+    if (bLandscape) {
+        this->setSource (QUrl ("qrc:/MainView_l.qml"));
 //        ui->gridMain->removeWidget (ui->wgtKeypad);
 //        ui->gridMain->addWidget (ui->wgtKeypad, 0, 1);
     } else {
+        this->setSource (QUrl ("qrc:/MainView_p.qml"));
 //        ui->gridMain->removeWidget (ui->wgtKeypad);
 //        ui->gridMain->addWidget (ui->wgtKeypad, 1, 0);
     }
+    this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
+
+    // Call or text a number
+    QObject::connect (this->rootObject(), SIGNAL (sigCall (QString)),
+                      this              , SLOT   (dialNow (QString)));
+    QObject::connect (this->rootObject(), SIGNAL (sigText (QString)),
+                      this              , SLOT   (textANumber (QString)));
+    QObject::connect (
+        this->rootObject(), SIGNAL (sigContacts ()),
+        this              , SLOT   (on_btnContacts_clicked ()));
+    QObject::connect (
+        this->rootObject(), SIGNAL (sigInbox ()),
+        this              , SLOT   (on_btnHistory_clicked ()));
 }//MainWindow::orientationChanged
 
 void
