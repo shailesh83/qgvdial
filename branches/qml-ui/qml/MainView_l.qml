@@ -99,15 +99,7 @@ Rectangle {
             width: parent.width / 2
             height: parent.height
 
-            onBtnClick: {
-                var origStart = wDisp.txtEd.selectionStart;
-                var result = wDisp.txtEd.text.substr(0,origStart);
-                result += strText;
-                result += wDisp.txtEd.text.substr(wDisp.txtEd.selectionEnd);
-                wDisp.txtEd.text = result;
-                wDisp.txtEd.cursorPosition = origStart + strText.length;
-            }
-
+            onBtnClick: Code.doIns(strText)
             onBtnDelClick: Code.doDel()
         }//Keypad
 

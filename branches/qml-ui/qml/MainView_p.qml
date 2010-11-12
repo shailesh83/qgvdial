@@ -46,9 +46,7 @@ Rectangle {
                 width: parent.width
                 height: parent.height * (4 / 9)
 
-                onBtnClick: {
-                }
-
+                onBtnClick: Code.doIns(strText)
                 onBtnDelClick: Code.doDel()
             }//Keypad
 

@@ -55,6 +55,15 @@ function doDel () {
     wDisp.txtEd.cursorPosition = origStart;
 }
 
+function doIns (strText) {
+    var origStart = wDisp.txtEd.selectionStart;
+    var result = wDisp.txtEd.text.substr(0,origStart);
+    result += strText;
+    result += wDisp.txtEd.text.substr(wDisp.txtEd.selectionEnd);
+    wDisp.txtEd.text = result;
+    wDisp.txtEd.cursorPosition = origStart + strText.length;
+}
+
 function getOriName (ori) {
     var name = "UnknownOrientation";
     if (ori == Orientation.Portrait) {

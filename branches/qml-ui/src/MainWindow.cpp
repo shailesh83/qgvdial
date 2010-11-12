@@ -35,7 +35,6 @@ MainWindow::MainWindow (QWidget *parent)
 //    ui->setupUi(this);
 
     this->setSource (QUrl ("qrc:/MainView_p.qml"));
-    QGraphicsObject *rootItem = this->rootObject ();
 #ifdef Q_WS_MAEMO_5
     QObject::connect(QApplication::desktop(), SIGNAL(resized(int)),
                      this                   , SLOT  (orientationChanged()));
