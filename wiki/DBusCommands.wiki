@@ -4,4 +4,4 @@
 dbus-send --dest=org.QGVDial.CallServer --session --print-reply /org/QGVDial/CallServer org.QGVDial.CallServer.Call string:"121212121"
 
 *To text a number*
-dbus-send --dest=org.QGVDial.TextServer --session --print-reply /org/QGVDial/TextServer org.QGVDial.TextServer.Text array:string:"+14082183716" string:"Some text"
+dbus-send --dest=org.QGVDial.TextServer --session --print-reply /org/QGVDial/TextServer org.QGVDial.TextServer.Text array:string:"+1aaabbbcccc" string:"Some text"
