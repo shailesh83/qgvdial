@@ -5,3 +5,6 @@ dbus-send --dest=org.QGVDial.CallServer --session --print-reply /org/QGVDial/Cal
 
 *To text a number*
 dbus-send --dest=org.QGVDial.TextServer --session --print-reply /org/QGVDial/TextServer org.QGVDial.TextServer.Text array:string:"+1aaabbbcccc" string:"Some text"
+
+*To text a number without any text (open a text input dialog)*
+dbus-send --dest=org.QGVDial.TextServer --session --print-reply /org/QGVDial/TextServer org.QGVDial.TextServer.TextWithoutData array:string:"+1aaabbbcccc"
