@@ -1,0 +1,17 @@
+[Profile]
+DisplayName = QGV
+IconName = vicar_phone
+Manager = qgvtp
+Protocol = gv
+Priority = -1
+VCardDefault = 1
+VCardField = X-QGV
+Capabilities = voice-p2p, split-account
+ConfigurationUI = osso-accounts
+LocalizationDomain = rtcom-call-ui
+
+[Action call]
+Name = Call via QGV
+IconName = vicar_phone
+VCardFields = X-QGV,TEL
+prop-org.freedesktop.Telepathy.Channel.ChannelType-s = org.freedesktop.Telepathy.Channel.Type.StreamedMedia

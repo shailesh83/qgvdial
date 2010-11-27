@@ -1,5 +1,5 @@
 /* qgvdial Telepathy is GPL.
- * Derived from viacar-telepathy. Its licence follows.
+ * Derived from vicar-telepathy. Its licence follows.
  */
 
 /*
@@ -44,7 +44,7 @@ Based on Telepathy-SNOM with copyright notice below.
 
 namespace
 {
-static const QString protocol_qgvtp("tel");
+static const QString protocol_qgvtp("gv");
 
 static const QString connection_service_name_prefix("org.freedesktop.Telepathy.Connection." TP_NAME "." + protocol_qgvtp + '.');
 static const QString connection_object_path_prefix("/org/freedesktop/Telepathy/Connection/" TP_NAME "/" + protocol_qgvtp + '/');
@@ -132,12 +132,12 @@ Connection::Connection(const QString & account, QObject * parent)
 
 
 
-    qDebug() << "VICaR: Connection set up.";
+    qDebug() << "qgvtp: Connection set up.";
 }
 
 Connection::~Connection()
 {
-    qDebug() << "VICaR: Connection closed.";
+    qDebug() << "qgvtp: Connection closed.";
     delete(d);
 }
 
@@ -145,14 +145,14 @@ bool Connection::registerObject()
 {
     if (!QDBusConnection::sessionBus().registerService(serviceName()))
     {
-        qDebug() << "VICaR: Problem registering connection service:" << serviceName();
+        qDebug() << "qgvtp: Problem registering connection service:" << serviceName();
         return false;
     }
 
     if (!QDBusConnection::sessionBus().registerObject(objectPath().path(),
                                                       this))
     {
-        qDebug() << "VICaR: Problem registering object path:" << objectPath().path();
+        qDebug() << "qgvtp: Problem registering object path:" << objectPath().path();
         return false;
     }
     return true;
@@ -160,14 +160,14 @@ bool Connection::registerObject()
 
 void Connection::unregisterObject()
 {
-    qDebug() << "VICaR: Unregistering Connection object from DBus";
+    qDebug() << "qgvtp: Unregistering Connection object from DBus";
     QDBusConnection::sessionBus().unregisterObject(objectPath().path());
     QDBusConnection::sessionBus().unregisterService(serviceName());
 }
 
 QString Connection::name() const
 {    
-    return QString("vicar");
+    return QString("qgvtp");
 }
 
 
@@ -185,22 +185,22 @@ void Connection::Connect()
        Since this is not a "real" Telepathy Connection to a SIP, Chat server,
        I am not connecting to anything.
      */
-    qDebug() << "VICaR: Changing status to Connected...";
+    qDebug() << "qgvtp: Changing status to Connected...";
     d->connection_status = Connection::Connected;
 
     //Let all the Telepathy clients know that connection status has changed
-    qDebug() << "VICaR: Emitting StatusChanged.";
+    qDebug() << "qgvtp: Emitting StatusChanged.";
     emit StatusChanged(d->connection_status, ReasonRequested);
 
 }
 
 void Connection::Disconnect()
 {
-    qDebug() << "VICaR: Changing status to Disconnected...";
+    qDebug() << "qgvtp: Changing status to Disconnected...";
     //We don't have any Handles to release here. So just change the status to Disconnected
     d->connection_status = Connection::Disconnected;
 
-    qDebug() << "VICaR: Emitting StatusChanged";
+    qDebug() << "qgvtp: Emitting StatusChanged";
     emit StatusChanged(d->connection_status, ReasonRequested);
 
     //As per Telepathy specfication, on disconnect we need to unregister from Dbus and destroy the object.
@@ -214,7 +214,7 @@ QStringList Connection::GetInterfaces()
     if (d->connection_status != Connected)
     {
         sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
-                       "VICaR - Unable to get Interfaces List. The connection is no longer available.");
+                       "qgvtp - Unable to get Interfaces List. The connection is no longer available.");
         return result;
     }    
     result <<requests_interface;
@@ -229,18 +229,18 @@ uint Connection::GetStatus()
 
 uint Connection::GetSelfHandle()
 {
-    qDebug() << "VICaR: GetSelfHandle";
+    qDebug() << "qgvtp: GetSelfHandle";
     if (d->connection_status != Connected)
     {
         sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
-                       "VICaR - Unable to get Self Handle. The connection is no longer available.");
-        qDebug() << "VICaR: NOT CONNECTED when requesting selfhandle!";
+                       "qgvtp - Unable to get Self Handle. The connection is no longer available.");
+        qDebug() << "qgvtp: NOT CONNECTED when requesting selfhandle!";
         return 0;
     }
 
     //WARNING: Incomplete implemenation
     uint handle = 0;
-    qDebug() << "VICaR: Returning Handle" << handle << "as self handle.";
+    qDebug() << "qgvtp: Returning Handle" << handle << "as self handle.";
     return handle;
 }
 
@@ -254,13 +254,13 @@ QList<uint> Connection::RequestHandles(uint handle_type,
     if (d->connection_status != Connected)
     {
         sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
-                       "VICaR - Unable to process handle request. The connection is no longer available.");
+                       "qgvtp - Unable to process handle request. The connection is no longer available.");
         return result;
     }
     if (handle_type != HandleContact)
     {
         sendErrorReply("org.freedesktop.Telepathy.Error.InvalidArgument",
-                       "VICaR - Supports handles of type Contact only.");
+                       "qgvtp - Supports handles of type Contact only.");
         return result;
     }
 
@@ -271,17 +271,17 @@ QList<uint> Connection::RequestHandles(uint handle_type,
 void Connection::HoldHandles(const uint handle_type, const QList<uint> &handles)
 {
     Q_UNUSED(handles);
-    qDebug() << "VICaR: HoldHandles.";
+    qDebug() << "qgvtp: HoldHandles.";
     if (d->connection_status != Connected)
     {
         sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
-                       "VICaR - Unable to process handle request. The connection is no longer available.");
+                       "qgvtp - Unable to process handle request. The connection is no longer available.");
         return;
     }
     if (handle_type != HandleContact)
     {
         sendErrorReply("org.freedesktop.Telepathy.Error.InvalidArgument",
-                       "VICaR - Supports handles of type Contact only.");
+                       "qgvtp - Supports handles of type Contact only.");
         return;
     }
 
@@ -298,13 +298,13 @@ QStringList Connection::InspectHandles(const uint handle_type,
     if (d->connection_status != Connected)
     {
         sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
-                       "VICaR - Unable to process handle request. The connection is no longer available.");
+                       "qgvtp - Unable to process handle request. The connection is no longer available.");
         return result;
     }
     if (handle_type != HandleContact)
     {
         sendErrorReply("org.freedesktop.Telepathy.Error.InvalidArgument",
-                       "VICaR - Supports handles of type Contact only.");
+                       "qgvtp - Supports handles of type Contact only.");
         return result;
     }
 
@@ -318,15 +318,15 @@ void Connection::ReleaseHandles(const uint handle_type, const QList<uint> &handl
     if (d->connection_status != Connected)
     {
         sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
-                       "VICaR - Unable to release handle. The connection is no longer available.");
-        qDebug() << "VICaR: Releasing Handle while connection is no longer connected.";
+                       "qgvtp - Unable to release handle. The connection is no longer available.");
+        qDebug() << "qgvtp: Releasing Handle while connection is no longer connected.";
         return;
     }
     if (handle_type != HandleContact)
     {
         sendErrorReply("org.freedesktop.Telepathy.Error.InvalidArgument",
-                       "VICaR - Supports handles of type Contact only.");
-        qDebug() << "VICaR: Trying to release a Handle that is not a contact.";
+                       "qgvtp - Supports handles of type Contact only.");
+        qDebug() << "qgvtp: Trying to release a Handle that is not a contact.";
         return;
     }
 
@@ -339,7 +339,7 @@ org::freedesktop::Telepathy::ChannelInfoList Connection::ListChannels()
     if (d->connection_status != Connected)
     {
         sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
-                       "VICaR - Unable to list channels. The connection is no longer available.");
+                       "qgvtp - Unable to list channels. The connection is no longer available.");
         return result;
     }
 
@@ -360,25 +360,25 @@ QDBusObjectPath Connection::RequestChannel(const QString &type,
     if (type != QString("org.freedesktop.Telepathy.Channel.Type.StreamedMedia"))
     {
         sendErrorReply("org.freedesktop.Telepathy.Error.NotImplemented",
-                       "VICaR: Failed to create channel: Channel type not implemented.");
+                       "qgvtp: Failed to create channel: Channel type not implemented.");
         return QDBusObjectPath();
     }
 
     if (handle_type != HandleContact )
     {
         sendErrorReply("org.freedesktop.Telepathy.Error.InvalidHandle",
-                       "VICaR: Failed to create channel: Handle type not supported.");
+                       "qgvtp: Failed to create channel: Handle type not supported.");
         return QDBusObjectPath();
     }
 
     if (d->connection_status != Connected)
     {
         sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
-                       "VICaR: Failed to create channel: Connection is Disconnected.");
+                       "qgvtp: Failed to create channel: Connection is Disconnected.");
         return QDBusObjectPath();
     }
 
-    //TODO VICaR Specific code here
+    //TODO qgvtp Specific code here
 
     //WARNING: Incomplete implementation, we are not creating any channels here at all.
     QDBusObjectPath channel_path;
@@ -391,12 +391,12 @@ QDBusObjectPath Connection::CreateChannel(const QVariantMap &request,
 {
     Q_UNUSED(channel_properties);
     Q_ASSERT(!request.isEmpty());
-    qDebug() << "VICaR: CreateChannel";
+    qDebug() << "qgvtp: CreateChannel";
     qDebug() << " Request details are: "<< request;
 
      //Ideally we need to emit NewChannels signal here, but since we are not creating any channels we ignore it
 
-    //WARNING: VICaR - Specific implementation
+    //WARNING: qgvtp - Specific implementation
     return processChannel(request);
 
 }
@@ -408,7 +408,7 @@ bool Connection::EnsureChannel(const QVariantMap &request,
     Q_UNUSED(channel_object);
     Q_UNUSED(channel_properties);
     Q_ASSERT(!request.isEmpty());
-    qDebug() << "VICaR: EnsureChannel";
+    qDebug() << "qgvtp: EnsureChannel";
     qDebug() << " Request details are: "<< request;
 
     //WARNING: Incomplete implementation
@@ -423,20 +423,20 @@ QDBusObjectPath Connection::processChannel(const QVariantMap &request){
 
     if (!request.contains("org.freedesktop.Telepathy.Channel.TargetID")){
         sendErrorReply("org.freedesktop.Telepathy.Error.InvalidArgument",
-                       "VICaR - Invalid request. TargetID (Phone Number) not included.");
+                       "qgvtp - Invalid request. TargetID (Phone Number) not included.");
         return channel_path;
     }
 
     QVariant vNumber = request.value("org.freedesktop.Telepathy.Channel.TargetID");
     if (!vNumber.isValid()){
         sendErrorReply("org.freedesktop.Telepathy.Error.InvalidArgument",
-                       "VICaR - Invalid request. Phone Number is not valid.");
+                       "qgvtp - Invalid request. Phone Number is not valid.");
         return channel_path;
     }
     QString strNumber = vNumber.toString();
     if (strNumber.isEmpty()){
         sendErrorReply("org.freedesktop.Telepathy.Error.InvalidArgument",
-                       "VICaR - Invalid request. Phone Number is empty.");
+                       "qgvtp - Invalid request. Phone Number is empty.");
         return channel_path;
     }
 
@@ -447,7 +447,7 @@ QDBusObjectPath Connection::processChannel(const QVariantMap &request){
      */
 
     sendErrorReply("org.freedesktop.Telepathy.Error.NotAvailable",
-                   "VICaR - Creating a new channel to "+strNumber+" via Ring.");
+                   "qgvtp - Creating a new channel to "+strNumber+" via qgvdial.");
 
 
     // This is where we call QGVDIAL.
@@ -468,7 +468,7 @@ QDBusObjectPath Connection::processChannel(const QVariantMap &request){
 
     callRouter->callInternationalNumber(strNumber);
 
-    qDebug() << "VICaR: Call is processed.";
+    qDebug() << "qgvtp: Call is processed.";
 */
 
     return channel_path;
