@@ -2,7 +2,7 @@
 DisplayName = QGV
 IconName = vicar_phone
 Manager = qgvtp
-Protocol = gv
+Protocol = qgv
 Priority = -1
 VCardDefault = 1
 VCardField = X-QGV

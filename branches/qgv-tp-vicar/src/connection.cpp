@@ -44,7 +44,7 @@ Based on Telepathy-SNOM with copyright notice below.
 
 namespace
 {
-static const QString protocol_qgvtp("gv");
+static const QString protocol_qgvtp("qgv");
 
 static const QString connection_service_name_prefix("org.freedesktop.Telepathy.Connection." TP_NAME "." + protocol_qgvtp + '.');
 static const QString connection_object_path_prefix("/org/freedesktop/Telepathy/Connection/" TP_NAME "/" + protocol_qgvtp + '/');

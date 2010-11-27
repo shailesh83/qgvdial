@@ -1,4 +1,5 @@
 [ConnectionManager]
+Name=qgvtp
 BusName=org.freedesktop.Telepathy.ConnectionManager.qgvtp
 ObjectPath=/org/freedesktop/Telepathy/ConnectionManager/qgvtp
 
