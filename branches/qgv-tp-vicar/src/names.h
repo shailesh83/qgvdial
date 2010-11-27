@@ -37,7 +37,7 @@ Based on Telepathy-SNOM with copyright notice below.
 #define TP_NAME "qgvtp"
 
 #define cm_interface_name               "org.freedesktop.Telepathy.ConnectionManager"
-#define cm_service_name                 cm_interface_name TP_NAME
+#define cm_service_name                 cm_interface_name "." TP_NAME
 #define cm_object_path                  "/org/freedesktop/Telepathy/ConnectionManager/" TP_NAME
 
 #define ACCOUNT_MGR_NAME                "org.freedesktop.Telepathy.AccountManager"

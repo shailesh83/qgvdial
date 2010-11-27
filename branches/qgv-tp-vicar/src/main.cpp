@@ -117,7 +117,7 @@ int main(int argc, char ** argv)
                    arg(cm_object_path)));
     }
 
-    qDebug(qPrintable(QObject::tr("Enternig main loop.")));    
+    qDebug(qPrintable(QObject::tr("Entering main loop.")));    
 //    logfile.close();
     return app.exec();
 }
