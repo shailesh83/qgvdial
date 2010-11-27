@@ -12,9 +12,15 @@
 #ifndef CONNECTIONADAPTOR_H_1172489892
 #define CONNECTIONADAPTOR_H_1172489892
 
-#include <QtCore>
-#include <QtDBus>
+#include <QtCore/QObject>
+#include <QtDBus/QtDBus>
 #include "connectiontypes.h"
+class QByteArray;
+template<class T> class QList;
+template<class Key, class Value> class QMap;
+class QString;
+class QStringList;
+class QVariant;
 
 /*
  * Adaptor class for interface org.freedesktop.Telepathy.Connection
@@ -112,4 +118,4 @@ Q_SIGNALS: // SIGNALS
     void StatusChanged(uint status, uint reason);
 };
 
-#endif //CONNECTIONADAPTOR_H_1172489892
+#endif

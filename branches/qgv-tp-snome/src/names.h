@@ -25,7 +25,9 @@
 #ifndef _SNOM_NAMES_H_
 #define _SNOM_NAMES_H_
 
-static const QString cm_service_name("org.freedesktop.Telepathy.ConnectionManager.qgvtp");
-static const QString cm_object_path("/org/freedesktop/Telepathy/ConnectionManager/qgvtp");
+#define TP_NAME "qgvtp"
+
+static const QString cm_service_name("org.freedesktop.Telepathy.ConnectionManager." TP_NAME);
+static const QString cm_object_path("/org/freedesktop/Telepathy/ConnectionManager/" TP_NAME);
 
 #endif

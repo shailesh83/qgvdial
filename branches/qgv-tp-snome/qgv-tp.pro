@@ -2,6 +2,8 @@ TEMPLATE = app
 TARGET = qgv-tp
 DEPENDPATH += src
 INCLUDEPATH += src
+
+QT *= core network dbus
 CONFIG *= console
 
 MOC_DIR = mocs

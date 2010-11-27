@@ -25,21 +25,16 @@
 #include "channel.h"
 #include "phoneconnector.h"
 
-#include <QtCore/QDebug>
-#include <QtCore/QCoreApplication>
-#include <QtCore/QBuffer>
-#include <QtCore/QByteArray>
-#include <QtNetwork/QHttpResponseHeader>
-#include <QtNetwork/QHttp>
-#include <QtNetwork/QTcpServer>
-#include <QtNetwork/QTcpSocket>
+#include <QtCore>
+#include <QtNetwork>
 
 namespace
 {
-static const QString protocol_snom("snom");
+static const QString protocol_snom("tel");
 
-static const QString connection_service_name_prefix("org.freedesktop.Telepathy.Connection.snom." + protocol_snom + '.');
-static const QString connection_object_path_prefix("/org/freedesktop/Telepathy/Connection/snom/" + protocol_snom + '/');
+static const QString connection_service_name_prefix("org.freedesktop.Telepathy.Connection." TP_NAME "." + protocol_snom + '.');
+static const QString connection_object_path_prefix("/org/freedesktop/Telepathy/Connection/" TP_NAME "/" + protocol_snom + '/');
+static const QString requests_interface("org.freedesktop.Telepathy.Connection.Interface.Requests");
 
 static const QString privacy_dnd_disabled("allow-all");
 static const QString privacy_dnd_enabled("allow-subscribed");
