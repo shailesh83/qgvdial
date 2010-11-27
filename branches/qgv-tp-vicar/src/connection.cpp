@@ -450,14 +450,26 @@ QDBusObjectPath Connection::processChannel(const QVariantMap &request){
                    "VICaR - Creating a new channel to "+strNumber+" via Ring.");
 
 
-    //Initiate a new call to CC/Google Out/Skype-out number by requesting a new channel with Ring CM.
-    //@@UV: This is where we call QGVDIAL.
+    // This is where we call QGVDIAL.
+    QDBusInterface iface("org.QGVDial.CallServer",
+                         "/org/QGVDial/CallServer",
+                         "", 
+                         QDBusConnection::sessionBus());
+    if (!iface.isValid()) {
+        qDebug ("QGVDial interface is not ready");
+        return channel_path;
+    }
+        
+    iface.call("Call", strNumber);
 
+/*
+    //Initiate a new call to CC/Google Out/Skype-out number by requesting a new channel with Ring CM.
     VicarCallRouterProxy *callRouter = new VicarCallRouterProxy(APPLICATION_DBUS_SERVICE,APPLICATION_DBUS_PATH,QDBusConnection::sessionBus(),this);
 
     callRouter->callInternationalNumber(strNumber);
 
     qDebug() << "VICaR: Call is processed.";
+*/
 
     return channel_path;
 }
