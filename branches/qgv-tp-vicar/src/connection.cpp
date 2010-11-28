@@ -30,6 +30,7 @@ Based on Telepathy-SNOM with copyright notice below.
  * 51 Franklin SQObject::treet, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "names.h"
 #include "connection.h"
 #include "connectionadaptor.h"
 #include "connectioninterfacerequestsadaptor.h"
@@ -45,9 +46,9 @@ namespace
 {
 static const QString protocol_qgvtp("qgv");
 
-static const QString connection_service_name_prefix("org.freedesktop.Telepathy.Connection." TP_NAME "." + protocol_qgvtp + '.');
-static const QString connection_object_path_prefix("/org/freedesktop/Telepathy/Connection/" TP_NAME "/" + protocol_qgvtp + '/');
-static const QString requests_interface("org.freedesktop.Telepathy.Connection.Interface.Requests");
+static const QString connection_service_name_prefix(TP_PATH_DOT ".Connection." TP_NAME "." + protocol_qgvtp + '.');
+static const QString connection_object_path_prefix(TP_PATH_SLASH "/Connection/" TP_NAME "/" + protocol_qgvtp + '/');
+static const QString requests_interface(TP_PATH_DOT ".Connection.Interface.Requests");
 }
 
 class ConnectionPrivate
@@ -105,21 +106,21 @@ Connection::Connection(const QString & account, QObject * parent)
     uint targetHandleType(1);
 
     org::freedesktop::Telepathy::RequestableChannelClass requestableChannelClass1;
-    requestableChannelClass1.fixedProperties.insert("org.freedesktop.Telepathy.Channel.TargetHandleType",targetHandleType);
-    requestableChannelClass1.fixedProperties.insert("org.freedesktop.Telepathy.Channel.ChannelType","org.freedesktop.Telepathy.Channel.Type.StreamedMedia");
+    requestableChannelClass1.fixedProperties.insert(TP_PATH_DOT ".Channel.TargetHandleType",targetHandleType);
+    requestableChannelClass1.fixedProperties.insert(TP_PATH_DOT ".Channel.ChannelType", TP_PATH_DOT ".Channel.Type.StreamedMedia");
 
-    requestableChannelClass1.allowedProperties.append("org.freedesktop.Telepathy.Channel.TargetHandle");
-    requestableChannelClass1.allowedProperties.append("org.freedesktop.Telepathy.Channel.Type.StreamedMedia.InitialAudio");
+    requestableChannelClass1.allowedProperties.append(TP_PATH_DOT ".Channel.TargetHandle");
+    requestableChannelClass1.allowedProperties.append(TP_PATH_DOT ".Channel.Type.StreamedMedia.InitialAudio");
 
     requestableChannelClasses.append(requestableChannelClass1);
 
     org::freedesktop::Telepathy::RequestableChannelClass requestableChannelClass2;
-    requestableChannelClass2.fixedProperties.insert("org.freedesktop.Telepathy.Channel.TargetHandleType",targetHandleType);
-    requestableChannelClass2.fixedProperties.insert("org.freedesktop.Telepathy.Channel.ChannelType","org.freedesktop.Telepathy.Channel.Type.StreamedMedia");
+    requestableChannelClass2.fixedProperties.insert(TP_PATH_DOT ".Channel.TargetHandleType",targetHandleType);
+    requestableChannelClass2.fixedProperties.insert(TP_PATH_DOT ".Channel.ChannelType",TP_PATH_DOT ".Channel.Type.StreamedMedia");
 
     requestableChannelClass2.allowedProperties.append("com.nokia.Telepathy.Channel.Interface.Conference.InitialMembers");
-    requestableChannelClass2.allowedProperties.append("org.freedesktop.Telepathy.Channel.TargetHandleType");
-    requestableChannelClass2.allowedProperties.append("org.freedesktop.Telepathy.Channel.Type.StreamedMedia.InitialAudio");
+    requestableChannelClass2.allowedProperties.append(TP_PATH_DOT ".Channel.TargetHandleType");
+    requestableChannelClass2.allowedProperties.append(TP_PATH_DOT ".Channel.Type.StreamedMedia.InitialAudio");
 
     requestableChannelClasses.append(requestableChannelClass2);
 
@@ -209,7 +210,7 @@ QStringList Connection::GetInterfaces()
     QStringList result;
     if (d->connection_status != Connected)
     {
-        sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
+        sendErrorReply(TP_PATH_DOT ".Error.Disconnected",
                        "qgvtp - Unable to get Interfaces List. The connection is no longer available.");
         return result;
     }
@@ -228,7 +229,7 @@ uint Connection::GetSelfHandle()
     qDebug() << "qgvtp: GetSelfHandle";
     if (d->connection_status != Connected)
     {
-        sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
+        sendErrorReply(TP_PATH_DOT ".Error.Disconnected",
                        "qgvtp - Unable to get Self Handle. The connection is no longer available.");
         qDebug() << "qgvtp: NOT CONNECTED when requesting selfhandle!";
         return 0;
@@ -249,13 +250,13 @@ QList<uint> Connection::RequestHandles(uint handle_type,
     // check input:
     if (d->connection_status != Connected)
     {
-        sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
+        sendErrorReply(TP_PATH_DOT ".Error.Disconnected",
                        "qgvtp - Unable to process handle request. The connection is no longer available.");
         return result;
     }
     if (handle_type != HandleContact)
     {
-        sendErrorReply("org.freedesktop.Telepathy.Error.InvalidArgument",
+        sendErrorReply(TP_PATH_DOT ".Error.InvalidArgument",
                        "qgvtp - Supports handles of type Contact only.");
         return result;
     }
@@ -270,13 +271,13 @@ void Connection::HoldHandles(const uint handle_type, const QList<uint> &handles)
     qDebug() << "qgvtp: HoldHandles.";
     if (d->connection_status != Connected)
     {
-        sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
+        sendErrorReply(TP_PATH_DOT ".Error.Disconnected",
                        "qgvtp - Unable to process handle request. The connection is no longer available.");
         return;
     }
     if (handle_type != HandleContact)
     {
-        sendErrorReply("org.freedesktop.Telepathy.Error.InvalidArgument",
+        sendErrorReply(TP_PATH_DOT ".Error.InvalidArgument",
                        "qgvtp - Supports handles of type Contact only.");
         return;
     }
@@ -293,13 +294,13 @@ QStringList Connection::InspectHandles(const uint handle_type,
         // check input:
     if (d->connection_status != Connected)
     {
-        sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
+        sendErrorReply(TP_PATH_DOT ".Error.Disconnected",
                        "qgvtp - Unable to process handle request. The connection is no longer available.");
         return result;
     }
     if (handle_type != HandleContact)
     {
-        sendErrorReply("org.freedesktop.Telepathy.Error.InvalidArgument",
+        sendErrorReply(TP_PATH_DOT ".Error.InvalidArgument",
                        "qgvtp - Supports handles of type Contact only.");
         return result;
     }
@@ -313,14 +314,14 @@ void Connection::ReleaseHandles(const uint handle_type, const QList<uint> &handl
     Q_UNUSED(handles);
     if (d->connection_status != Connected)
     {
-        sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
+        sendErrorReply(TP_PATH_DOT ".Error.Disconnected",
                        "qgvtp - Unable to release handle. The connection is no longer available.");
         qDebug() << "qgvtp: Releasing Handle while connection is no longer connected.";
         return;
     }
     if (handle_type != HandleContact)
     {
-        sendErrorReply("org.freedesktop.Telepathy.Error.InvalidArgument",
+        sendErrorReply(TP_PATH_DOT ".Error.InvalidArgument",
                        "qgvtp - Supports handles of type Contact only.");
         qDebug() << "qgvtp: Trying to release a Handle that is not a contact.";
         return;
@@ -334,7 +335,7 @@ org::freedesktop::Telepathy::ChannelInfoList Connection::ListChannels()
     org::freedesktop::Telepathy::ChannelInfoList result;
     if (d->connection_status != Connected)
     {
-        sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
+        sendErrorReply(TP_PATH_DOT ".Error.Disconnected",
                        "qgvtp - Unable to list channels. The connection is no longer available.");
         return result;
     }
@@ -353,23 +354,23 @@ QDBusObjectPath Connection::RequestChannel(const QString &type,
     Q_UNUSED(suppress_handler);
     //This method is deprecated and no longer used as per latest Telepathy spec
 
-    if (type != QString("org.freedesktop.Telepathy.Channel.Type.StreamedMedia"))
+    if (type != QString(TP_PATH_DOT ".Channel.Type.StreamedMedia"))
     {
-        sendErrorReply("org.freedesktop.Telepathy.Error.NotImplemented",
+        sendErrorReply(TP_PATH_DOT ".Error.NotImplemented",
                        "qgvtp: Failed to create channel: Channel type not implemented.");
         return QDBusObjectPath();
     }
 
     if (handle_type != HandleContact )
     {
-        sendErrorReply("org.freedesktop.Telepathy.Error.InvalidHandle",
+        sendErrorReply(TP_PATH_DOT ".Error.InvalidHandle",
                        "qgvtp: Failed to create channel: Handle type not supported.");
         return QDBusObjectPath();
     }
 
     if (d->connection_status != Connected)
     {
-        sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
+        sendErrorReply(TP_PATH_DOT ".Error.Disconnected",
                        "qgvtp: Failed to create channel: Connection is Disconnected.");
         return QDBusObjectPath();
     }
@@ -417,21 +418,21 @@ QDBusObjectPath Connection::processChannel(const QVariantMap &request){
 
     QDBusObjectPath channel_path;
 
-    if (!request.contains("org.freedesktop.Telepathy.Channel.TargetID")){
-        sendErrorReply("org.freedesktop.Telepathy.Error.InvalidArgument",
+    if (!request.contains(TP_PATH_DOT ".Channel.TargetID")){
+        sendErrorReply(TP_PATH_DOT ".Error.InvalidArgument",
                        "qgvtp - Invalid request. TargetID (Phone Number) not included.");
         return channel_path;
     }
 
-    QVariant vNumber = request.value("org.freedesktop.Telepathy.Channel.TargetID");
+    QVariant vNumber = request.value(TP_PATH_DOT ".Channel.TargetID");
     if (!vNumber.isValid()){
-        sendErrorReply("org.freedesktop.Telepathy.Error.InvalidArgument",
+        sendErrorReply(TP_PATH_DOT ".Error.InvalidArgument",
                        "qgvtp - Invalid request. Phone Number is not valid.");
         return channel_path;
     }
     QString strNumber = vNumber.toString();
     if (strNumber.isEmpty()){
-        sendErrorReply("org.freedesktop.Telepathy.Error.InvalidArgument",
+        sendErrorReply(TP_PATH_DOT ".Error.InvalidArgument",
                        "qgvtp - Invalid request. Phone Number is empty.");
         return channel_path;
     }
@@ -442,7 +443,7 @@ QDBusObjectPath Connection::processChannel(const QVariantMap &request){
 
      */
 
-    sendErrorReply("org.freedesktop.Telepathy.Error.NotAvailable",
+    sendErrorReply(TP_PATH_DOT ".Error.NotAvailable",
                    "qgvtp - Creating a new channel to "+strNumber+" via qgvdial.");
 
 
