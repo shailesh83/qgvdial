@@ -35,7 +35,7 @@ Based on Telepathy-SNOM with copyright notice below.
 #define _QGVTP_NAMES_H_
 
 #define TP_PATH_DOT     "org.freedesktop.Telepathy"
-#define TP_PATH_SLASH   "org/freedesktop/Telepathy"
+#define TP_PATH_SLASH   "/org/freedesktop/Telepathy"
 #define TP_NAME "qgvtp"
 
 #define cm_interface_name               TP_PATH_DOT ".ConnectionManager"
