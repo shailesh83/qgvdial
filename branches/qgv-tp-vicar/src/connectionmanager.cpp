@@ -34,7 +34,7 @@ Based on Telepathy-SNOM with copyright notice below.
 
 namespace
 {
-static const QString protocol_name("tel");
+static const QString protocol_name("qgv");
 }
 
 class ConnectionManagerPrivate
@@ -109,7 +109,7 @@ ConnectionManager::GetParameters(const QString &proto)
 
 QStringList ConnectionManager::ListProtocols()
 {
-    qDebug() << "VICaR ConnectionManager::ListProtocols()";
+    qDebug() << "qgvtp ConnectionManager::ListProtocols()";
     return QStringList(protocol_name);
 }
 
@@ -117,7 +117,7 @@ QString ConnectionManager::RequestConnection(const QString & proto,
                                              QVariantMap parameters,
                                              QDBusObjectPath & object_path)
 {
-    qDebug() << "VICaR CM: Connection Requested...";
+    qDebug() << "qgvtp CM: Connection Requested...";
     QString connection_service;
     object_path = QDBusObjectPath();
 
@@ -125,9 +125,9 @@ QString ConnectionManager::RequestConnection(const QString & proto,
     {
         /*
         sendErrorReply("org.freedesktop.Telepathy.Error.NotImplemented",
-                       "VICaR - Unable to create Connection. Requested protocol is not implemented.");
+                       "qgvtp - Unable to create Connection. Requested protocol is not implemented.");
         */
-        qDebug() << "VICaR CM::RequestConnection: proto mismatch.";
+        qDebug() << "qgvtp CM::RequestConnection: proto mismatch.";
         return connection_service;
     }
 
@@ -159,9 +159,9 @@ QString ConnectionManager::RequestConnection(const QString & proto,
         {
             /*
             sendErrorReply("org.freedesktop.Telepathy.Error.InvalidArgument",
-                           "VICaR - Unable to create Connection. Invalid parameters specified.");
+                           "qgvtp - Unable to create Connection. Invalid parameters specified.");
             */
-            qDebug() << "VICaR CM::RequestConnection: invalid parameter" << param << "found.";
+            qDebug() << "qgvtp CM::RequestConnection: invalid parameter" << param << "found.";
             return connection_service;
         }
     }
@@ -171,17 +171,17 @@ QString ConnectionManager::RequestConnection(const QString & proto,
 
     if (!new_connection->registerObject())
     {
-        qDebug() << "VICaR CM: Error while registering Connection object with DBus.";
+        qDebug() << "qgvtp CM: Error while registering Connection object with DBus.";
         delete new_connection;
         return QString();
     }
 
-    qDebug() << "VICaR CM: New Connection Created. Status is "<< new_connection->GetStatus();
+    qDebug() << "qgvtp CM: New Connection Created. Status is "<< new_connection->GetStatus();
 
     object_path = new_connection->objectPath();
     connection_service = new_connection->serviceName();
 
-    emit NewConnection(connection_service, object_path, "tel");
+    emit NewConnection(connection_service, object_path, "qgv");
 
     return new_connection->serviceName();
 }

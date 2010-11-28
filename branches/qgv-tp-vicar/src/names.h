@@ -34,14 +34,16 @@ Based on Telepathy-SNOM with copyright notice below.
 #ifndef _QGVTP_NAMES_H_
 #define _QGVTP_NAMES_H_
 
+#define TP_PATH_DOT     "org.freedesktop.Telepathy"
+#define TP_PATH_SLASH   "org/freedesktop/Telepathy"
 #define TP_NAME "qgvtp"
 
-#define cm_interface_name               "org.freedesktop.Telepathy.ConnectionManager"
+#define cm_interface_name               TP_PATH_DOT ".ConnectionManager"
 #define cm_service_name                 cm_interface_name "." TP_NAME
-#define cm_object_path                  "/org/freedesktop/Telepathy/ConnectionManager/" TP_NAME
+#define cm_object_path                  TP_PATH_SLASH "/ConnectionManager/" TP_NAME
 
-#define ACCOUNT_MGR_NAME                "org.freedesktop.Telepathy.AccountManager"
-#define ACCOUNT_MGR_PATH                "/org/freedesktop/Telepathy/AccountManager"
+#define ACCOUNT_MGR_NAME                TP_PATH_DOT ".AccountManager"
+#define ACCOUNT_MGR_PATH                TP_PATH_SLASH "/AccountManager"
 #define ACCOUNT_MGR_IFACE_QUERY         "com.nokia.AccountManager.Interface.Query"
 #define ACCOUNT_IFACE_COMPAT            "com.nokia.Account.Interface.Compat"
 #define ACCOUNT_IFACE_COMPAT_PROFILE    "com.nokia.Account.Interface.Compat.Profile"
