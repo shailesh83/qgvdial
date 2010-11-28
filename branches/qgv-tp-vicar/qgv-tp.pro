@@ -19,7 +19,6 @@ SOURCES  += src/main.cpp \
             src/connection.cpp \
             src/connectioninterfacerequeststypes.cpp \
             src/connectioninterfacerequestsadaptor.cpp \
-            src/vicarcallrouterproxy.cpp \
             src/connectioninterfacecapabilitiestypes.cpp \
             src/connectioninterfacecapabilitiesadaptor.cpp
 
@@ -33,7 +32,6 @@ HEADERS  += src/names.h \
             src/basetypes.h \
             src/connectioninterfacerequeststypes.h \
             src/connectioninterfacerequestsadaptor.h \
-            src/vicarcallrouterproxy.h \
             src/connectioninterfacecapabilitiestypes.h \
             src/connectioninterfacecapabilitiesadaptor.h
 

@@ -63,35 +63,11 @@ org::freedesktop::Telepathy::ParameterDefinitionList
 ConnectionManager::GetParameters(const QString &proto)
 {
     Q_ASSERT(!proto.isEmpty());
-    qDebug() << "VICAR: ConnectionManager::GetParameters(const QString &prot)";
+    qDebug() << "qgvtp: ConnectionManager::GetParameters(const QString &prot)";
     org::freedesktop::Telepathy::ParameterDefinitionList result;
     org::freedesktop::Telepathy::ParameterDefinition param;
 
     // Attention! Default constructed QDBusVariants cause havok on the D-Bus!
-    param.name = "com.nokia.Telepathy.Connection.Interface.GSM.IMSI";
-    param.flags = Register;
-    param.signature = "s";
-    //param.defaultValue = QDBusVariant(QString());
-    result.append(param);
-
-    param.name = "com.nokia.Telepathy.Connection.Interface.GSM.Privacy";
-    param.flags = Register|hasDefault;
-    param.signature = "s";
-    param.defaultValue = QDBusVariant(QString());
-    result.append(param);
-
-    param.name = "com.nokia.Telepathy.Connection.Interface.GSM.SMSServiceCentre";
-    param.flags = Register;
-    param.signature = "s";
-    //param.defaultValue = QDBusVariant(QString());
-    result.append(param);
-
-    param.name = "com.nokia.Telepathy.Connection.Interface.GSM.SMSValidityPeriod";
-    param.flags = Register|hasDefault;
-    param.signature = "u";
-    param.defaultValue = QDBusVariant(0);
-    result.append(param);
-
     param.name = "account";
     param.flags = None;
     param.signature = "s";
@@ -143,15 +119,7 @@ QString ConnectionManager::RequestConnection(const QString & proto,
     QString param;
     foreach (param, parameters.keys())
     {
-        if ("com.nokia.Telepathy.Connection.Interface.GSM.IMSI" == param)
-        { imsi = parameters[param].toString(); }
-        else if ("com.nokia.Telepathy.Connection.Interface.GSM.Privacy" == param)
-        { privacy = parameters[param].toString(); }
-        else if ("com.nokia.Telepathy.Connection.Interface.GSM.SMSServiceCentre" == param)
-        { smsServiceCenter = parameters[param].toString(); }
-        else if ("com.nokia.Telepathy.Connection.Interface.GSM.SMSValidityPeriod" == param)
-        { smsValidityPeriod = parameters[param].toInt(); }
-        else if ("account" == param)
+        if ("account" == param)
         { account = parameters[param].toString(); }
         else if ("password" == param)
         { password = parameters[param].toString(); }

@@ -37,7 +37,6 @@ Based on Telepathy-SNOM with copyright notice below.
 #include "connectioninterfacecapabilitiesadaptor.h"
 #include "connectioninterfacecapabilitiestypes.h"
 #include "names.h"
-#include "vicarcallrouterproxy.h"
 
 #include <QtCore>
 #include <QtDBus>
@@ -50,9 +49,6 @@ static const QString connection_service_name_prefix("org.freedesktop.Telepathy.C
 static const QString connection_object_path_prefix("/org/freedesktop/Telepathy/Connection/" TP_NAME "/" + protocol_qgvtp + '/');
 static const QString requests_interface("org.freedesktop.Telepathy.Connection.Interface.Requests");
 }
-
-using namespace org::maemo;
-
 
 class ConnectionPrivate
 {
@@ -166,7 +162,7 @@ void Connection::unregisterObject()
 }
 
 QString Connection::name() const
-{    
+{
     return QString("qgvtp");
 }
 
@@ -216,7 +212,7 @@ QStringList Connection::GetInterfaces()
         sendErrorReply("org.freedesktop.Telepathy.Error.Disconnected",
                        "qgvtp - Unable to get Interfaces List. The connection is no longer available.");
         return result;
-    }    
+    }
     result <<requests_interface;
     return result;
 }
@@ -453,13 +449,13 @@ QDBusObjectPath Connection::processChannel(const QVariantMap &request){
     // This is where we call QGVDIAL.
     QDBusInterface iface("org.QGVDial.CallServer",
                          "/org/QGVDial/CallServer",
-                         "", 
+                         "",
                          QDBusConnection::sessionBus());
     if (!iface.isValid()) {
         qDebug ("QGVDial interface is not ready");
         return channel_path;
     }
-        
+
     iface.call("Call", strNumber);
 
 /*
