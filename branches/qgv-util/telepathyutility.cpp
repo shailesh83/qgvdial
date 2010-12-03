@@ -8,12 +8,8 @@
 #include "accountmanagerproxy.h"
 #include "accountproxy.h"
 #include "accountcompatproxy.h"
-#include <QDBusInterface>
-#include <QDBusConnection>
-#include <QStringList>
-#include <QDBusPendingReply>
-#include <QDBusObjectPath>
-#include <QDebug>
+#include <QtCore>
+#include <QtDBus>
 
 using namespace org::freedesktop::Telepathy;
 
