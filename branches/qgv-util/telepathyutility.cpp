@@ -13,18 +13,18 @@
 
 using namespace org::freedesktop::Telepathy;
 
-TelepathyUtility::TelepathyUtility(QObject *parent) :
-    QObject(parent)
+TelepathyUtility::TelepathyUtility(QObject *parent)
+: QObject(parent)
 {
 }
 
-TelepathyUtility::~TelepathyUtility(){
-
+TelepathyUtility::~TelepathyUtility()
+{
 }
 
 //Get a list of all Telepathy accounts
-QList<QDBusObjectPath> TelepathyUtility::getAllAccounts(){
-
+QList<QDBusObjectPath> TelepathyUtility::getAllAccounts()
+{
     QList<QDBusObjectPath> objPathList;
 
     QDBusInterface *iface = new QDBusInterface(AM_SERVICE,AM_OBJ_PATH,DBUS_PROPS_IFACE,QDBusConnection::sessionBus(),this);
@@ -40,7 +40,7 @@ QList<QDBusObjectPath> TelepathyUtility::getAllAccounts(){
             while (!arg.atEnd()){
                 QDBusObjectPath opath;
                 arg >> opath;
-                if (opath.path().contains("tel")){
+                if (opath.path().contains("qgv")){
                     qDebug() << opath.path();
                 }
                 objPathList.append(opath);
@@ -50,22 +50,21 @@ QList<QDBusObjectPath> TelepathyUtility::getAllAccounts(){
         else{
             qDebug() << "Error occurred while fetching accounts list "<<reply.error();
         }
-    }
-    else{
-        qDebug() << "Error occurred while connecting to DBus interface";
+    } else {
+        qDebug("Error occurred while connecting to DBus interface");
     }
 
-    return objPathList;
-
+    return (objPathList);
 }
 
 //Check if Vicar telepathy account exists
-bool TelepathyUtility::accountExists(){
+bool TelepathyUtility::accountExists()
+{
     bool vicarAccountExists = false;
     QList<QDBusObjectPath> accountsList = this->getAllAccounts();
     QDBusObjectPath account;
     foreach (account,accountsList){
-        if (account.path().contains("vicar/tel/vicar")){
+        if (account.path().contains("qgvtp/qgv/qgvtp")){
             vicarAccountExists = true;
             break;
         }
@@ -75,19 +74,20 @@ bool TelepathyUtility::accountExists(){
 }
 
 //Get telepathy account status
-QString TelepathyUtility::getAccountStatus(){
-
+QString TelepathyUtility::getAccountStatus()
+{
     QString status = "Not Available";
 
     QList<QDBusObjectPath> accountsList = this->getAllAccounts();
     QDBusObjectPath account;
     foreach (account,accountsList){
-        if (account.path().contains("vicar/tel/vicar")){
+        if (account.path().contains("qgvtp/qgv/qgvtp")){
             AccountProxy *accountProxy = new AccountProxy(AM_SERVICE,account.path(),QDBusConnection::sessionBus(),this);
-            if (accountProxy->isValid()){
+            if (accountProxy->isValid())
+            {
                 uint intStatus = accountProxy->property("ConnectionStatus").toUInt();
                 //Based on http://telepathy.freedesktop.org/spec/Connection.html#Connection_Status
-                switch(intStatus){
+                switch (intStatus) {
                 case 0:
                     status = "Connected";
                     break;
@@ -106,12 +106,12 @@ QString TelepathyUtility::getAccountStatus(){
 }
 
 //Create Vicar telepathy account (used installation)
-bool TelepathyUtility::createAccount(){
-
+bool TelepathyUtility::createAccount()
+{
     AccountManagerProxy *amProxy = new AccountManagerProxy(AM_SERVICE,AM_OBJ_PATH,QDBusConnection::sessionBus(),this);
 
     QMap<QString,QVariant> connectionParametersMap;
-    connectionParametersMap.insert("account","vicar");
+    connectionParametersMap.insert("account","qgvtp");
 
     QList<QVariant> presenceDetails;
     uint presenceType(2); //Available = 2
@@ -129,31 +129,31 @@ bool TelepathyUtility::createAccount(){
     accountPropertiesMap.insert("org.freedesktop.Telepathy.Account.Enabled",true);
     accountPropertiesMap.insert("org.freedesktop.Telepathy.Account.ConnectAutomatically",true);
     accountPropertiesMap.insert("org.freedesktop.Telepathy.Account.RequestedPresence",QVariant::fromValue(presence));
-    accountPropertiesMap.insert("com.nokia.Account.Interface.Compat.Profile","vicar");
+    accountPropertiesMap.insert("com.nokia.Account.Interface.Compat.Profile","qgvtp");
 
     QStringList valuesList;
     valuesList.append("TEL");
     accountPropertiesMap.insert("com.nokia.Account.Interface.Compat.SecondaryVCardFields",valuesList);
 
-    QDBusPendingReply<QDBusObjectPath> reply = amProxy->CreateAccount("vicar","tel","Vicar",connectionParametersMap,accountPropertiesMap);
+    QDBusPendingReply<QDBusObjectPath> reply = amProxy->CreateAccount("qgvtp","qgv","qgvtp",connectionParametersMap,accountPropertiesMap);
     reply.waitForFinished();
 
     if (reply.isValid()){
         QDBusObjectPath account = reply.value();
-        qDebug() << account.path() <<" created successfully.";
+        qDebug() << account.path() << "created successfully.";
 
         AccountCompatProxy *accountCompatProxy = new AccountCompatProxy(AM_SERVICE,account.path(),QDBusConnection::sessionBus(),this);
         if (accountCompatProxy->isValid()){
             QDBusPendingReply<> dbusReply = accountCompatProxy->SetHasBeenOnline();
             dbusReply.waitForFinished();
             if (dbusReply.isError()){
-                qDebug() << "Error occurred while setting HasBeenOnline property "<<dbusReply.error();
+                qDebug() << "Error occurred while setting HasBeenOnline property " << dbusReply.error();
                 return false;
             }
         }
     }
     else{
-        qDebug() << "Error creating VICaR telepathy account "<<reply.error();
+        qDebug() << "Error creating VICaR telepathy account " << reply.error();
         return false;
     }
 
@@ -161,22 +161,21 @@ bool TelepathyUtility::createAccount(){
 }
 
 //Delete Vicar telepathy account (used during uninstallation)
-bool TelepathyUtility::deleteAccount(){
-
+bool TelepathyUtility::deleteAccount()
+{
     QList<QDBusObjectPath> accountsList = this->getAllAccounts();
     QDBusObjectPath account;
     foreach (account,accountsList){
-        if (account.path().contains("vicar/tel/vicar")){
+        if (account.path().contains("qgvtp/qgv/qgvtp")){
             AccountProxy *accountProxy = new AccountProxy(AM_SERVICE,account.path(),QDBusConnection::sessionBus(),this);
             if (accountProxy->isValid()){
                 QDBusPendingReply<> dbusReply = accountProxy->Remove();
                 dbusReply.waitForFinished();
                 if (dbusReply.isError()){
-                    qDebug() << "Error occurred while removing VICaR account "<<dbusReply.error();
+                    qDebug() << "Error occurred while removing qgv-tp account "<<dbusReply.error();
                     return false;
-                }
-                else{
-                    qDebug() <<"VICaR account deleted";
+                } else {
+                    qDebug ("qgv-tp account deleted");
                 }
             }
         }
@@ -186,19 +185,20 @@ bool TelepathyUtility::deleteAccount(){
 }
 
 // Marshall the Presence data into a D-Bus argument
- QDBusArgument &operator<<(QDBusArgument &argument, const SimplePresence &simplePresence)
- {
-     argument.beginStructure();
-     argument <<  simplePresence.type << simplePresence.status << simplePresence.statusMessage;
-     argument.endStructure();
-     return argument;
- }
+QDBusArgument &operator<<(QDBusArgument &argument, const SimplePresence &simplePresence)
+{
+    argument.beginStructure();
+    argument <<  simplePresence.type << simplePresence.status << simplePresence.statusMessage;
+    argument.endStructure();
+    return argument;
+}
 
- // Retrieve the Presence data from the D-Bus argument
- const QDBusArgument &operator>>(const QDBusArgument &argument, SimplePresence &simplePresence)
- {
-     argument.beginStructure();
-     argument >> simplePresence.type >> simplePresence.status >> simplePresence.statusMessage;
-     argument.endStructure();
-     return argument;
- }
+// Retrieve the Presence data from the D-Bus argument
+const QDBusArgument &operator>>(const QDBusArgument &argument, SimplePresence &simplePresence)
+{
+    argument.beginStructure();
+    argument >> simplePresence.type >> simplePresence.status >> simplePresence.statusMessage;
+    argument.endStructure();
+    return argument;
+}
+

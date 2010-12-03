@@ -9,8 +9,8 @@
 */
 
 #include "telepathyutility.h"
-#include <QDebug>
-#include <QDBusMetaType>
+#include <QtCore>
+#include <QtDBus>
 
 int main(int argc, char *argv[])
 {

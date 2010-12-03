@@ -7,9 +7,8 @@
 #ifndef TELEPATHYUTILITY_H
 #define TELEPATHYUTILITY_H
 
-#include <QObject>
-#include <QDBusObjectPath>
-#include <QDBusArgument>
+#include <QtCore>
+#include <QtDBus>
 
 
 #define AM_SERVICE          "org.freedesktop.Telepathy.AccountManager"
@@ -17,7 +16,7 @@
 #define AM_INTERFACE        "org.freedesktop.Telepathy.AccountManager"
 #define DBUS_SERVICE        "org.freedesktop.DBus.Properties"
 #define DBUS_OBJ_PATH       "/org/freedesktop/DBus/Properties"
-#define DBUS_PROPS_IFACE     "org.freedesktop.DBus.Properties"
+#define DBUS_PROPS_IFACE    "org.freedesktop.DBus.Properties"
 
 namespace org {
 namespace freedesktop {
