@@ -1,9 +1,0 @@
-[ConnectionManager]
-
-[Protocol snom]
-param-account=s
-param-password=s
-param-server=s required
-param-port=q
-default-port=80
-
