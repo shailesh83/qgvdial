@@ -2,8 +2,12 @@ import Qt 4.7
 import "../../trunk/qml/helper.js" as Code
 
 Rectangle {
+    id: container
     width: 400; height: 250
     color: "black"
+
+    signal sigCall(string strNumber)
+    signal sigText(string strNumber)
 
     ListModel {
         id: contactsModel
@@ -50,20 +54,14 @@ Rectangle {
                 if (detailsOpacity == 0) {
                     return (listView.height / 5);
                 } else {
-                    return listView.height;
+                    return listView.height / 3;
                 }
             }
 
             MouseArea {
                 anchors.fill: parent
 
-                onClicked: {
-                    if (listDelegate.detailsOpacity == 0) {
-                        listDelegate.detailsOpacity = 1;
-                    } else {
-                        listDelegate.detailsOpacity = 0;
-                    }
-                }
+                onClicked: listDelegate.state = 'Details'
             }
 
             // Bounding rectangle
@@ -75,63 +73,105 @@ Rectangle {
                 opacity: 1
             }
 
-            Text {
-                id: nameText
-                anchors {
-                    top: parent.top
-                    left: parent.left
-                    topMargin: 10
-                    leftMargin: 3
-                }
-
-                text: (listDelegate.detailsOpacity==0 ? model.name : model.name + " details")
-                color: "white"
-
-                font.pointSize: (Code.btnFontPoint () / 8)
-            }
-
+            // Topmost information in each delegate entry
             Item {
-                id: smallForm
-                opacity: (1 - listDelegate.detailsOpacity)
-                anchors.fill: parent
+                id: topRow
+
+                anchors.left: parent.left
+                width: parent.width
+                height: Math.max(textName.height, btnClose.height) + 10
+
+                Row {
+                    anchors.fill: parent
+
+                    Text {
+                        id: textName
+                        width: parent.width - btnClose.width
+
+                        text: (listDelegate.detailsOpacity==0 ? model.name : model.name + " details")
+                        color: "white"
+
+                        anchors {
+                            top: parent.top
+                            topMargin: 10
+                            leftMargin: 3
+                        }
+
+                        font.pointSize: (Code.btnFontPoint () / 8)
+                    }
+
+                    TextButton {
+                        id: btnClose
+
+                        text: "Close"
+                        fontPoint: (Code.btnFontPoint () / 12)
+
+                        opacity: listDelegate.detailsOpacity
+                        anchors {
+                            top: parent.top
+                            topMargin: 10
+                        }
+
+                        onClicked: listDelegate.state = ''
+                    }
+                }
             }
 
+            // Details in the delegate
             Item {
                 id: bigForm
                 opacity: listDelegate.detailsOpacity
                 anchors {
-                    top: nameText.bottom
+                    top: topRow.bottom
                     left: parent.left
+                    right: parent.right
+                    bottom: parent.bottom
                 }
 
                 width: parent.width
-                height: (parent.height - nameText.height)
+                height: (parent.height - topRow.height)
 
                 ListView {
                     id: listPhones
                     model: contacts
+                    anchors.fill: parent
+                    spacing: 2
 
-                    delegate: Rectangle {
-                        width: listPhones.width
-                        height: (listPhones.height / 2)
+                    delegate: Flow {
+                        width: parent.width
+                        height: Math.max(textNumber.height, btnCall.height)
 
                         Text {
-                            anchors.left: parent.left
-                            anchors.top: parent.top
-                            text: "woo" // listPhones.model.type
+                            id: textNumber
+                            width: parent.width - btnCall.width - btnText.width
+                            text: type + "\t: " + number
                             color: "white"
-                            font.pointSize: (Code.btnFontPoint () / 8)
+                            font.pointSize: (Code.btnFontPoint () / 12)
                         }
-                        Text {
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-                            text: number
-                            color: "white"
-                            font.pointSize: (Code.btnFontPoint () / 8)
+
+                        TextButton {
+                            id: btnCall
+                            text: "Call"
+                            fontPoint: (Code.btnFontPoint () / 12)
+
+                            onClicked: container.sigCall(number)
+                        }
+                        TextButton {
+                            id: btnText
+                            text: "Text"
+                            fontPoint: (Code.btnFontPoint () / 12)
+
+                            onClicked: container.sigText(number)
                         }
                     }
                 }
             }
+
+            states: State {
+                name: "Details"
+                PropertyChanges { target: listDelegate; detailsOpacity: 1 }
+            }
+
         }// delegate Rectangle
     }// ListView
 }// Rectangle
