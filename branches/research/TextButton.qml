@@ -67,6 +67,7 @@ Rectangle {
 
     Text {
         id: label
+        color: palette.buttonText
         anchors.centerIn: parent
         font.pointSize: container.fontPoint
     }

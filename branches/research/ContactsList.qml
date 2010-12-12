@@ -20,6 +20,10 @@ Rectangle {
                     number: "+1 408 905 9884"
                 },
                 ListElement {
+                    type: "Work"
+                    number: "+1 408 497 1234"
+                },
+                ListElement {
                     type: "Home"
                     number: "+1 408 916 5616"
                 }
@@ -136,6 +140,7 @@ Rectangle {
                     model: contacts
                     anchors.fill: parent
                     spacing: 2
+                    clip: true
 
                     delegate: Flow {
                         width: parent.width
@@ -170,6 +175,12 @@ Rectangle {
             states: State {
                 name: "Details"
                 PropertyChanges { target: listDelegate; detailsOpacity: 1 }
+
+                // Move the list so that this item is at the top.
+                PropertyChanges { target: listDelegate.ListView.view; explicit: true; contentY: listDelegate.y }
+
+                // Disallow flicking while we're in detailed view
+                PropertyChanges { target: listDelegate.ListView.view; interactive: false }
             }
 
             transitions: Transition {
