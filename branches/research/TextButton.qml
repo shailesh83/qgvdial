@@ -44,7 +44,7 @@ Rectangle {
     id: container
 
     property alias text: label.text
-    property alias fontPoint: label.font.pointSize
+    property real fontPoint: 40 // Outrageously large so that you are forced to change it.
 
     signal clicked
 
@@ -68,6 +68,7 @@ Rectangle {
     Text {
         id: label
         anchors.centerIn: parent
+        font.pointSize: container.fontPoint
     }
 
     states: State {

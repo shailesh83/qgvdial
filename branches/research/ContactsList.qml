@@ -88,7 +88,7 @@ Rectangle {
                         id: textName
                         width: parent.width - btnClose.width
 
-                        text: (listDelegate.detailsOpacity==0 ? model.name : model.name + " details")
+                        text: model.name
                         color: "white"
 
                         anchors {
@@ -172,6 +172,13 @@ Rectangle {
                 PropertyChanges { target: listDelegate; detailsOpacity: 1 }
             }
 
+            transitions: Transition {
+                // Make the state changes smooth
+                ParallelAnimation {
+//                    ColorAnimation { property: "color"; duration: 500 }
+                    NumberAnimation { duration: 300; properties: "detailsOpacity,x,height,width" }
+                }
+            }
         }// delegate Rectangle
     }// ListView
 }// Rectangle
