@@ -1,0 +1,6 @@
+#!/bin/sh
+chmod +x /opt/qgvdial/bin/qgvdial
+chmod +x /opt/qgvdial/bin/qgv-tp
+chmod +x /opt/qgvdial/bin/qgv-util
+run-standalone.sh /opt/qgvdial/bin/qgv-util INSTALL
+
