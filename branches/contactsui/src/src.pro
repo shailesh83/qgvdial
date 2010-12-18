@@ -3,7 +3,7 @@ TARGET   = qgvdial
 TEMPLATE = app
 
 CONFIG  += mobility
-MOBILITY = multimedia
+MOBILITY *= multimedia
 
 include(qtsingleapplication/qtsingleapplication.pri)
 
