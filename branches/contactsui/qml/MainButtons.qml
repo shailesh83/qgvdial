@@ -1,13 +1,10 @@
 import Qt 4.7
 import "helper.js" as Code
 
-Rectangle {
+Item {
     id: container
-    height: (mainBtnList.model.count * btnReference.height) + mainBtnList.spacing
 
-    width: parent.width
-    anchors.horizontalCenter: parent.horizontalCenter
-    anchors.verticalCenter: parent.verticalCenter
+    anchors.fill: parent
 
     signal sigDialer
     signal sigContacts
@@ -27,23 +24,30 @@ Rectangle {
         model: ListModel {
             ListElement {
                 name: "Dialer"
+                imagePath: "Phone.png"
             }
             ListElement {
                 name: "Contacts"
+                imagePath: "users.png"
             }
             ListElement {
                 name: "Inbox"
+                imagePath: "note.png"
             }
             ListElement {
                 name: "Settings"
+                imagePath: "Google.png"
             }
         }
 
-        delegate: TextButton {
-            id: btn
-            text: name
+        delegate: MyButton {
+            mainText: name
 
-            anchors.horizontalCenter: parent.horizontalCenter
+            id: btn
+            height: mainBtnList.height / (mainBtnList.model.count + mainBtnList.spacing)
+            width: mainBtnList.width
+
+            mainFontPoint: Code.btnFontPoint()/3.7
 
             onClicked: {
                 if (name == "Dialer") {
