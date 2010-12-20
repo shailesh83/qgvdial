@@ -29,6 +29,11 @@ ContactsModel::data (const QModelIndex &index, int role) const
             info.strLink = QSqlQueryModel::data (index.sibling(index.row(), 0),
                                                  Qt::EditRole)
                             .toString ();
+            if (info.strLink.isEmpty ()) {
+                qWarning ("This link is empty!");
+                break;
+            }
+
             CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
             dbMain.getContactFromLink (info);
 
@@ -122,3 +127,21 @@ ContactsModel::convert (const ContactInfo &cInfo, GVContactInfo &gvcInfo)
 
     return (true);
 }//ContactsModel::convert
+
+bool
+ContactsModel::hasChildren (const QModelIndex &parent /*= QModelIndex()*/)
+{
+    bool rv = false;
+    QVariant var = this->data (parent, CT_ContactsRole);
+    if (var.isValid ()) {
+        // Delete the contents of the var
+        ContactDetailsModel *pCdm = (ContactDetailsModel *)
+                                    var.value <QObject *>();
+        if (NULL != pCdm) {
+            delete pCdm;
+        }
+        rv = true;
+    }
+
+    return (rv);
+}//ContactsModel::hasChildren
