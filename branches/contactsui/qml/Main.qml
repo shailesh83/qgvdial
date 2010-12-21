@@ -4,12 +4,15 @@ import "helper.js" as Code
 Rectangle {
     id: main
     width: 250; height: 400
+    color: "black"
 
-    signal sigCall(string strNumber)
-    signal sigText(string strNumber)
+    signal sigCall(string number)
+    signal sigText(string number)
 
     property bool landscape: (main.width > main.height)
     property string strStatus: "Ready"
+
+    property int nMargins: 1
 
 
     Item {
@@ -63,8 +66,12 @@ Rectangle {
 
             width: mainColumn.centralWidth
             height: mainColumn.centralHeight
-            anchors.top: barTop.bottom
-            anchors.bottom: barStatus.top
+            anchors {
+                top: barTop.bottom
+                bottom: barStatus.top
+                topMargin: nMargins
+                bottomMargin: nMargins
+            }
 
             color: "black"
             opacity: 1
@@ -85,10 +92,17 @@ Rectangle {
 
             width: mainColumn.centralWidth
             height: mainColumn.centralHeight
-            anchors.top: barTop.bottom
-            anchors.bottom: barStatus.top
+            anchors {
+                top: barTop.bottom
+                bottom: barStatus.top
+                topMargin: nMargins
+                bottomMargin: nMargins
+            }
 
             opacity: 0
+
+            onSigCall: main.sigCall (number)
+            onSigText: main.sigCall (number)
         }
 
         ContactsList {
@@ -96,10 +110,17 @@ Rectangle {
 
             width: mainColumn.centralWidth
             height: mainColumn.centralHeight
-            anchors.top: barTop.bottom
-            anchors.bottom: barStatus.top
+            anchors {
+                top: barTop.bottom
+                bottom: barStatus.top
+                topMargin: nMargins
+                bottomMargin: nMargins
+            }
 
             opacity: 0
+
+            onSigCall: main.sigCall (number)
+            onSigText: main.sigCall (number)
         }
 
         InboxList {
@@ -107,10 +128,17 @@ Rectangle {
 
             width: mainColumn.centralWidth
             height: mainColumn.centralHeight
-            anchors.top: barTop.bottom
-            anchors.bottom: barStatus.top
+            anchors {
+                top: barTop.bottom
+                bottom: barStatus.top
+                topMargin: nMargins
+                bottomMargin: nMargins
+            }
 
             opacity: 0
+
+            onSigCall: main.sigCall (number)
+            onSigText: main.sigCall (number)
         }
 
 ////////////////////////////////////////////////////////////////////////////////

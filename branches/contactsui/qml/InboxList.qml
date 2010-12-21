@@ -6,8 +6,8 @@ Rectangle {
     width: 250; height: 320
     color: "black"
 
-    signal sigCall(string strNumber)
-    signal sigText(string strNumber)
+    signal sigCall(string number)
+    signal sigText(string number)
 
     property bool landscape: container.width > container.height
     property variant rotationDelta: landscape? -90 : 0
@@ -71,8 +71,7 @@ Rectangle {
         clip: true
         opacity: 1
 
-//        model: contactsModel
-        model: testContactsModelData1
+        model: inboxModel
 
         delegate: Rectangle {
             id: listDelegate

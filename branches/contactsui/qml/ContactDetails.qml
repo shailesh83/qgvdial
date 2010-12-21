@@ -7,6 +7,8 @@ ListView {
     signal sigCall (string number)
     signal sigText (string number)
 
+    model: contactDetailsModel
+
     delegate: Flow {
         width: parent.width
         height: Math.max(textNumber.height, btnCall.height)

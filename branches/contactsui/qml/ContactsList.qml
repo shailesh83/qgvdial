@@ -6,9 +6,9 @@ Rectangle {
     width: 250; height: 320
     color: "black"
 
-    signal sigCall(string strNumber)
-    signal sigText(string strNumber)
-    signal sigContactlink(string strLink)
+    signal sigCall(string number)
+    signal sigText(string number)
+    signal sigContactlink(string link)
 
     property bool landscape: container.width > container.height
     property variant rotationDelta: landscape? -90 : 0
@@ -69,16 +69,16 @@ Rectangle {
             }
         }
 
-        ListView {
+        ContactDetails {
             anchors {
                 top: detailTopRow.bottom
                 left: parent.left
                 right: parent.right
                 bottom: parent.bottom
             }
-            clip: true
 
-            model: contactDetailsModel
+            onSigCall: container.sigCall(number)
+            onSigText: container.sigText(number)
         }
     }
 
@@ -122,9 +122,6 @@ Rectangle {
 
                 onClicked: {
                     container.sigContactlink (contacts);
-
-//                    detailsView.model = contacts;
-
                     container.state = "Details"
                 }
             }
