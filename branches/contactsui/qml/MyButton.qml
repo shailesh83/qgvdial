@@ -43,7 +43,6 @@ Rectangle {
         onPressAndHold: button.pressHold(mainText);
     }// MouseArea
 
-
     states: State {
         name: "pressed"
         when: mouseArea.pressed

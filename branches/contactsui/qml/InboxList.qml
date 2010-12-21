@@ -8,28 +8,10 @@ Rectangle {
 
     signal sigCall(string strNumber)
     signal sigText(string strNumber)
-    signal sigContactlink(string strLink)
 
     property bool landscape: container.width > container.height
     property variant rotationDelta: landscape? -90 : 0
     rotation: rotationDelta
-
-////////////////////////////////////////////////////////////////////////////////
-//                                Data models                                 //
-////////////////////////////////////////////////////////////////////////////////
-    ContactsModelData1 {
-        id: testContactsModelData1
-    }
-
-    XmlListModel {
-        id: testContactsModelData2
-        source: "./ContactsModelData2.xml"
-        query: "/all_contacts/one_contact"
-
-        XmlRole { name: "name"; query: "@name/string()" }
-        XmlRole { name: "contacts"; query: "contact/*" }
-    }
-////////////////////////////////////////////////////////////////////////////////
 
     Rectangle {
         id: detailsView

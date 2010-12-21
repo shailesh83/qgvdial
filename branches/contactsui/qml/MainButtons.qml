@@ -20,6 +20,7 @@ Item {
     ListView {
         id: mainBtnList
         anchors.fill: parent
+        clip: true
 
         model: ListModel {
             ListElement {
@@ -59,7 +60,7 @@ Item {
                 } else if (name == "Settings") {
                     container.sigSettings();
                 }
-            }
-        }
-    }
-}
+            }//onClicked
+        }//MyButton (delegate)
+    }//ListView
+}//Item (main container)
