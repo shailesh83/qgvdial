@@ -8,6 +8,7 @@ Rectangle {
 
     signal sigCall(string number)
     signal sigText(string number)
+    signal sigContactlink(string link)
 
     property bool landscape: (main.width > main.height)
     property string strStatus: "Ready"
@@ -121,6 +122,7 @@ Rectangle {
 
             onSigCall: main.sigCall (number)
             onSigText: main.sigCall (number)
+            onSigContactlink: main.sigContactlink(link)
         }
 
         InboxList {
