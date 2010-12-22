@@ -18,7 +18,7 @@ Rectangle {
     signal pressHold(string strText)
 
     gradient: Gradient {
-        GradientStop { id: gradientStop; position: 0.0; color: palette.dark }
+        GradientStop { id: gradientStop; position: 0.0; color: "azure" }
         GradientStop { position: 1.0; color: palette.button }
     }
     SystemPalette { id: palette }
@@ -33,7 +33,6 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
 
         font.pointSize: mainFontPoint
-        font.bold: true
     }// Text
 
     MouseArea {
@@ -47,6 +46,6 @@ Rectangle {
     states: State {
         name: "pressed"
         when: mouseArea.pressed
-        PropertyChanges { target: gradientStop; color: palette.light }
+        PropertyChanges { target: gradientStop; color: "orange" }
     }
 }// Rectangle
