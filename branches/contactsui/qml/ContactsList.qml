@@ -17,18 +17,18 @@ Rectangle {
 ////////////////////////////////////////////////////////////////////////////////
 //                                Data models                                 //
 ////////////////////////////////////////////////////////////////////////////////
-    ContactsModelData1 {
-        id: testContactsModelData1
-    }
+//    ContactsModelData1 {
+//        id: testContactsModelData1
+//    }
 
-    XmlListModel {
-        id: testContactsModelData2
-        source: "./ContactsModelData2.xml"
-        query: "/all_contacts/one_contact"
+//    XmlListModel {
+//        id: testContactsModelData2
+//        source: "./ContactsModelData2.xml"
+//        query: "/all_contacts/one_contact"
 
-        XmlRole { name: "name"; query: "@name/string()" }
-        XmlRole { name: "contacts"; query: "contact/*" }
-    }
+//        XmlRole { name: "name"; query: "@name/string()" }
+//        XmlRole { name: "contacts"; query: "contact/*" }
+//    }
 ////////////////////////////////////////////////////////////////////////////////
 
     Rectangle {
@@ -89,8 +89,8 @@ Rectangle {
         clip: true
         opacity: 1
 
-//        model: contactsModel
-        model: testContactsModelData1
+        model: contactsModel
+//        model: testContactsModelData1
 
         delegate: Rectangle {
             id: listDelegate

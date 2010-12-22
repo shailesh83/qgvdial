@@ -7,16 +7,14 @@
 
 #include <QtDeclarative>
 
-GVContactsTable::GVContactsTable (QWidget *parent)
-: QDeclarativeView (parent)
+GVContactsTable::GVContactsTable (QObject *parent)
+: QObject (parent)
 , modelContacts (NULL)
 , nwMgr (this)
 , mutex(QMutex::Recursive)
 , bLoggedIn(false)
 , bRefreshRequested (false)
 {
-    OsDependent &osd = Singletons::getRef().getOSD ();
-    osd.setDefaultWindowAttributes (this);
 }//GVContactsTable::GVContactsTable
 
 GVContactsTable::~GVContactsTable ()
@@ -34,26 +32,16 @@ GVContactsTable::deinitModel ()
 }//GVContactsTable::deinitModel
 
 void
-GVContactsTable::initModel ()
+GVContactsTable::initModel (QDeclarativeView *pMainWindow)
 {
     deinitModel ();
 
     if (NULL == modelContacts) {
         CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
         modelContacts = dbMain.newContactsModel ();
-    }
 
-    if (this->source ().isEmpty ()) {
-        QDeclarativeContext *ctx = this->rootContext();
+        QDeclarativeContext *ctx = pMainWindow->rootContext();
         ctx->setContextProperty ("contactsModel", modelContacts);
-
-        this->setSource (QUrl ("qrc:/ContactsList.qml"));
-        this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
-
-        QObject::connect (this, SIGNAL (sigCall   (const QString &)),
-                          this, SLOT   (placeCall (const QString &)));
-        QObject::connect (this, SIGNAL (sigText   (const QString &)),
-                          this, SLOT   (sendSMS   (const QString &)));
     }
 }//GVContactsTable::initModel
 
@@ -146,7 +134,15 @@ GVContactsTable::refreshContacts ()
 
     emit status ("Retrieving contacts", 0);
     getRequest (strUrl, this , SLOT (onGotContacts (QNetworkReply *)));
-}//GVContactsTable::refreshContactsFromContactsAPI
+}//GVContactsTable::refreshContacts
+
+void
+GVContactsTable::setUserPass (const QString &strU, const QString &strP)
+{
+    QMutexLocker locker(&mutex);
+    strUser = strU;
+    strPass = strP;
+}//GVContactsTable::setUserPass
 
 void
 GVContactsTable::loginSuccess ()
@@ -171,26 +167,6 @@ GVContactsTable::loggedOut ()
 
     strGoogleAuth.clear ();
 }//GVContactsTable::loggedOut
-
-void
-GVContactsTable::placeCall (const QString &strNumber)
-{
-    emit callNumber (strNumber, QString ());
-}//GVContactsTable::placeCall
-
-void
-GVContactsTable::sendSMS (const QString &strNumber)
-{
-    emit textANumber (strNumber, QString());
-}//GVContactsTable::sendSMS
-
-void
-GVContactsTable::setUserPass (const QString &strU, const QString &strP)
-{
-    QMutexLocker locker(&mutex);
-    strUser = strU;
-    strPass = strP;
-}//GVContactsTable::setUserPass
 
 void
 GVContactsTable::onLoginResponse (QNetworkReply *reply)
@@ -228,7 +204,7 @@ GVContactsTable::onLoginResponse (QNetworkReply *reply)
             strCaptchaUrl = "http://www.google.com/accounts/"
                           + strCaptchaUrl;
             qDebug ("Loading captcha");
-            CaptchaWidget *captcha = new CaptchaWidget(strCaptchaUrl, this);
+            CaptchaWidget *captcha = new CaptchaWidget(strCaptchaUrl);
             QObject::connect (
                 captcha, SIGNAL (done (bool, const QString &)),
                 this   , SLOT   (onCaptchaDone (bool, const QString &)));

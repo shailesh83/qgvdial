@@ -7,16 +7,16 @@
 
 #include "ContactsModel.h"
 
-class GVContactsTable : public QDeclarativeView
+class GVContactsTable : public QObject
 {
     Q_OBJECT
 
 public:
-    GVContactsTable (QWidget *parent = 0);
+    GVContactsTable (QObject *parent = 0);
     ~GVContactsTable ();
 
     void deinitModel ();
-    void initModel ();
+    void initModel (QDeclarativeView *pMainWindow);
 
     //! Use this to set the username and password for the contacts API login
     void setUserPass (const QString &strU, const QString &strP);
@@ -35,20 +35,10 @@ signals:
     //! Emitted when all contacts are done
     void allContacts (bool bOk);
 
-    //! Emitted on user request to call a known contact
-    void callNumber (const QString &strNumber, const QString &strNameLink);
-    //! Emitted on user request to send an SMS to a known contact
-    void textANumber (const QString &strNumber, const QString &strNameLink);
-
 public slots:
     void refreshContacts ();
 
 private slots:
-    //! Invoked when the place call action is triggered
-    void placeCall (const QString &strNumber);
-    //! Invoked when the send SMS action is triggered
-    void sendSMS (const QString &strNumber);
-
     //! Invoked on response to login to contacts API
     void onLoginResponse (QNetworkReply *reply);
     //! Invoked when the captcha is done
@@ -75,7 +65,7 @@ private:
     ContactsModel  *modelContacts;
 
     //! Username and password for google authentication
-    QString strUser, strPass;
+    QString         strUser, strPass;
     //! The authentication string returned by the contacts API
     QString         strGoogleAuth;
 

@@ -25,26 +25,17 @@ ContactsModel::data (const QModelIndex &index, int role) const
         }
 
         if (CT_ContactsRole == role) {
-            GVContactInfo info;
-            info.strLink = QSqlQueryModel::data (index.sibling(index.row(), 0),
-                                                 Qt::EditRole)
-                            .toString ();
-            if (info.strLink.isEmpty ()) {
+            QString strLink =
+            QSqlQueryModel::data (index.sibling(index.row(), 0), Qt::EditRole)
+                                  .toString ();
+            if (strLink.isEmpty ()) {
                 qWarning ("This link is empty!");
                 break;
             }
 
-            CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-            dbMain.getContactFromLink (info);
+            qApp->processEvents (QEventLoop::AllEvents, 100);
 
-            QObject *pNonConst = (QObject *) this;
-            ContactDetailsModel *pCdm = new ContactDetailsModel (info,
-                                                                 pNonConst);
-            if (NULL != pCdm) {
-                retVar = qVariantFromValue<QObject *> (pCdm);
-            } else {
-                qWarning ("Failed to allocate contact detail");
-            }
+            retVar = strLink;
             break;
         }
 

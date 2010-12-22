@@ -10,11 +10,14 @@ Rectangle {
     signal sigText(string number)
     signal sigContactlink(string link)
 
+    onSigCall: console.debug("Call " + number)
+    onSigText: console.debug("Text " + number)
+    onSigContactlink: console.debug("Link :" + link)
+
     property bool landscape: (main.width > main.height)
     property string strStatus: "Ready"
 
     property int nMargins: 1
-
 
     Item {
         id: mainColumn
@@ -103,7 +106,7 @@ Rectangle {
             opacity: 0
 
             onSigCall: main.sigCall (number)
-            onSigText: main.sigCall (number)
+            onSigText: main.sigText (number)
         }
 
         ContactsList {
