@@ -10,7 +10,8 @@ Rectangle {
 
     // Main text in the button
     property string mainText: "2"
-    property alias mainFontPoint: mText.font.pointSize
+    //property alias mainFontPoint: mText.font.pointSize
+    property real mainFontPoint: Code.btnFontPoint ();
 
     // Button emits clicks, but we also mention what is the text to display
     signal clicked(string strText)
@@ -31,7 +32,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
 
-        font.pointSize: Code.btnFontPoint ();
+        font.pointSize: mainFontPoint
         font.bold: true
     }// Text
 
