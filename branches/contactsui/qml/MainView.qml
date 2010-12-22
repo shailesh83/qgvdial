@@ -19,6 +19,7 @@ Rectangle {
 
         onSigCall: main.sigCall(number)
         onSigText: main.sigText(number)
+        onSigSelChanged: main.sigSelChanged(index)
         onSigNumChanged: m_p.theNumber = strNumber
     }
 

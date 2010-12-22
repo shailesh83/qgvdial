@@ -317,6 +317,9 @@ MainWindow::initQML ()
                       this, SLOT   (dialNow (QString)));
     QObject::connect (gObj, SIGNAL (sigText (QString)),
                       this, SLOT   (textANumber (QString)));
+    QObject::connect (
+        gObj, SIGNAL (sigSelChanged (int)),
+        this, SLOT   (onRegPhoneSelectionChange (int)));
 }//MainWindow::initQML
 
 /** Invoked to begin the login process.
