@@ -10,10 +10,6 @@ Rectangle {
     signal sigText(string number)
     signal sigContactlink(string link)
 
-    property bool landscape: container.width > container.height
-    property variant rotationDelta: landscape? -90 : 0
-    rotation: rotationDelta
-
 ////////////////////////////////////////////////////////////////////////////////
 //                                Data models                                 //
 ////////////////////////////////////////////////////////////////////////////////

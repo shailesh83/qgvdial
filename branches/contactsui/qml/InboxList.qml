@@ -9,10 +9,6 @@ Rectangle {
     signal sigCall(string number)
     signal sigText(string number)
 
-    property bool landscape: container.width > container.height
-    property variant rotationDelta: landscape? -90 : 0
-    rotation: rotationDelta
-
     Rectangle {
         id: detailsView
 
