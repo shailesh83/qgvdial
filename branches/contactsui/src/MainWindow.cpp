@@ -29,6 +29,7 @@ MainWindow::MainWindow (QWidget *parent)
 #endif
 , menuFile ("&File", this)
 , actLogin ("Login...", this)
+, actDismiss ("Dismiss", this)
 , actExit ("Exit", this)
 , actViewWeb ("Show web view", this)
 , bLoggedIn (false)
@@ -66,6 +67,7 @@ MainWindow::MainWindow (QWidget *parent)
         pSystray = new QSystemTrayIcon (this);
         pSystray->setIcon (icoGoogle);
         pSystray->setToolTip ("Google Voice dialer");
+        pSystray->setContextMenu (&menuFile);
         QObject::connect (
             pSystray,
             SIGNAL (activated (QSystemTrayIcon::ActivationReason)),
@@ -261,20 +263,26 @@ MainWindow::init ()
 
     // Login/logout = Ctrl+L
     actLogin.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_L));
+    // Dismiss = Esc
+    actDismiss.setShortcut (QKeySequence(Qt::Key_Escape));
     // Quit = Ctrl+Q
     actExit.setShortcut (QKeySequence(Qt::CTRL + Qt::Key_Q));
     // Show debug webpage = Ctrl+Shift+W
     actViewWeb.setShortcut (QKeySequence (Qt::CTRL + Qt::SHIFT + Qt::Key_W));
     // Add these actions to the window
-    menuFile.addAction (&actLogin);
-    menuFile.addAction (&actExit);
     menuFile.addAction (&actViewWeb);
+    menuFile.addAction (&actLogin);
+    menuFile.addAction (&actDismiss);
+    menuFile.addAction (&actExit);
     this->addAction (&actLogin);
+    this->addAction (&actDismiss);
     this->addAction (&actExit);
     this->addAction (&actViewWeb);
     // When the actions are triggered, do the corresponding work.
     QObject::connect (&actLogin, SIGNAL (triggered()),
                        this    , SLOT   (on_action_Login_triggered()));
+    QObject::connect (&actDismiss, SIGNAL (triggered()),
+                       this      , SLOT   (close()));
     QObject::connect (&actExit, SIGNAL (triggered()),
                        this   , SLOT   (on_actionE_xit_triggered()));
     QObject::connect (&actViewWeb, SIGNAL (triggered ()),

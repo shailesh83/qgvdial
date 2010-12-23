@@ -160,6 +160,7 @@ private:
     // Menus and actions
     QMenu           menuFile;
     QAction         actLogin;
+    QAction         actDismiss;
     QAction         actExit;
     QAction         actViewWeb;
 

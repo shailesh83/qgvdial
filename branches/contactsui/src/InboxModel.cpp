@@ -133,7 +133,8 @@ InboxModel::data (const QModelIndex &index,
                 break;
             }
 
-            qDebug () << "Inbox: Number could not be deciphered: " << strNum;
+            qDebug () << "Inbox: Number could not be identified: " << strNum
+                      << "Labeling it as unknown.";
             var = "Unknown";
         }
         else if (4 == column)   // GV_IN_PHONE

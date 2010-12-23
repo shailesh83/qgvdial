@@ -12,7 +12,8 @@ Rectangle {
     signal sigInboxSelect(string selection)
 
     // Private properties. DO NOT TOUCH from outside.
-    property string strTopRow: ""
+    property string strDetailsName: ""
+    property string strDetailsTime: ""
     property bool isVoicemail: false
     property string theNumber: ""
     property string strSelected: "All"
@@ -38,7 +39,7 @@ Rectangle {
             height: btnDetailsClose.height
 
             Text {
-                text: strTopRow
+                text: strDetailsName
                 anchors.verticalCenter: parent.verticalCenter
                 color: "white"
                 font.pointSize: Code.btnFontPoint () / 8
@@ -64,9 +65,20 @@ Rectangle {
             }
 
             Text {
+                id: theTime
+                text: strDetailsTime
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                }
+                color: "white"
+                font.pointSize: Code.btnFontPoint () / 8
+            }
+
+            Text {
                 text: theNumber
                 anchors {
-                    verticalCenter: parent.verticalCenter
+                    top: theTime.bottom
                     left: parent.left
                 }
                 color: "white"
@@ -81,15 +93,18 @@ Rectangle {
                 TextButton {
                     text: "Call"
                     onClicked: container.sigCall(theNumber)
+                    fontPoint: Code.btnFontPoint()/8
                 }
                 TextButton {
                     text: "Text"
                     onClicked: container.sigText(theNumber)
+                    fontPoint: Code.btnFontPoint()/8
                 }
                 TextButton {
                     text: "Listen"
-                    opacity: (opacity & isVoicemail)
+                    opacity: (detailsView.opacity & isVoicemail)
                     onClicked: container.sigListen()
+                    fontPoint: Code.btnFontPoint()/8
                 }
             }
         }
@@ -222,7 +237,8 @@ Rectangle {
                     anchors.fill: parent
 
                     onClicked: {
-                        strTopRow = type + " at " + time + " : " + name;
+                        strDetailsTime = type + " " + time_detail
+                        strDetailsName = name;
 
                         if (type == "Voicemail") {
                             isVoicemail = true;
