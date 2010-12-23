@@ -38,7 +38,7 @@ GVHistory::initModel (QDeclarativeView *pMainWindow)
 
     QDeclarativeContext *ctx = pMainWindow->rootContext();
     ctx->setContextProperty ("inboxModel", modelInbox);
-//    prepView ();
+    prepView ();
 }//GVHistory::initModel
 
 void
@@ -48,6 +48,10 @@ GVHistory::prepView ()
 
     emit status ("Re-selecting inbox entries. This will take some time", 0);
     dbMain.refreshInboxModel (modelInbox, strSelectedMessages);
+
+    while (modelInbox->canFetchMore ()) {
+        modelInbox->fetchMore ();
+    }
     emit status ("Inbox entries selected.");
 }//GVHistory::prepView
 

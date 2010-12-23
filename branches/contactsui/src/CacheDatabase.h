@@ -48,6 +48,7 @@ public:
     void clearInbox ();
     void refreshInboxModel (InboxModel *modelInbox,
                             const QString &strType);
+    quint32 getInboxCount ();
 
     bool setLastInboxUpdate (const QDateTime &dateTime);
     bool getLastInboxUpdate (QDateTime &dateTime);
@@ -60,12 +61,6 @@ signals:
 
 private:
     QSqlDatabase    dbMain;
-
-    //! Count of the entries in the inbox
-    quint32         nCountInbox;
-
-    //! Count of contacts
-    quint32         nCountContacts;
 
     friend class Singletons;
 };

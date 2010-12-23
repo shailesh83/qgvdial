@@ -295,16 +295,9 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
                 .arg (contactsHandler.getUsableContacts ());
     } while (0); // End cleanup block (not a loop)
 
-//    QSqlTableModel *modelContacts = (QSqlTableModel *) ui->treeView->model ();
-//    if (rv) {
-//        emit status ("Contacts retrieved. Saving. This will take some time...");
-//        modelContacts->submitAll ();
-//        emit status ("Contacts committed to local database");
-//    } else {
-//        modelContacts->revertAll ();
-//    }
-
-//    modelContacts->select ();
+    while (modelContacts->canFetchMore ()) {
+        modelContacts->fetchMore ();
+    }
 
     emit status (msg);
     emit allContacts (rv);

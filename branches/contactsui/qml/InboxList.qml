@@ -12,10 +12,10 @@ Rectangle {
     signal sigInboxSelect(string selection)
 
     // Private properties. DO NOT TOUCH from outside.
-    property string strDetailsName: ""
-    property string strDetailsTime: ""
+    property string strDetailsName: "Detail name"
+    property string strDetailsTime: "Detail Time"
     property bool isVoicemail: false
-    property string strNumber: ""
+    property string strNumber: "The number"
     property string strSelected: "All"
 
     Rectangle { // Details
@@ -42,7 +42,7 @@ Rectangle {
                 text: strDetailsName
                 anchors.verticalCenter: parent.verticalCenter
                 color: "white"
-                font.pointSize: Code.btnFontPoint () / 8
+                font.pointSize: Code.btnFontPoint()/8
                 anchors.left: parent.left
             }
 
@@ -52,7 +52,7 @@ Rectangle {
                 onClicked: container.state= ''
                 anchors.right: parent.right
 
-                fontPoint: Code.btnFontPoint() / 8
+                fontPoint: Code.btnFontPoint()/12
             }
         }
 
@@ -72,53 +72,49 @@ Rectangle {
                     top: parent.top
                     left: parent.left
                 }
+                width: parent.width
+
                 color: "white"
-                font.pointSize: Code.btnFontPoint () / 12
+                font.pointSize: Code.btnFontPoint()/12
+
+                wrapMode: Text.Wrap
             }
 
-            Item {
+            Text {
                 id: theNumber
                 anchors {
                     top: theTime.bottom
                     left: parent.left
                 }
-                width: lblNumber.width
-                height: lblNumber.height
-
-                Text {
-                    id: lblNumber
-                    anchors.fill: parent
-                    text: strNumber
-                    color: "white"
-                    font.pointSize: Code.btnFontPoint () / 12
-                }
+                text: strNumber
+                color: "white"
+                font.pointSize: Code.btnFontPoint()/12
             }
-
 
             Row {
                 anchors {
-                    top: theNumber.top
+                    top: theNumber.bottom
+                    left: parent.left
                     right: parent.right
                 }
                 height: btnCall.height
-                width: parent.width - theNumber.width
 
                 TextButton {
                     id: btnCall
                     text: "Call"
                     onClicked: container.sigCall(strNumber)
-                    fontPoint: Code.btnFontPoint()/12
+                    fontPoint: Code.btnFontPoint()/15
                 }
                 TextButton {
                     text: "Text"
                     onClicked: container.sigText(strNumber)
-                    fontPoint: Code.btnFontPoint()/12
+                    fontPoint: Code.btnFontPoint()/15
                 }
                 TextButton {
-                    text: "Listen"
+                    text: "Play"
                     opacity: (detailsView.opacity & isVoicemail)
-                    onClicked: container.sigListen()
-                    fontPoint: Code.btnFontPoint()/12
+                    onClicked: container.sigVoicemail()
+                    fontPoint: Code.btnFontPoint()/15
                 }
             }
         }
@@ -253,6 +249,7 @@ Rectangle {
                     onClicked: {
                         strDetailsTime = type + " " + time_detail
                         strDetailsName = name;
+                        strNumber = number;
 
                         if (type == "Voicemail") {
                             isVoicemail = true;

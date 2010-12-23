@@ -15,6 +15,13 @@ InboxModel::InboxModel (QObject * parent)
     setRoleNames(roles);
 }//InboxModel::InboxModel
 
+int
+InboxModel::rowCount (const QModelIndex &parent /* = QModelIndex()*/ ) const
+{
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    return (dbMain.getInboxCount ());
+}//InboxModel::rowCount
+
 QVariant
 InboxModel::data (const QModelIndex &index,
                         int          role ) const
@@ -61,7 +68,7 @@ InboxModel::data (const QModelIndex &index,
                 break;
             }
         }
-        else if (1 == column)        // GV_IN_TYPE
+        else if (1 == column)   // GV_IN_TYPE
         {
             char chType = var.toChar().toAscii ();
             QString strDisp = type_to_string ((GVH_Event_Type) chType);
@@ -87,23 +94,26 @@ InboxModel::data (const QModelIndex &index,
             int daysTo = dt.daysTo (QDateTime::currentDateTime ());
             if (IN_TimeDetail == role) {
                 if (0 == daysTo) {
-                    strDisp = dt.toString ("today at hh:mm:ss");
+                    strDisp = "today at " + dt.toString ("hh:mm:ss");
                 } else if (1 == daysTo) {
                     strDisp = "yesterday at " + dt.toString ("hh:mm:ss");
                 } else {
-                    strDisp = dt.toString ("on dddd, dd-MMM at hh:mm:ss");
+                    strDisp = "on "
+                              + dt.toString ("dddd, dd-MMM")
+                              + " at "
+                              + dt.toString ("hh:mm:ss");
                 }
             } else {
                 if (0 == daysTo) {
-                    strDisp = dt.toString ("at hh:mm");
+                    strDisp = "at " + dt.toString ("hh:mm");
                 } else if (1 == daysTo) {
                     strDisp = "yesterday";
                 } else if (daysTo < currentDate.dayOfWeek ()) {
-                    strDisp = dt.toString ("on dddd");
+                    strDisp = "on " + dt.toString ("dddd");
                 } else if (daysTo < (currentDate.dayOfWeek () + 7)) {
                     strDisp = "last week";
                 } else {
-                    strDisp = dt.toString ("on dd-MMM");
+                    strDisp = "on " + dt.toString ("dd-MMM");
                 }
             }
 

@@ -61,8 +61,6 @@
 CacheDatabase::CacheDatabase(const QSqlDatabase & other, QObject *parent)
 : QObject (parent)
 , dbMain (other)
-, nCountInbox (0)
-, nCountContacts (0)
 {
 }//CacheDatabase::CacheDatabase
 
@@ -219,18 +217,6 @@ CacheDatabase::refreshContactsModel (ContactsModel *modelContacts)
                              "ORDER BY " GV_C_NAME, dbMain);
     modelContacts->setHeaderData (0, Qt::Horizontal, QObject::tr("Id"));
     modelContacts->setHeaderData (1, Qt::Horizontal, QObject::tr("Name"));
-
-    QSqlQuery query;
-    query.setForwardOnly (true);
-    query.exec ("SELECT COUNT (*) FROM " GV_CONTACTS_TABLE);
-    if (query.next ()) {
-        bool bOk = false;
-        int val = query.value (0).toInt (&bOk);
-        nCountContacts = 0;
-        if (bOk) {
-            nCountContacts = val;
-        }
-    }
 }//CacheDatabase::refreshContactsModel
 
 bool
@@ -398,7 +384,6 @@ CacheDatabase::deleteContact (const QString  &strLink)
         query.exec (QString ("DELETE FROM " GV_CONTACTS_TABLE " "
                              "WHERE " GV_C_ID "='%1'")
                     .arg (strLink));
-        nCountContacts--;
     }
 
     return (true);
@@ -420,7 +405,6 @@ CacheDatabase::insertContact (const QString  &strName,
             query.exec (QString ("DELETE FROM " GV_CONTACTS_TABLE " "
                                  "WHERE " GV_C_ID "='%1'")
                         .arg (strLink));
-            nCountContacts--;
         }
 
         rv = query.exec (QString ("INSERT INTO " GV_CONTACTS_TABLE ""
@@ -437,7 +421,6 @@ CacheDatabase::insertContact (const QString  &strName,
             break;
         }
 
-        nCountContacts++;
         rv = true;
     } while (0); // End cleanup block (not a loop)
 
@@ -447,6 +430,18 @@ CacheDatabase::insertContact (const QString  &strName,
 quint32
 CacheDatabase::getContactsCount ()
 {
+    quint32 nCountContacts = 0;
+    QSqlQuery query;
+
+    query.setForwardOnly (true);
+    query.exec ("SELECT COUNT (*) FROM " GV_CONTACTS_TABLE);
+    if (query.next ()) {
+        bool bOk = false;
+        int val = query.value (0).toInt (&bOk);
+        if (bOk) {
+            nCountContacts = val;
+        }
+    }
     return (nCountContacts);
 }//CacheDatabase::getContactsCount
 
@@ -665,19 +660,25 @@ CacheDatabase::refreshInboxModel (InboxModel *modelInbox,
     modelInbox->setQuery (strQ, dbMain);
     modelInbox->setHeaderData (0, Qt::Horizontal, QObject::tr("Name"));
     modelInbox->setHeaderData (1, Qt::Horizontal, QObject::tr("Link"));
+}//CacheDatabase::refreshInboxModel
 
+quint32
+CacheDatabase::getInboxCount ()
+{
+    quint32 nCountInbox = 0;
     QSqlQuery query;
     query.setForwardOnly (true);
     query.exec ("SELECT COUNT (*) FROM " GV_INBOX_TABLE);
     if (query.next ()) {
         bool bOk = false;
         int val = query.value (0).toInt (&bOk);
-        nCountInbox = 0;
         if (bOk) {
             nCountInbox = val;
         }
     }
-}//CacheDatabase::refreshInboxModel
+
+    return (nCountInbox);
+}//CacheDatabase::getInboxCount
 
 bool
 CacheDatabase::setLastInboxUpdate (const QDateTime &dateTime)
@@ -797,7 +798,6 @@ CacheDatabase::insertHistory (const GVHistoryEvent &hEvent)
             query.exec (QString ("DELETE FROM " GV_INBOX_TABLE " "
                                  "WHERE " GV_IN_ID "='%1'")
                         .arg (hEvent.id));
-            nCountInbox--;
         }
 
         rv = query.exec (QString ("INSERT INTO " GV_INBOX_TABLE ""
@@ -819,7 +819,6 @@ CacheDatabase::insertHistory (const GVHistoryEvent &hEvent)
             break;
         }
 
-        nCountInbox++;
         rv = true;
     } while (0); // End cleanup block (not a loop)
 

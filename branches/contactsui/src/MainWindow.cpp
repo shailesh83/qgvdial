@@ -315,7 +315,6 @@ MainWindow::initQML ()
     // Initialize the QML view
     QDeclarativeContext *ctx = this->rootContext();
     ctx->setContextProperty ("registeredPhonesModel", &modelRegNumber);
-    onRegPhoneSelectionChange (indRegPhone);
     this->setSource (QUrl ("qrc:/Main.qml"));
     this->setResizeMode (QDeclarativeView::SizeRootObjectToView);
 
