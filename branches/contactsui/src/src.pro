@@ -102,7 +102,6 @@ HEADERS  += global.h                    \
             ContactDetailsModel.h
 
 FORMS    += LoginDialog.ui              \
-            InboxWidget.ui              \
             VMailDialog.ui              \
             WebWidget.ui
 

@@ -8,8 +8,16 @@ Rectangle {
 
     signal sigCall(string number)
     signal sigText(string number)
+    signal sigVoicemail(string link)
+    signal sigInboxSelect(string selection)
 
-    Rectangle {
+    // Private properties. DO NOT TOUCH from outside.
+    property string strTopRow: ""
+    property bool isVoicemail: false
+    property string theNumber: ""
+    property string strSelected: "All"
+
+    Rectangle { // Details
         id: detailsView
 
         anchors.fill: parent
@@ -19,7 +27,7 @@ Rectangle {
 
         opacity: 0
 
-        Item {
+        Item {  // Top row
             id: detailTopRow
 
             anchors {
@@ -30,7 +38,7 @@ Rectangle {
             height: btnDetailsClose.height
 
             Text {
-                text: "Contact name"    // contactDetailName
+                text: strTopRow
                 anchors.verticalCenter: parent.verticalCenter
                 color: "white"
                 font.pointSize: Code.btnFontPoint () / 8
@@ -47,71 +55,206 @@ Rectangle {
             }
         }
 
-        ListView {
+        Item {  // Number and buttons
             anchors {
                 top: detailTopRow.bottom
                 left: parent.left
                 right: parent.right
                 bottom: parent.bottom
             }
-            clip: true
-
-            model: contactDetailsModel
-        }
-    }
-
-    ListView {
-        id: contactsView
-
-        anchors.fill: parent
-        clip: true
-        opacity: 1
-
-        model: inboxModel
-
-        delegate: Rectangle {
-            id: listDelegate
-
-            color: "darkslategray"
-            border.color: "orange"
-            radius: 10
-
-            width: contactsView.width
-            height: (contactsView.height / 5);
 
             Text {
-                id: textName
-
+                text: theNumber
                 anchors {
                     verticalCenter: parent.verticalCenter
                     left: parent.left
-                    leftMargin: 5
+                }
+                color: "white"
+                font.pointSize: Code.btnFontPoint () / 8
+            }
+
+            Row {
+                anchors {
+                    right: parent.right
                 }
 
-                text: name
-                color: "white"
+                TextButton {
+                    text: "Call"
+                    onClicked: container.sigCall(theNumber)
+                }
+                TextButton {
+                    text: "Text"
+                    onClicked: container.sigText(theNumber)
+                }
+                TextButton {
+                    text: "Listen"
+                    opacity: (opacity & isVoicemail)
+                    onClicked: container.sigListen()
+                }
+            }
+        }
+    }
 
-                font.pointSize: (Code.btnFontPoint () / 8)
+    Item { //  The combined inbox list and selector list
+        id: inboxView
+        anchors.fill: parent
+        opacity: 1
+
+        Rectangle { // Selector bar at the top
+            id: barTop
+            width: parent.width
+            height: parent.height / 15
+            anchors.top: parent.top
+
+            color: "black"
+
+            signal clickedTopBar
+
+            Text {
+                text: strSelected
+                font.pointSize: Code.btnFontPoint()/10
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                color: "white"
             }
 
             MouseArea {
+                id: mouseAreaTopBar
                 anchors.fill: parent
 
                 onClicked: {
-                    container.sigContactlink (contacts);
-
-//                    detailsView.model = contacts;
-
-                    container.state = "Details"
+                    barTop.clickedTopBar();
+                    inboxView.state = 'Selectors';
                 }
+            }// MouseArea
+
+            states: [
+                State {
+                    name: "pressed"
+                    when: mouseAreaTopBar.pressed
+                    PropertyChanges { target: barTop; color: "orange" }
+                }
+            ]
+        }// Rectangle (selector)
+
+        ListView {
+            id: listSelector
+            anchors {
+                top: barTop.bottom
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
             }
-        }// delegate Rectangle
-    }// ListView
+
+            opacity: 0
+            clip: true
+
+            model: ["All", "Placed", "Missed", "Received", "Voicemail", "SMS"]
+            delegate:  Rectangle {
+                height: lblSelector.height
+                width: listSelector.width
+
+                color: "black"
+                border.color: "orange"
+
+                Text {
+                    id: lblSelector
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    text: modelData
+                    font.pointSize: Code.btnFontPoint()/12
+                    color: "white"
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        inboxView.state = '';
+                        strSelected = modelData
+                        container.sigInboxSelect(modelData)
+                    }
+                }
+            }// TextButton
+        }
+
+        ListView {
+            id: listInbox
+            anchors {
+                top: barTop.bottom
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
+
+            opacity: 1
+
+            clip: true
+
+            model: inboxModel
+
+            delegate: Rectangle {
+                id: listDelegate
+
+                color: "darkslategray"
+                border.color: "orange"
+                radius: 2
+
+                width: inboxView.width
+                height: textName.height + 6
+
+                Text {
+                    id: textName
+
+                    anchors {
+                        verticalCenter: parent.verticalCenter
+                        left: parent.left
+                        leftMargin: 5
+                    }
+
+                    text: type + " " + time + " : " + name
+
+                    color: "white"
+
+                    font.pointSize: (Code.btnFontPoint () / 12)
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+
+                    onClicked: {
+                        strTopRow = type + " at " + time + " : " + name;
+
+                        if (type == "Voicemail") {
+                            isVoicemail = true;
+                        } else {
+                            isVoicemail = false;
+                        }
+
+                        container.state = "Details"
+                    }
+                }
+            }// delegate Rectangle
+        }// ListView
+
+        states: [
+            State {
+                name: "Selectors"
+                PropertyChanges { target: listInbox; opacity: 0 }
+                PropertyChanges { target: listSelector; opacity: 1 }
+            }
+        ]
+
+        transitions: [
+            Transition {
+                PropertyAnimation { property: "opacity"; easing.type: Easing.InOutQuad}
+            }
+        ]
+    }// Item (list and selector)
 
     states: [
         State {
             name: "Details"
-            PropertyChanges { target: contactsView; opacity: 0 }
+            PropertyChanges { target: inboxView; opacity: 0 }
             PropertyChanges { target: detailsView; opacity: 1 }
         }
     ]

@@ -21,8 +21,8 @@ MainWindow::MainWindow (QWidget *parent)
 , fLogfile (this)
 , icoGoogle (":/Google.png")
 , pSystray (NULL)
-, oContactsTable (this)
-, pInboxView (NULL)
+, oContacts (this)
+, oInbox (this)
 , pWebWidget (new WebWidget (this, Qt::Window))
 #ifdef Q_WS_MAEMO_5
 , infoBox (this)
@@ -317,6 +317,8 @@ MainWindow::initQML ()
                       this, SLOT   (dialNow (QString)));
     QObject::connect (gObj, SIGNAL (sigText (QString)),
                       this, SLOT   (textANumber (QString)));
+    QObject::connect (gObj, SIGNAL (sigVoicemail (QString)),
+                      this, SLOT   (retrieveVoicemail (const QString &)));
     QObject::connect (
         gObj, SIGNAL (sigSelChanged (int)),
         this, SLOT   (onRegPhoneSelectionChange (int)));
@@ -428,7 +430,7 @@ MainWindow::loginCompleted (bool bOk, const QVariantList &varList)
         // Prepare then contacts
         initContacts ();
         // Prepare the inbox widget for usage
-        initInboxWidget ();
+        initInbox ();
         // Finally prepare the mail QML
         initQML ();
 
@@ -484,7 +486,7 @@ MainWindow::logoutCompleted (bool, const QVariantList &)
 {
     // This clears out the table and the view as well
     deinitContacts ();
-    deinitInboxWidget ();
+    deinitInbox ();
 
     arrNumbers.clear ();
 
@@ -562,86 +564,51 @@ void
 MainWindow::initContacts ()
 {
     // Status
-    QObject::connect (
-            &oContactsTable, SIGNAL (status   (const QString &, int)),
-             this          , SLOT   (setStatus(const QString &, int)));
+    QObject::connect (&oContacts, SIGNAL (status   (const QString &, int)),
+                       this     , SLOT   (setStatus(const QString &, int)));
 
-    // oContactsTable.allContacts -> this.getContactsDone
-    QObject::connect (&oContactsTable, SIGNAL (allContacts (bool)),
-                      this           , SLOT   (getContactsDone (bool)));
+    // oContacts.allContacts -> this.getContactsDone
+    QObject::connect (&oContacts, SIGNAL (allContacts (bool)),
+                      this      , SLOT   (getContactsDone (bool)));
 
-    oContactsTable.setUserPass (strUser, strPass);
-    oContactsTable.loginSuccess ();
-    oContactsTable.initModel (this);
+    oContacts.setUserPass (strUser, strPass);
+    oContacts.loginSuccess ();
+    oContacts.initModel (this);
 
 #ifndef Q_WS_MAEMO_5
-    oContactsTable.refreshContacts ();
+    oContacts.refreshContacts ();
 #endif
 }//MainWindow::initContacts
 
 void
 MainWindow::deinitContacts ()
 {
-    oContactsTable.deinitModel ();
-    oContactsTable.loggedOut ();
+    oContacts.deinitModel ();
+    oContacts.loggedOut ();
 }//MainWindow::deinitContacts
 
 void
-MainWindow::initInboxWidget ()
+MainWindow::initInbox ()
 {
-    do { // Begin cleanup block (not a loop)
-        if (NULL != pInboxView) {
-            qDebug ("Inbox widget is already active");
-            break;
-        }
+    // Status
+    QObject::connect (
+            &oInbox, SIGNAL (status   (const QString &, int)),
+            this   , SLOT   (setStatus(const QString &, int)));
 
-        // Create the contact view
-        pInboxView = new GVHistory (this);
-
-        // Status
-        QObject::connect (
-            pInboxView, SIGNAL (status   (const QString &, int)),
-            this      , SLOT   (setStatus(const QString &, int)));
-
-        // pInboxView.call -> this.call
-        QObject::connect (
-            pInboxView, SIGNAL(callNumber(const QString &, const QString &)),
-            this      , SLOT  (callNumber(const QString &, const QString &)));
-        // pInboxView.SMS -> this.SMS
-        QObject::connect (
-            pInboxView, SIGNAL(textANumber (const QString &, const QString &)),
-            this      , SLOT  (textANumber (const QString &, const QString &)));
-        // pInboxView.retrieveVoicemail -> this.retrieveVoicemail
-        QObject::connect (
-            pInboxView, SIGNAL(retrieveVoicemail (const QString &)),
-            this      , SLOT  (retrieveVoicemail (const QString &)));
-
-        pInboxView->loginSuccess ();
-        pInboxView->initModel ();
+    oInbox.loginSuccess ();
+    oInbox.initModel (this);
 
 #ifndef Q_WS_MAEMO_5
-        pInboxView->refreshHistory ();
+    oInbox.refreshHistory ();
 #endif
-    } while (0); // End cleanup block (not a loop)
-}//MainWindow::initInboxWidget
+}//MainWindow::initInbox
 
 void
-MainWindow::deinitInboxWidget ()
+MainWindow::deinitInbox ()
 {
-    do { // Begin cleanup block (not a loop)
-        if (NULL == pInboxView) {
-            qWarning ("Inbox widget was NULL.");
-            break;
-        }
-
-        pInboxView->deinitModel ();
-
-        pInboxView->loggedOut ();
-
-        pInboxView->deleteLater ();
-        pInboxView = NULL;
-    } while (0); // End cleanup block (not a loop)
-}//MainWindow::deinitInboxWidget
+    oInbox.deinitModel ();
+    oInbox.loggedOut ();
+}//MainWindow::deinitInbox
 
 /** Convert a number and a key to more info into a structure with all the info.
  * @param strNumber The phone number
@@ -1183,13 +1150,6 @@ MainWindow::sendSMSDone (bool bOk, const QVariantList &params)
 
     setStatus (msg);
 }//MainWindow::sendSMSDone
-
-void
-MainWindow::closeEvent (QCloseEvent *event)
-{
-    deinitInboxWidget ();
-    QDeclarativeView::closeEvent (event);
-}//MainWindow::closeEvent
 
 bool
 MainWindow::refreshRegisteredNumbers ()

@@ -5,8 +5,6 @@
 #include "Singletons.h"
 #include "ContactsXmlHandler.h"
 
-#include <QtDeclarative>
-
 GVContactsTable::GVContactsTable (QObject *parent)
 : QObject (parent)
 , modelContacts (NULL)
@@ -36,13 +34,11 @@ GVContactsTable::initModel (QDeclarativeView *pMainWindow)
 {
     deinitModel ();
 
-    if (NULL == modelContacts) {
-        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-        modelContacts = dbMain.newContactsModel ();
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    modelContacts = dbMain.newContactsModel ();
 
-        QDeclarativeContext *ctx = pMainWindow->rootContext();
-        ctx->setContextProperty ("contactsModel", modelContacts);
-    }
+    QDeclarativeContext *ctx = pMainWindow->rootContext();
+    ctx->setContextProperty ("contactsModel", modelContacts);
 }//GVContactsTable::initModel
 
 QNetworkReply *

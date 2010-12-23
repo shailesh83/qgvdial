@@ -10,6 +10,8 @@ Rectangle {
     signal sigText(string number)
     signal sigContactlink(string link)
     signal sigSelChanged(int index)
+    signal sigVoicemail(string link)
+    signal sigInboxSelect(string selection)
 
     onSigCall: console.debug("Call " + number)
     onSigText: console.debug("Text " + number)
@@ -146,6 +148,8 @@ Rectangle {
 
             onSigCall: main.sigCall (number)
             onSigText: main.sigCall (number)
+            onSigInboxSelect: main.sigInboxSelect(selection)
+            onSigVoicemail: main.sigVoicemail(link)
         }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,7 +172,7 @@ Rectangle {
                 color: "white"
             }
         }
-    }//Column
+    }//Item: Main column that has all the co-existent views
 
     states: [
         State {

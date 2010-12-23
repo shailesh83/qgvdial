@@ -120,16 +120,14 @@ private:
     void initContacts ();
     void deinitContacts ();
 
-    void initInboxWidget ();
-    void deinitInboxWidget ();
+    void initInbox ();
+    void deinitInbox ();
 
     bool getInfoFrom (const QString &strNumber,
                       const QString &strNameLink,
                       GVContactInfo &info);
 
     bool findInfo (const QString &strNumber, GVContactInfo &info);
-
-    void closeEvent (QCloseEvent *event);
 
     bool refreshRegisteredNumbers ();
     void fillCallbackNumbers (bool bSave = true);
@@ -147,9 +145,9 @@ private:
     QIcon           icoGoogle;
     QSystemTrayIcon *pSystray;
     //! Contacts table widget
-    GVContactsTable oContactsTable;
+    GVContactsTable oContacts;
     //! Contacts table widget
-    GVHistory       *pInboxView;
+    GVHistory       oInbox;
     //! SMS Window
     SMSDlg          dlgSMS;
     //! Web View

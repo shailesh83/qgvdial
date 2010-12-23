@@ -93,10 +93,10 @@ Rectangle {
 
             color: "darkslategray"
             border.color: "orange"
-            radius: 10
+            radius: 5
 
             width: contactsView.width
-            height: (contactsView.height / 5);
+            height: textName.height + 8
 
             Text {
                 id: textName
