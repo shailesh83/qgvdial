@@ -15,7 +15,7 @@ Rectangle {
     property string strDetailsName: ""
     property string strDetailsTime: ""
     property bool isVoicemail: false
-    property string theNumber: ""
+    property string strNumber: ""
     property string strSelected: "All"
 
     Rectangle { // Details
@@ -59,6 +59,7 @@ Rectangle {
         Item {  // Number and buttons
             anchors {
                 top: detailTopRow.bottom
+                topMargin: 5
                 left: parent.left
                 right: parent.right
                 bottom: parent.bottom
@@ -72,39 +73,52 @@ Rectangle {
                     left: parent.left
                 }
                 color: "white"
-                font.pointSize: Code.btnFontPoint () / 8
+                font.pointSize: Code.btnFontPoint () / 12
             }
 
-            Text {
-                text: theNumber
+            Item {
+                id: theNumber
                 anchors {
                     top: theTime.bottom
                     left: parent.left
                 }
-                color: "white"
-                font.pointSize: Code.btnFontPoint () / 8
+                width: lblNumber.width
+                height: lblNumber.height
+
+                Text {
+                    id: lblNumber
+                    anchors.fill: parent
+                    text: strNumber
+                    color: "white"
+                    font.pointSize: Code.btnFontPoint () / 12
+                }
             }
+
 
             Row {
                 anchors {
+                    top: theNumber.top
                     right: parent.right
                 }
+                height: btnCall.height
+                width: parent.width - theNumber.width
 
                 TextButton {
+                    id: btnCall
                     text: "Call"
-                    onClicked: container.sigCall(theNumber)
-                    fontPoint: Code.btnFontPoint()/8
+                    onClicked: container.sigCall(strNumber)
+                    fontPoint: Code.btnFontPoint()/12
                 }
                 TextButton {
                     text: "Text"
-                    onClicked: container.sigText(theNumber)
-                    fontPoint: Code.btnFontPoint()/8
+                    onClicked: container.sigText(strNumber)
+                    fontPoint: Code.btnFontPoint()/12
                 }
                 TextButton {
                     text: "Listen"
                     opacity: (detailsView.opacity & isVoicemail)
                     onClicked: container.sigListen()
-                    fontPoint: Code.btnFontPoint()/8
+                    fontPoint: Code.btnFontPoint()/12
                 }
             }
         }
