@@ -16,7 +16,7 @@ InboxModel::InboxModel (QObject * parent)
 }//InboxModel::InboxModel
 
 int
-InboxModel::rowCount (const QModelIndex &parent /* = QModelIndex()*/ ) const
+InboxModel::rowCount (const QModelIndex & /*parent = QModelIndex()*/) const
 {
     CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
     return (dbMain.getInboxCount ());
@@ -127,6 +127,13 @@ InboxModel::data (const QModelIndex &index,
                 qWarning ("Inbox: Friendly number is blank in entry");
                 break;
             }
+
+            if (strNum.startsWith ("Unknown")) {
+                qDebug ("Inbox: Unknown number is unknown");
+                var = "Unknown";
+                break;
+            }
+
             if (!GVAccess::isNumberValid (strNum)) {
                 qWarning () << "Inbox: Display phone number is invalid : "
                             << strNum;

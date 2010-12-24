@@ -39,6 +39,10 @@ GVContactsTable::initModel (QDeclarativeView *pMainWindow)
 
     QDeclarativeContext *ctx = pMainWindow->rootContext();
     ctx->setContextProperty ("contactsModel", modelContacts);
+
+    while (modelContacts->canFetchMore ()) {
+        modelContacts->fetchMore ();
+    }
 }//GVContactsTable::initModel
 
 QNetworkReply *
@@ -294,10 +298,6 @@ GVContactsTable::onGotContacts (QNetworkReply *reply)
                 .arg (contactsHandler.getTotalContacts ())
                 .arg (contactsHandler.getUsableContacts ());
     } while (0); // End cleanup block (not a loop)
-
-    while (modelContacts->canFetchMore ()) {
-        modelContacts->fetchMore ();
-    }
 
     emit status (msg);
     emit allContacts (rv);

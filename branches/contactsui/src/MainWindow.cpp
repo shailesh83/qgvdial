@@ -326,9 +326,10 @@ MainWindow::initQML ()
                       this, SLOT   (textANumber (QString)));
     QObject::connect (gObj, SIGNAL (sigVoicemail (QString)),
                       this, SLOT   (retrieveVoicemail (const QString &)));
-    QObject::connect (
-        gObj, SIGNAL (sigSelChanged (int)),
-        this, SLOT   (onRegPhoneSelectionChange (int)));
+    QObject::connect (gObj, SIGNAL (sigSelChanged (int)),
+                      this, SLOT   (onRegPhoneSelectionChange (int)));
+    QObject::connect (gObj   , SIGNAL (sigInboxSelect (QString)),
+                      &oInbox, SLOT   (onInboxSelected (const QString &)));
 }//MainWindow::initQML
 
 /** Invoked to begin the login process.

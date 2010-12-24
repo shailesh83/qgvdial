@@ -16,6 +16,7 @@ Rectangle {
     property string strDetailsTime: "Detail Time"
     property bool isVoicemail: false
     property string strNumber: "The number"
+    property string strLink: "BAD LINK!"
     property string strSelected: "All"
 
     Rectangle { // Details
@@ -113,7 +114,7 @@ Rectangle {
                 TextButton {
                     text: "Play"
                     opacity: (detailsView.opacity & isVoicemail)
-                    onClicked: container.sigVoicemail()
+                    onClicked: container.sigVoicemail(strLink)
                     fontPoint: Code.btnFontPoint()/15
                 }
             }
@@ -250,6 +251,7 @@ Rectangle {
                         strDetailsTime = type + " " + time_detail
                         strDetailsName = name;
                         strNumber = number;
+                        strLink = link;
 
                         if (type == "Voicemail") {
                             isVoicemail = true;
