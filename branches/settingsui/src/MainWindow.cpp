@@ -311,7 +311,7 @@ MainWindow::init ()
     QObject::connect (&actDismiss, SIGNAL (triggered()),
                        this      , SLOT   (close()));
     QObject::connect (&actRefresh, SIGNAL (triggered()),
-                       this      , SLOT   (onRefreshAll()));
+                       this      , SLOT   (onRefresh()));
     QObject::connect (&actExit, SIGNAL (triggered()),
                        this   , SLOT   (on_actionE_xit_triggered()));
     QObject::connect (&actViewWeb, SIGNAL (triggered ()),
@@ -359,8 +359,10 @@ MainWindow::initQML ()
                       this, SLOT   (onRegPhoneSelectionChange (int)));
     QObject::connect (gObj   , SIGNAL (sigInboxSelect (QString)),
                       &oInbox, SLOT   (onInboxSelected (const QString &)));
+    QObject::connect (gObj, SIGNAL (sigRefresh ()),
+                      this, SLOT   (onRefresh ()));
     QObject::connect (gObj, SIGNAL (sigRefreshAll ()),
-                      this, SLOT   (onRefreshAll  ()));
+                      this, SLOT   (onRefreshAll ()));
     QObject::connect (gObj, SIGNAL (sigDismiss ()),
                       this, SLOT   (close ()));
     QObject::connect (gObj, SIGNAL (sigQuit ()),
@@ -1486,11 +1488,21 @@ MainWindow::onRegPhoneSelectionChange (int index)
 }//MainWindow::onRegPhoneSelectionChange
 
 void
-MainWindow::onRefreshAll ()
+MainWindow::onRefresh ()
 {
     qDebug ("Refresh all requested.");
 
     refreshRegisteredNumbers ();
     oInbox.refreshHistory ();
     oContacts.refreshContacts ();
+}//MainWindow::onRefresh
+
+void
+MainWindow::onRefreshAll ()
+{
+    qDebug ("Refresh all requested.");
+
+    refreshRegisteredNumbers ();
+    oInbox.refreshFullInbox ();
+    oContacts.refreshAllContacts ();
 }//MainWindow::onRefreshAll

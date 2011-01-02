@@ -117,6 +117,7 @@ private slots:
     void onRegPhoneSelectionChange (int index);
 
     //! Invoked when user invokes refresh
+    void onRefresh ();
     void onRefreshAll ();
 
     void onStatusTimerTick ();

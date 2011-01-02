@@ -16,7 +16,10 @@ Rectangle {
     // Signal from inbox to chose the type of inbox entries to show
     signal sigInboxSelect(string selection)
     // Signals from the Settings page
-    signal sigLogin (bool bLogin)
+    signal sigUserPassChanged(string username, string password)
+    signal sigLogin
+    signal sigLogout
+    signal sigRefresh
     signal sigRefreshAll
     signal sigDismiss
     signal sigQuit
@@ -170,7 +173,9 @@ Rectangle {
 
             opacity: 0
 
-            onSigLogin: main.sigLogin(bLogin)
+            onSigLogin: main.sigLogin()
+            onSigLogout: main.sigLogout()
+            onSigRefresh: main.sigRefresh()
             onSigRefreshAll: main.sigRefreshAll()
             onSigDismiss: main.sigDismiss()
             onSigQuit: main.sigQuit()
