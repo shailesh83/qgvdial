@@ -147,6 +147,21 @@ Rectangle {
             onSigVoicemail: main.sigVoicemail(link)
         }
 
+        Settings {
+            id: settingsView
+
+            width: mainColumn.centralWidth
+            height: mainColumn.centralHeight
+            anchors {
+                top: barTop.bottom
+                bottom: barStatus.top
+                topMargin: nMargins
+                bottomMargin: nMargins
+            }
+
+            opacity: 0
+        }
+
 ////////////////////////////////////////////////////////////////////////////////
 //                           Co-existent Items End                            //
 ////////////////////////////////////////////////////////////////////////////////
@@ -173,17 +188,22 @@ Rectangle {
         State {
             name: "Dialpad"
             PropertyChanges { target: dialPad; opacity: 1}
+            PropertyChanges { target: mainRect; opacity: 0}
         },
         State {
             name: "Contacts"
             PropertyChanges { target: contactsList; opacity: 1}
+            PropertyChanges { target: mainRect; opacity: 0}
         },
         State {
             name: "Inbox"
             PropertyChanges { target: inboxList; opacity: 1}
+            PropertyChanges { target: mainRect; opacity: 0}
         },
         State {
             name: "Settings"
+            PropertyChanges { target: settingsView; opacity: 1}
+            PropertyChanges { target: mainRect; opacity: 0}
         }
     ]//states
 
