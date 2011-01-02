@@ -4,12 +4,13 @@ import "helper.js" as Code
 Rectangle {
     id: container
 
+    height: textLabel.height + 5
+    width: textLabel.width + 5
     color: "black"
 
     property string text: "Yes or no question?"
     property bool check: false
-    height: textLabel.height + 5
-    width: textLabel.width + 5
+    property real fontPoint: 40 // Outrageously large so that you are forced to change it.
 
     Row {
         anchors.fill: parent
@@ -39,6 +40,7 @@ Rectangle {
             id: textLabel
             text: container.text
             anchors.verticalCenter: parent.verticalCenter
+            font.pointSize: container.fontPoint
 
             color: "white"
         }
