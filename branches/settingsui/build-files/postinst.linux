@@ -1,6 +1,0 @@
-#!/bin/sh
-chmod +x /usr/bin/qgvdial
-chmod +x /usr/bin/qgv-tp
-chmod +x /usr/bin/qgv-util
-/usr/bin/qgv-util INSTALL
-
