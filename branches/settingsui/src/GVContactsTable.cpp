@@ -39,7 +39,7 @@ GVContactsTable::initModel (QDeclarativeView *pMainWindow)
     modelContacts = dbMain.newContactsModel ();
 
     QDeclarativeContext *ctx = pMainWindow->rootContext();
-    ctx->setContextProperty ("contactsModel", modelContacts);
+    ctx->setContextProperty ("g_contactsModel", modelContacts);
 
     while (modelContacts->canFetchMore ()) {
         modelContacts->fetchMore ();

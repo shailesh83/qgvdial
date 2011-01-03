@@ -4,10 +4,10 @@ import "helper.js" as Code
 Item {
     id: container
 
-    //@@UV: 4 at the beginning yet tobe done
     signal sigProxySupport(bool enable)
     signal sigUseSystemProxy(bool enable)
-    signal sigUserPassChanged(string username, string password)
+    signal sigUserChanged(string username)
+    signal sigPassChanged(string password)
     signal sigLogin
     signal sigLogout
     signal sigRefresh
@@ -24,9 +24,9 @@ Item {
         property bool bUserProxy: ((proxySupport.check == true) && (proxySystem.check  != true))
 
         // Test properties; comment out when adding qml to c++ code.
-        property string strUsername: "user@gmail.com"   // g_strUsername
-        property string strPassword: "hunter2 :p"       // g_strPassword
-        property bool bIsLoggedIn: false                // g_bIsLoggedIn
+        property string strUsername: g_strUsername      // "user@gmail.com"
+        property string strPassword: g_strPassword      // "hunter2 :p"
+        property bool bIsLoggedIn: g_bIsLoggedIn        // false
 
         Row {
             width: parent.width
@@ -48,7 +48,7 @@ Item {
 
                 opacity: (mainColumn.bIsLoggedIn == true ? 0 : 1)
 
-                onTextChanged: container.sigUserPassChanged(text, textPassword.text);
+                onTextChanged: container.sigUserChanged(textUsername.text);
             }
 
             Text {
@@ -81,7 +81,7 @@ Item {
 
                 opacity: (mainColumn.bIsLoggedIn == true ? 0 : 1)
 
-                onTextChanged: container.sigUserPassChanged(textUsername.text, text);
+                onTextChanged: container.sigPassChanged(textPassword.text);
             }
 
             Text {
