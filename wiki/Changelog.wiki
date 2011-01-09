@@ -1,5 +1,18 @@
 #summary Change log
 
+*2011-01-09 (since the last time)*
+ * Inbox now updated based on latest inbox entry.
+ * UI is almost entirely in QML. Only some components remain in QtCreator form format.
+ * Rotation is really truly complete
+ * Call ui, contacts UI and inbox UI all work.
+ * SMS and call buttons on contacts and inbox pages.
+ * SMSes are shown in the inbox and sending SMS actually works!
+ * log goes into logfile at ~/.qgvdial/qgvdial.log
+ * use a model view design for using QML
+ * DBus activation for Call and Text service. Used by MyContacts and my own qgv-tp on Maemo5
+ * Added a telepathy connection manager "qgv-tp" to integrate into the n900 phone book. Calls are now possible directly from the phone book.
+ * Added network proxy support.
+
 *2010-10-04*
  * Windows build now uses VS 2010 and QT 4.7 with qtmobility 1.1
  * Inbox view changed. Should now be much faster to load and less quirky to display.
