@@ -1,7 +1,8 @@
 #summary Features to be added, bugs to be fixed, R&D to be done
 
 *Planned features:*
- * fcrochik has given some interface. Need to look at that and see what it does.
+ * Save and retrieve the Inbox selector.
+ * Don't show disabled Telepathy accounts.
  * Auto-accept dialback phone call in desktop skype
  * Auto-accept dialback phone call in phone
  * Convert the GV access class into a QtMobility connection manager so that anyone else can access it and create other interesting apps.
