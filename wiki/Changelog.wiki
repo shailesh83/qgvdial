@@ -1,5 +1,22 @@
 #summary Change log
 
+*2011-02-22*
+ * Proxy settings - user entered or system or none, with support for username
+ and password. Proxy settings are saved.
+ * All network traffic now has time outs associated. This allows for qgvdial
+ to recover itself to a stable state in case the network is too slow or flaky
+ or not present or borked because of captive portals (the "Starbucks effect")
+ * Fixed contacts update and inbox update so that the time it used to take to
+ commit the entries to disk is now much almost non-existent.
+ * Cleaned up the QML to be more QML-like instead of C like.
+ * Long press on backspace button clears the number on the dialpad.
+ * Added an about page with version number, and URL links to project specific
+ info
+ * Maemo builds now happen on the maemo.org build farm.
+ * Windows build is now an MSI.
+ * Settings page has tab order!
+ * Inbox selection is saved.
+
 *2011-01-09 (since the last time)*
  * Inbox now updated based on latest inbox entry.
  * UI is almost entirely in QML. Only some components remain in QtCreator form format.
