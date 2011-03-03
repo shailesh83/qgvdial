@@ -1,5 +1,9 @@
 #summary Change log
 
+*2011-03-02*
+ * Mosquitto support. qgvdial can now subscribe to a mosquitto topic that will inform it of inbox updates. This is at present, Linux and Maemo only.
+ * Added changelog to Maemo and Linux build.
+
 *2011-02-22*
  * Proxy settings - user entered or system or none, with support for username and password. Proxy settings are saved.
  * All network traffic now has time outs associated. This allows for qgvdial to recover itself to a stable state in case the network is too slow or flaky or not present or borked because of captive portals (the "Starbucks effect")
