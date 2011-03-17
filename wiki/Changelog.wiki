@@ -1,5 +1,12 @@
 #summary Change log
 
+*2011-03-16*
+ * Lots of Symbian work. UI works as expected finally, and sizes are all fine.
+ * Call out with Symbian version works. Phone only. No SIP or Skype.
+ * Icon for Symbian. Hide window also works.
+ * Stop using the Qt MessageBox for the dial cancel dialog. Use inbuilt QML.
+ * Made it look proper on Maemo and others as well.
+
 *2011-03-11*
  * Changed all the QML elements to use pixel size instead of font point.
 
