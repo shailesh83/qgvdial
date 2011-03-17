@@ -1,5 +1,9 @@
 #summary Change log
 
+*2011-03-17*
+ * Differentiate the text input boxes from labels
+ * Added tab order to most text fields
+
 *2011-03-16*
  * Lots of Symbian work. UI works as expected finally, and sizes are all fine.
  * Call out with Symbian version works. Phone only. No SIP or Skype.
