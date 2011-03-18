@@ -1,5 +1,10 @@
 #summary Change log
 
+*2011-03-18*
+ * Fixed the QML message box so that is is definitely visible.
+ * Introduced a perl script that clears out leading whitespace and comments from QML so that the resource section is smaller.
+ * Eliminated TextButton. It wasn't being used anywhere.
+
 *2011-03-17*
  * Differentiate the text input boxes from labels
  * Added tab order to most text fields
