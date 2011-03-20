@@ -1,5 +1,9 @@
 #summary Change log
 
+*2011-03-19*
+ * Removed version to the pro file and added it only at build time.
+ * Cancel msgbox did not disappear when Observer notices that call has occured.
+
 *2011-03-18*
  * Fixed the QML message box so that is is definitely visible.
  * Introduced a perl script that clears out leading whitespace and comments from QML so that the resource section is smaller.
