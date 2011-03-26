@@ -5,7 +5,7 @@
  * If the dial out method is not enabled, not valid or otherwise unusable, don't show it.
  * qgvdial has been submitted to the Ovi store for QA and in the calling all innovators contest!
  * Upper bound check on the registered number array
- * Special case for Desktop Skype: Always online.
+ * Special case for Desktop Skype and Symbian Phone: Always online.
 
 *2011-03-19*
  * Removed version to the pro file and added it only at build time.
