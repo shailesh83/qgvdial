@@ -1,6 +1,9 @@
 #summary Change log
 
 *2011-03-30*
+ * VMail now plays using QtMobility QML element
+
+*2011-03-30*
  * QML fix: Stop using 3 different MainView files. Simplify things.
  * Minor width corrections on the Settings page.
 
