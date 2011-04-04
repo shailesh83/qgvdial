@@ -1,5 +1,9 @@
 #summary Change log
 
+*2011-04-04*
+ * Contact and inbox notes functionality added.
+ * Massive code cleanup. merged duplicate structures, removed redundant classes.
+
 *2011-04-03*
  * SIP instead of sofiasip. Also add the account after "SIP:" to be more descriptive.
  * Mosquitto settings never made it to the cpp code !! - Now fixed.
