@@ -1,5 +1,10 @@
 #summary Change log
 
+*2011-04-05*
+ * Symbian needs all paths to use backslash
+ * sqlite db moved into $home/.qgvdial/qgvdial.sqlite.db for all platforms.
+ * Word wrap contact notes in QML
+
 *2011-04-04*
  * Contact and inbox notes functionality added.
  * Massive code cleanup. merged duplicate structures, removed redundant classes.
