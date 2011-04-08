@@ -1,5 +1,8 @@
 #summary Change log
 
+*2011-04-08*
+ * Web widget it now embedded in QML
+
 *2011-04-05*
  * Symbian needs all paths to use backslash
  * sqlite db moved into $home/.qgvdial/qgvdial.sqlite.db for all platforms.
