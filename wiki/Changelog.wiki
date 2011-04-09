@@ -2,6 +2,7 @@
 
 *2011-04-08*
  * Web widget it now embedded in QML
+ * Voicemail transcription from Google!
 
 *2011-04-05*
  * Symbian needs all paths to use backslash
