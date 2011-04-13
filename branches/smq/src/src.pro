@@ -169,6 +169,9 @@ symbian {
                SymbianCallInitiatorPrivate.cpp  \
                SymbianCallObserverPrivate.cpp
 
+# Add the mosquitto lib to symbian
+include(mqlib/mqlib.pri)
+
 # The Symbian telephony stack library
     LIBS += -letel3rdparty
 
