@@ -171,6 +171,8 @@ symbian {
 
 # Add the mosquitto lib to symbian
 include(mqlib/mqlib.pri)
+HEADERS += MqClientThread.h
+SOURCES += MqClientThread.cpp
 
 # The Symbian telephony stack library
     LIBS += -letel3rdparty

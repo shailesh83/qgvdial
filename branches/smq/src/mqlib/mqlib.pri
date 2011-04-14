@@ -1,4 +1,5 @@
 QT *= network
+INCLUDEPATH	 += $$PWD
 
 HEADERS  += $$PWD/logging_mosq.h        \
             $$PWD/memory_mosq.h         \
