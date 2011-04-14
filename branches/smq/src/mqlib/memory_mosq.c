@@ -27,7 +27,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <config.h>
+#include <mq_config.h>
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -51,66 +51,66 @@ static unsigned long memcount;
 
 void *_mosquitto_calloc(size_t nmemb, size_t size)
 {
-	void *mem = calloc(nmemb, size);
+    void *mem = calloc(nmemb, size);
 
 #ifdef REAL_WITH_MEMORY_TRACKING
-	memcount += malloc_usable_size(mem);
+    memcount += malloc_usable_size(mem);
 #endif
 
-	return mem;
+    return mem;
 }
 
 void _mosquitto_free(void *mem)
 {
 #ifdef REAL_WITH_MEMORY_TRACKING
-	memcount -= malloc_usable_size(mem);
+    memcount -= malloc_usable_size(mem);
 #endif
-	free(mem);
+    free(mem);
 }
 
 void *_mosquitto_malloc(size_t size)
 {
-	void *mem = malloc(size);
+    void *mem = malloc(size);
 
 #ifdef REAL_WITH_MEMORY_TRACKING
-	memcount += malloc_usable_size(mem);
+    memcount += malloc_usable_size(mem);
 #endif
 
-	return mem;
+    return mem;
 }
 
 #ifdef REAL_WITH_MEMORY_TRACKING
 unsigned long _mosquitto_memory_used(void)
 {
-	return memcount;
+    return memcount;
 }
 #endif
 
 void *_mosquitto_realloc(void *ptr, size_t size)
 {
-	void *mem;
+    void *mem;
 #ifdef REAL_WITH_MEMORY_TRACKING
-	if(ptr){
-		memcount -= malloc_usable_size(ptr);
-	}
+    if(ptr){
+        memcount -= malloc_usable_size(ptr);
+    }
 #endif
-	mem = realloc(ptr, size);
+    mem = realloc(ptr, size);
 
 #ifdef REAL_WITH_MEMORY_TRACKING
-	memcount += malloc_usable_size(mem);
+    memcount += malloc_usable_size(mem);
 #endif
 
-	return mem;
+    return mem;
 }
 
 char *_mosquitto_strdup(const char *s)
 {
-	char *str = strdup(s);
+    char *str = strdup(s);
 
 #ifdef REAL_WITH_MEMORY_TRACKING
-	memcount += malloc_usable_size(str);
+    memcount += malloc_usable_size(str);
 #endif
 
-	return str;
+    return str;
 }
 

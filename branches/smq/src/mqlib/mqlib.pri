@@ -10,7 +10,8 @@ HEADERS  += $$PWD/logging_mosq.h        \
             $$PWD/net_mosq.h            \
             $$PWD/read_handle.h         \
             $$PWD/send_mosq.h           \
-            $$PWD/util_mosq.h
+            $$PWD/util_mosq.h           \
+            $$PWD/mq_config.h
 
 SOURCES  += $$PWD/logging_mosq.c        \
             $$PWD/memory_mosq.c         \
