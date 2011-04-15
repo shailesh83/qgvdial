@@ -1,7 +1,12 @@
 #summary Change log
 
+*2011-04-14*
+ * Mosquitto now works in Symbian
+ * Logs in QML
+ * qgvdial and qgvtp now split up
+
 *2011-04-08*
- * Web widget it now embedded in QML
+ * Web widget is now embedded in QML
  * Voicemail transcription from Google!
 
 *2011-04-05*
