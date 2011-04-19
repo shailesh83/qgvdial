@@ -1,7 +1,7 @@
 #summary Change log
 
 *2011-04-18*
- * Incorporate encryption into qgvdial. Username, password and contacts info (except names) encrypted.
+ * Incorporate encryption into qgvdial. Only username and password encrypted.
  * Right now the encryption key is open to public (in the source code). I'll fix this later. It's better than what I had previously.
  * Blocked passwords from the log dump.
  * Added icons to inbox view
