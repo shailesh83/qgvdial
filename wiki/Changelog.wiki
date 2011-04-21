@@ -2,6 +2,7 @@
 
 *2011-04-20*
  * Inbox icons changed
+ * Scroll bars for Inbox and Contacts List.
 
 *2011-04-19*
  * All platforms now use AES
