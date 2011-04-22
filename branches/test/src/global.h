@@ -8,7 +8,6 @@
 #include <QtNetwork>
 #include <QtSql>
 #include <QtXml>
-#include <QtDeclarative>
 #include <QtScript>
 
 #ifdef QT_NO_DEBUG
