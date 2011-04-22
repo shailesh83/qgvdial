@@ -1,5 +1,4 @@
 #include "GVWebPage.h"
-#include "Singletons.h"
 #include "GVI_XMLJsonHandler.h"
 
 #define GV_DATA_BASE "https://www.google.com/voice"

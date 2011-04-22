@@ -27,9 +27,15 @@ PRECOMPILED_HEADER = global.h
 SOURCES  += main.cpp                    \
             MainWindow.cpp              \
             GVAccess.cpp                \
-            GVWebPage.cpp
+            GVWebPage.cpp               \
+            MobileWebPage.cpp           \
+            GVI_XMLJsonHandler.cpp      \
+            GVI_SMS_Handler.cpp
 
 HEADERS  += global.h                    \
             MainWindow.h                \
             GVAccess.h                  \
-            GVWebPage.h
+            GVWebPage.h                 \
+            MobileWebPage.h             \
+            GVI_XMLJsonHandler.h        \
+            GVI_SMS_Handler.h

@@ -3,3 +3,9 @@
 ../src/GVWebPage.h GVWebPage.h
 ../src/GVWebPage.cpp GVWebPage.cpp
 ../src/global.h global.h
+../src/MobileWebPage.h MobileWebPage.h
+../src/MobileWebPage.cpp MobileWebPage.cpp
+../src/GVI_XMLJsonHandler.h GVI_XMLJsonHandler.h
+../src/GVI_XMLJsonHandler.cpp GVI_XMLJsonHandler.cpp
+../src/GVI_SMS_Handler.h GVI_SMS_Handler.h
+../src/GVI_SMS_Handler.cpp GVI_SMS_Handler.cpp
