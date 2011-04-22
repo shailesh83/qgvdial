@@ -1,4 +1,5 @@
-GVAccess.h https://qgvdial.googlecode.com/svn/branches/test/src/GVAccess.h
-GVAccess.cpp https://qgvdial.googlecode.com/svn/branches/test/src/GVAccess.cpp
-GVWebPage.h https://qgvdial.googlecode.com/svn/branches/test/src/GVWebPage.h
-GVWebPage.cpp https://qgvdial.googlecode.com/svn/branches/test/src/GVWebPage.cpp
+../src/GVAccess.h GVAccess.h
+../src/GVAccess.cpp GVAccess.cpp
+../src/GVWebPage.h GVWebPage.h
+../src/GVWebPage.cpp GVWebPage.cpp
+../src/global.h global.h
