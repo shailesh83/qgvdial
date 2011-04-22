@@ -7,6 +7,7 @@ GVDataAccess::GVDataAccess (QObject *parent /*= NULL*/)
 , nwMgr (this)
 , nwReply (NULL)
 {
+    nwMgr.setCookieJar (new MyCookieJar(this));
 }//GVDataAccess::GVDataAccess
 
 GVDataAccess::~GVDataAccess ()
@@ -65,7 +66,7 @@ GVDataAccess::loginCaptcha (const QString &strToken, const QString &strCaptcha)
         arrPairs += QStringPair("logintoken"  , strToken);
         arrPairs += QStringPair("logincaptcha", strCaptcha);
     }
-    postRequest (GV_CLIENTLOGIN, arrPairs, QString (),
+    postRequest (GV_CLIENTLOGIN, arrPairs, UA_IPHONE,
                  this, SLOT (onLoginResponse (QNetworkReply *)));
 
     return (true);
@@ -131,6 +132,18 @@ GVDataAccess::onLoginResponse (QNetworkReply *reply)
 
         qDebug ("Login success");
         bOk = true;
+
+        MyCookieJar *jar = (MyCookieJar *) nwMgr.cookieJar ();
+        QList<QNetworkCookie> cookies = jar->getAllCookies ();
+        foreach (QNetworkCookie cookie, cookies)
+        {
+            qDebug () << cookie;
+            if (cookie.name() == "gvx")
+            {
+                bLoggedIn = true;
+            }
+        }
+
     } while (0); // End cleanup block (not a loop)
 
     reply->deleteLater ();
@@ -233,3 +246,14 @@ GVDataAccess::playVmail ()
     completeCurrentWork (GVAW_playVmail, false);
     return (false);
 }//GVDataAccess::playVmail
+
+MyCookieJar::MyCookieJar(QObject *parent /*= 0*/)
+: QNetworkCookieJar(parent)
+{
+}//MyCookieJar::MyCookieJar
+
+QList<QNetworkCookie>
+MyCookieJar::getAllCookies ()
+{
+    return allCookies ();
+}//MyCookieJar::getAllCookies

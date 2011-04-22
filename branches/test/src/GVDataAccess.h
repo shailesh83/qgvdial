@@ -71,4 +71,13 @@ private:
     friend class Singletons;
 };
 
+class MyCookieJar : public QNetworkCookieJar
+{
+    Q_OBJECT
+
+public:
+    MyCookieJar(QObject * parent = 0);
+    QList<QNetworkCookie> getAllCookies ();
+};
+
 #endif //__GVDATAACCESS_H__
