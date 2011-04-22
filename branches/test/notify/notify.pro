@@ -1,4 +1,4 @@
-QT      *= core gui webkit sql xml xmlpatterns script
+QT      *= core gui network webkit sql xml xmlpatterns script
 TARGET   = qgvnotify
 TEMPLATE = app
 
@@ -25,7 +25,11 @@ unix:!symbian {
 PRECOMPILED_HEADER = global.h
 
 SOURCES  += main.cpp                    \
-            MainWindow.cpp
+            MainWindow.cpp              \
+            GVAccess.cpp                \
+            GVWebPage.cpp
 
 HEADERS  += global.h                    \
-            MainWindow.h
+            MainWindow.h                \
+            GVAccess.h                  \
+            GVWebPage.h
