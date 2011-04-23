@@ -109,12 +109,6 @@ GVWebPage::postRequest (QString            strUrl  ,
                                   receiver, method);
 }//GVWebPage::postRequest
 
-QWebElement
-GVWebPage::doc ()
-{
-    return (webPage.mainFrame()->documentElement());
-}//GVWebPage::doc
-
 bool
 GVWebPage::isLoggedIn ()
 {
@@ -341,16 +335,6 @@ GVWebPage::logoutDone (bool bOk)
 
     completeCurrentWork (GVAW_logout, bOk);
 }//GVWebPage::logoutDone
-
-bool
-GVWebPage::isNextContactsPageAvailable ()
-{
-    QWebFrame *f = webPage.mainFrame();
-    QString strTest = QString("a[href=\"/voice/m/contacts?p=%1\"]")
-                         .arg(nCurrent+1);
-    QWebElementCollection t = f->findAllElements (strTest);
-    return (0 != t.count ());
-}//GVWebPage::isNextContactsPageAvailable
 
 bool
 GVWebPage::dialCallback (bool bCallback)
@@ -597,41 +581,60 @@ GVWebPage::phonesListLoaded (bool bOk)
             break;
         }
 
-#define GVSELECTOR "div form div input[type=\"radio\"]"
-        QWebElementCollection numbers = doc().findAll (GVSELECTOR);
-#undef GVSELECTOR
-        if (0 == numbers.count ())
-        {
+        QString strHtml = webPage.mainFrame ()->toHtml ();
+#if 0
+        QFile temp("dump.txt");
+        temp.open (QIODevice::ReadWrite);
+        temp.write (strHtml.toAscii ());
+        temp.close ();
+#endif
+
+        QRegExp rx("<input\\s*type\\s*=\\s*\"radio\"\\s*name\\s*=\\s*\"phone\""
+                   "\\s*value\\s*=\\s*\"(.*)<br>\\s*<\\/div>");
+        rx.setMinimal (true);
+        if ((!strHtml.contains (rx)) || (rx.numCaptures () <= 0)) {
             qWarning ("No registered phones found for this account");
             break;
         }
 
-        QString strText = numbers[0].parent().toPlainText ();
-        QStringList astrPhones = strText.split ("\n", QString::SkipEmptyParts);
-        int index = 0;
-        foreach (strText, astrPhones)
-        {
-            GVRegisteredNumber regNumber;
-            strText = strText.simplified ();
-            QStringList arrSplit = strText.split (":");
-            regNumber.strName = arrSplit[0].trimmed ();
-            regNumber.strDescription = arrSplit[1].trimmed();
-            // Make the actual number follow the form: +1aaabbbcccc
-            regNumber.strDescription.remove (QRegExp("[ \t\n()-]"));
-            simplify_number (regNumber.strDescription);
+        QString strRx1 = "<input\\s*type\\s*=\\s*\"radio\"\\s*name\\s*=\\s*\""
+                         "phone\"\\s*value\\s*=\\s*\"(.*)<br>";
+        QString strRx2 = "(.*)\\|(.).*>[\\s\\r\\n]*(.*)";
+        strHtml = rx.cap (0);
+        rx.setPattern (strRx1);
+        rx.setMinimal (true);
+        while (strHtml.contains (rx) && (rx.numCaptures () > 0)) {
+            QString strOneNum = rx.cap (1);
+            strHtml.remove (0, strHtml.indexOf (strOneNum) + strOneNum.length ());
 
-            QString strFromInput = numbers[index].attribute("value");
-            QRegExp rx1("(.*)\\|(.)");
-            if ((strFromInput.contains (rx1)) && (2 == rx1.captureCount ()))
-            {
-                QString strTemp = rx1.cap (1);
-                simplify_number (strTemp);
-                if (strTemp == regNumber.strDescription) {
-                    regNumber.chType = rx1.cap (2)[0].toAscii ();
+            qDebug () << strOneNum;
+
+            rx.setPattern (strRx2);
+            rx.setMinimal (false);
+            if (strOneNum.contains (rx) && (rx.numCaptures () == 3)) {
+                GVRegisteredNumber regNumber;
+                QString strText = rx.cap (3);
+                strText = strText.simplified ();
+                QStringList arrSplit = strText.split (":");
+                if (arrSplit.length () == 2) {
+                    regNumber.strName = arrSplit[0].trimmed ();
+                    regNumber.strDescription = arrSplit[1].trimmed();
+                    // Make the actual number follow the form: +1aaabbbcccc
+                    regNumber.strDescription.remove (QRegExp("[ \t\n()-]"));
+                    simplify_number (regNumber.strDescription);
                 }
+
+                strText = rx.cap (1);
+                simplify_number (strText);
+                if (strText == regNumber.strDescription) {
+                    regNumber.chType = rx.cap (2)[0].toAscii ();
+                }
+
+                emit registeredPhone (regNumber);
             }
-            emit registeredPhone (regNumber);
-            index++;
+
+            rx.setPattern (strRx1);
+            rx.setMinimal (true);
         }
 
         bOk = true;
@@ -801,104 +804,6 @@ GVWebPage::onGotInboxXML (QNetworkReply *reply)
 
     reply->deleteLater ();
 }//GVWebPage::onGotInboxXML
-
-bool
-GVWebPage::getContactFromInboxLink ()
-{
-    if (!this->isOnline ()) {
-        qDebug ("Cannot get contact from inbox link when offline");
-        completeCurrentWork (GVAW_getContactFromInboxLink, false);
-        return false;
-    }
-
-    QMutexLocker locker(&mutex);
-    if (!bLoggedIn)
-    {
-        qWarning ("User not logged in when calling Inbox link");
-        completeCurrentWork (GVAW_getContactFromInboxLink, false);
-        return (false);
-    }
-
-    QString strQuery, strHost;
-    this->getHostAndQuery (strHost, strQuery);
-    QString strGoto = strHost
-                    + workCurrent.arrParams[0].toString();
-    QObject::connect (
-        &webPage, SIGNAL (loadFinished (bool)),
-         this   , SLOT   (getContactFromInboxLinkLoaded (bool)));
-    this->loadUrlString (strGoto);
-
-    return (true);
-}//GVWebPage::getContactFromInboxLink
-
-void
-GVWebPage::getContactFromInboxLinkLoaded (bool bOk)
-{
-    QObject::disconnect (
-        &webPage, SIGNAL (loadFinished (bool)),
-         this   , SLOT   (getContactFromInboxLinkLoaded (bool)));
-
-    ContactInfo info;
-    do // Begin cleanup block (not a loop)
-    {
-        if (isLoadFailed (bOk))
-        {
-            bOk = false;
-            qWarning ("Failed to load Inbox link page");
-            break;
-        }
-        bOk = false;
-
-#define GVSELECTOR "div form input[name=\"number\"]"
-        QWebElement user = doc().findFirst (GVSELECTOR);
-#undef GVSELECTOR
-        if (user.isNull ())
-        {
-            qWarning ("Couldn't find user name on page");
-            break;
-        }
-        info.strTitle = user.attribute ("name");
-        if (0 == info.strTitle.compare ("number", Qt::CaseInsensitive))
-        {
-            info.strTitle = user.attribute ("value");
-        }
-
-#define GVSELECTOR "div form div input[name=\"call\"]"
-        QWebElementCollection numbers = doc().findAll (GVSELECTOR);
-#undef GVSELECTOR
-        if (0 == numbers.count ())
-        {
-            qWarning ("No numbers found for this contact");
-            break;
-        }
-
-        QRegExp rx("([A-Z])\\)$", Qt::CaseInsensitive);
-        foreach (QWebElement btnCall, numbers)
-        {
-            QWebElement divParent = btnCall.parent ();
-            PhoneInfo gvNumber;
-            gvNumber.strNumber = divParent.toPlainText().simplified ();
-            int pos = rx.indexIn (gvNumber.strNumber);
-            if (-1 != pos)
-            {
-                QString strChr = rx.cap ();
-                gvNumber.Type = PhoneInfo::charToType (strChr[0].toAscii ());
-                gvNumber.strNumber.chop (3);
-                gvNumber.strNumber = gvNumber.strNumber.trimmed ();
-            }
-            info.arrPhones += gvNumber;
-        }
-
-        bOk = true;
-    } while (0); // End cleanup block (not a loop)
-    if (bOk)
-    {
-        info.strId = workCurrent.arrParams[0].toString();
-        emit contactInfo (info);
-    }
-
-    completeCurrentWork (GVAW_getContactFromInboxLink, bOk);
-}//GVWebPage::getContactFromInboxLinkLoaded
 
 void
 GVWebPage::garbageTimerTimeout ()

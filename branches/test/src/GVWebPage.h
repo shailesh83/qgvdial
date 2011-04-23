@@ -48,9 +48,6 @@ private slots:
     //! Invoked when GV responds with a inbox page.
     void onGotInboxXML (QNetworkReply *reply);
 
-    //! Invoked when the inbox entry link for an unknown number is loaded
-    void getContactFromInboxLinkLoaded (bool bOk);
-
     //! Invoked when the garbage timer times out.
     void garbageTimerTimeout ();
 
@@ -68,10 +65,8 @@ private slots:
     void onSocketXfer (qint64 bytesXfer, qint64 bytesTotal);
 
 private:
-    QWebElement doc ();
     bool isLoggedIn ();
     bool isOnline ();
-    bool isNextContactsPageAvailable ();
     void getHostAndQuery (QString &strHost, QString &strQuery);
     void loadUrlString (const QString &strUrl);
     bool isLoadFailed (bool bOk);
@@ -97,8 +92,6 @@ private:
     bool getInbox ();
     //! Create and send an inbox request
     bool sendInboxRequest ();
-    //! Call a number given the inbox entry link
-    bool getContactFromInboxLink ();
     //! This sends SMSes
     bool sendSMS ();
     //! Play a voicemail

@@ -41,8 +41,6 @@ private:
     bool getRegisteredPhones ();
     //! Begin the process to get inbox
     bool getInbox ();
-    //! Call a number given the inbox entry link
-    bool getContactFromInboxLink ();
     //! This sends SMSes
     bool sendSMS ();
     //! Play a voicemail

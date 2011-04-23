@@ -35,9 +35,6 @@ GVAccess::getNameForWork (GVAccess_Work whatwork)
     case GVAW_dialOut:
         func = "dialOut";
         break;
-    case GVAW_getContactFromInboxLink:
-        func = "getContactFromInboxLink";
-        break;
     case GVAW_login:
         func = "login";
         break;
@@ -90,13 +87,7 @@ GVAccess::enqueueWork (GVAccess_Work whatwork, const QVariantList &params,
         }
         break;
 
-    case GVAW_getContactFromInboxLink:  // Inbox link
-        if (1 != params.size ())
-        {
-            msg = "GVAccess: Invalid parameter count";
-            bValid = false;
-        }
-        break;
+    // No enum values that need only one parameter!!
 
     case GVAW_login:                // user and password
     case GVAW_sendSMS:              // Number, text
@@ -196,9 +187,6 @@ GVAccess::doNextWork ()
             break;
         case GVAW_getInbox:
             getInbox ();
-            break;
-        case GVAW_getContactFromInboxLink:
-            getContactFromInboxLink ();
             break;
         case GVAW_sendSMS:
             sendSMS ();

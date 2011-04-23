@@ -246,13 +246,6 @@ GVDataAccess::getInbox ()
 }//GVDataAccess::getInbox
 
 bool
-GVDataAccess::getContactFromInboxLink ()
-{
-    completeCurrentWork (GVAW_getContactFromInboxLink, false);
-    return (false);
-}//GVDataAccess::getContactFromInboxLink
-
-bool
 GVDataAccess::sendSMS ()
 {
     completeCurrentWork (GVAW_sendSMS, false);
