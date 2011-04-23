@@ -225,37 +225,6 @@ GVDataAccess::onLogout (QNetworkReply *reply)
 }//GVDataAccess::onLogout
 
 bool
-GVDataAccess::retrieveContacts ()
-{
-    if (strAuth.isEmpty ())
-    {
-        completeCurrentWork (GVAW_getAllContacts, false);
-        return (false);
-    }
-
-    QStringPairList arrPairs;
-    arrPairs += QStringPair("Auth", strAuth);
-    postRequest (GV_BASE "contacts/", arrPairs, QString (),
-                 this , SLOT (onRetrieveContacts (QNetworkReply *)));
-    return (true);
-}//GVDataAccess::retrieveContacts
-
-void
-GVDataAccess::onRetrieveContacts (QNetworkReply *reply)
-{
-    QByteArray btData = reply->readAll ();
-    reply->deleteLater ();
-    completeCurrentWork (GVAW_getAllContacts, true);
-}//GVDataAccess::onRetrieveContacts
-
-bool
-GVDataAccess::getContactInfoFromLink ()
-{
-    completeCurrentWork (GVAW_getContactFromLink, false);
-    return (false);
-}//GVDataAccess::getContactInfoFromLink
-
-bool
 GVDataAccess::dialCallback (bool /*bCallback*/)
 {
     completeCurrentWork (GVAW_dialCallback, false);

@@ -15,8 +15,6 @@ enum GVAccess_Work {
     GVAW_aboutBlank,
     GVAW_login,                     // user and password
     GVAW_logout,
-    GVAW_getAllContacts,
-    GVAW_getContactFromLink,        // Page link and default number
     GVAW_dialCallback,              // Destination number, callback number, type
     GVAW_dialOut,                   // Destination number, callout number
     GVAW_getRegisteredPhones,
@@ -102,8 +100,6 @@ signals:
     //! Emitted at the end of every work item
     void workCompleted (bool bSuccess, const QVariantList &arrParams);
 
-    //! Emitted every time a new contact is parsed from the contacts page
-    void gotContact (const QString &strName, const QString &strLink);
     //! Emitted when the contact info from the link is retrieved
     void contactInfo (const ContactInfo &info);
     //! Emitted for each registered phone number
@@ -151,10 +147,6 @@ protected:
     virtual bool login () = 0;
     //! Log out of Google voice
     virtual bool logout () = 0;
-    //! Retrieve all contacts for the logged in user
-    virtual bool retrieveContacts () = 0;
-    //! Get the contact info for the link provided
-    virtual bool getContactInfoFromLink () = 0;
     //! Make a phone call to an arbitrary number
     virtual bool dialCallback (bool bCallback) = 0;
     //! Get registered phones from the settings page

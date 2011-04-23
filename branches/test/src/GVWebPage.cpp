@@ -118,9 +118,13 @@ GVWebPage::doc ()
 bool
 GVWebPage::isLoggedIn ()
 {
-    QWebFrame *f = doc().webFrame();
-    QWebElementCollection t = f->findAllElements("form [name=\"_rnr_se\"]");
-    return (0 != t.count ());
+    QString strHtml = webPage.mainFrame ()->toHtml ();
+    QRegExp rx("<input.*name\\s*=\\s*\"_rnr_se\"\\s*value\\s*=\\s*\"(.*)\"\\s*>");
+    rx.setMinimal (true);
+    if ((strHtml.contains (rx)) && (rx.numCaptures () == 1) && (strRnr_se == rx.cap (1))) {
+        return true;
+    }
+    return false;
 }//GVWebPage::isLoggedIn
 
 bool
@@ -271,29 +275,34 @@ GVWebPage::loginStage3 (bool bOk)
         }
         bOk = false;
 
-        // Whats the GV number?
-#define GVSELECTOR "div b[class=\"ms3\"]"
-        QWebElement num = doc().findFirst (GVSELECTOR);
-#undef GVSELECTOR
-        if (num.isNull ())
-        {
+        QString strHtml = webPage.mainFrame ()->toHtml ();
+#if 0
+        QFile temp("dump.txt");
+        temp.open (QIODevice::ReadWrite);
+        temp.write (strHtml.toAscii ());
+        temp.close ();
+#endif
+
+        QRegExp rx("<b\\s*class\\s*=\\s*\"ms3\">(.*)</b>");
+        rx.setMinimal (true);
+        if ((strHtml.contains (rx)) && (rx.numCaptures () == 1)) {
+            strSelfNumber = rx.cap (1);
+        } else {
             qWarning ("Failed to get a google voice number!!");
             break;
         }
 
-        strSelfNumber = num.toPlainText ();
         simplify_number (strSelfNumber, false);
         workCurrent.arrParams += QVariant (strSelfNumber);
 
-#define GVSELECTOR "input[name=\"_rnr_se\"]"
-        QWebElement rnr_se = doc().findFirst (GVSELECTOR);
-#undef GVSELECTOR
-        if (rnr_se.isNull ())
-        {
+        rx.setPattern ("<input.*name\\s*=\\s*\"_rnr_se\"\\s*value\\s*=\\s*\"(.*)\"\\s*>");
+        rx.setMinimal (true);
+        if ((strHtml.contains (rx)) && (rx.numCaptures () == 1)) {
+            strRnr_se = rx.cap (1);
+        } else {
             qWarning ("Could not find rnr_se");
             break;
         }
-        strRnr_se = rnr_se.attribute ("value");
 
         bLoggedIn = true;
         bOk = true;
@@ -332,104 +341,6 @@ GVWebPage::logoutDone (bool bOk)
 
     completeCurrentWork (GVAW_logout, bOk);
 }//GVWebPage::logoutDone
-
-bool
-GVWebPage::retrieveContacts ()
-{
-    if (!this->isOnline ()) {
-        qDebug ("Cannot retrieve contacts when offline");
-        completeCurrentWork (GVAW_getAllContacts, false);
-        return false;
-    }
-
-    QMutexLocker locker(&mutex);
-    if (!bLoggedIn)
-    {
-        completeCurrentWork (GVAW_getAllContacts, false);
-        return (false);
-    }
-
-    nCurrent = 1;
-    QString strLink = GV_HTTPS_M "/contacts?p=1";
-    QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                       this   , SLOT   (contactsLoaded (bool)));
-    this->loadUrlString (strLink);
-
-    return (true);
-}//GVWebPage::retrieveContacts
-
-void
-GVWebPage::contactsLoaded (bool bOk)
-{
-    QString msg;
-    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
-                          this   , SLOT   (contactsLoaded (bool)));
-    do // Begin cleanup block (not a loop)
-    {
-        if (isLoadFailed (bOk))
-        {
-            bOk = false;
-            qWarning ("Failed to load contacts page");
-            break;
-        }
-        bOk = false;
-
-        QWebFrame *frame = webPage.mainFrame();
-        if (NULL == frame)
-        {
-            qWarning ("No frame!!");
-            break;
-        }
-
-        QWebElementCollection results;
-        results = frame->findAllElements("div[class=\"ms2\"] > a");
-        int max = results.count ();
-        int nContactCount = 0;
-        for (int i = 0; i < max; i++)
-        {
-            QWebElement e = results.at(i);
-            QString href = e.attribute ("href");
-            if (( href.isEmpty ()) ||
-                (!href.startsWith ("/voice/m/contact/")) ||
-                ( href.startsWith ("/voice/m/contact/p=")))
-            {
-                continue;
-            }
-
-            emit gotContact (e.toPlainText (), href);
-            nContactCount++;
-        }
-
-        if (0 != nContactCount)
-        {
-            msg = QString ("Found %1 contacts on page %2")
-                  .arg(nContactCount)
-                  .arg(nCurrent);
-            qDebug () << msg;
-        }
-        else
-        {
-            bOk = true;
-            completeCurrentWork (GVAW_getAllContacts, true);
-            break;
-        }
-
-        nCurrent++;
-        QString strNextPage = QString (GV_HTTPS_M "/contacts?p=%1")
-                              .arg(nCurrent);
-
-        QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                           this   , SLOT   (contactsLoaded (bool)));
-        this->loadUrlString (strNextPage);
-
-        bOk = true;
-    } while (0); // End cleanup block (not a loop)
-
-    if (!bOk)
-    {
-        completeCurrentWork (GVAW_getAllContacts, false);
-    }
-}//GVWebPage::contactsLoaded
 
 bool
 GVWebPage::isNextContactsPageAvailable ()
@@ -647,107 +558,6 @@ GVWebPage::onDataCallCanceled (QNetworkReply * reply)
 
     reply->deleteLater ();
 }//GVWebPage::onDataCallCanceled
-
-bool
-GVWebPage::getContactInfoFromLink ()
-{
-    if (!this->isOnline ()) {
-        qDebug ("Cannot retrieve contact info when offline");
-        completeCurrentWork (GVAW_getContactFromLink, false);
-        return false;
-    }
-
-    QMutexLocker locker(&mutex);
-    if (!bLoggedIn)
-    {
-        completeCurrentWork (GVAW_getContactFromLink, false);
-        return (false);
-    }
-
-    QString strQuery, strHost;
-    this->getHostAndQuery (strHost, strQuery);
-    QString strGoto = strHost
-                    + workCurrent.arrParams[0].toString();
-    QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                       this   , SLOT   (contactInfoLoaded (bool)));
-    this->loadUrlString (strGoto);
-
-    return (true);
-}//GVWebPage::getContactInfoFromLink
-
-void
-GVWebPage::contactInfoLoaded (bool bOk)
-{
-    ContactInfo info;
-    QObject::disconnect (&webPage, SIGNAL (loadFinished (bool)),
-                          this   , SLOT   (contactInfoLoaded (bool)));
-    do // Begin cleanup block (not a loop)
-    {
-        if (isLoadFailed (bOk))
-        {
-            bOk = false;
-            qWarning ("Failed to load call page 2");
-            break;
-        }
-        bOk = false;
-
-#define GVSELECTOR "div span strong"
-        QWebElement user = doc().findFirst (GVSELECTOR);
-#undef GVSELECTOR
-        if (user.isNull ())
-        {
-            qWarning ("Couldn't find user name on page");
-            break;
-        }
-        info.strTitle = user.toPlainText ();
-
-#define GVSELECTOR "div form div input[name=\"call\"]"
-        QWebElementCollection numbers = doc().findAll (GVSELECTOR);
-#undef GVSELECTOR
-        if (0 == numbers.count ())
-        {
-            qWarning ("No numbers found for this contact");
-            break;
-        }
-
-        QRegExp rx("([A-Z])\\)$", Qt::CaseInsensitive);
-        int i = 0;
-        foreach (QWebElement btnCall, numbers)
-        {
-            QWebElement divParent = btnCall.parent ();
-            PhoneInfo gvNumber;
-            gvNumber.strNumber = divParent.toPlainText().simplified ();
-            int pos = rx.indexIn (gvNumber.strNumber);
-            if (-1 != pos)
-            {
-                QString strChr = rx.cap ();
-                gvNumber.Type = PhoneInfo::charToType (strChr[0].toAscii ());
-                gvNumber.strNumber.chop (3);
-                gvNumber.strNumber = gvNumber.strNumber.trimmed ();
-            }
-            info.arrPhones += gvNumber;
-            QString strLHS = workCurrent.arrParams[1].toString();
-            QString strRHS = gvNumber.strNumber;
-            simplify_number (strLHS);
-            simplify_number (strRHS);
-            if (strLHS == strRHS)
-            {
-                info.selected = i;
-            }
-
-            i++;
-        }
-
-        bOk = true;
-    } while (0); // End cleanup block (not a loop)
-    if (bOk)
-    {
-        info.strId = workCurrent.arrParams[0].toString();
-        emit contactInfo (info);
-    }
-
-    completeCurrentWork (GVAW_getContactFromLink, bOk);
-}//GVWebPage::contactInfoLoaded
 
 bool
 GVWebPage::getRegisteredPhones ()

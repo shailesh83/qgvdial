@@ -39,14 +39,8 @@ private slots:
     //! Invoked when the logout page has loaded
     void logoutDone (bool bOk);
 
-    //! Repeatedly invoked when the next page in the contacts list is loaded
-    void contactsLoaded (bool bOk);
-
     void onDataCallDone (QNetworkReply * reply);
     void onDataCallCanceled (QNetworkReply * reply);
-
-    //! Invoked when the contact info link is loaded
-    void contactInfoLoaded (bool bOk);
 
     //! Invoked when the registered phone list page is loaded
     void phonesListLoaded (bool bOk);
@@ -95,10 +89,6 @@ private:
     bool login ();
     //! Log out of Google voice
     bool logout ();
-    //! Retrieve all contacts for the logged in user
-    bool retrieveContacts ();
-    //! Get the contact info for the link provided
-    bool getContactInfoFromLink ();
     //! Make a phone call to an arbitrary number
     bool dialCallback (bool bCallback);
     //! Get registered phones from the settings page
