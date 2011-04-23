@@ -122,8 +122,6 @@ private:
     void startTimerForReply(QNetworkReply *reply);
 
 private:
-    bool                    bUseIphoneUA;
-
     //! The webkit page that does all our work
     MobileWebPage           webPage;
 

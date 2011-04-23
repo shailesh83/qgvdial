@@ -48,8 +48,58 @@ GVDataAccess::aboutBlank ()
 bool
 GVDataAccess::login ()
 {
-    return (loginCaptcha (QString(), QString()));
+    //return (loginCaptcha (QString(), QString()));
+
+#define GV_LOGIN_PAGE "https://www.google.com/accounts/ServiceLoginAuth"
+    QVariantList &arrParams = workCurrent.arrParams;
+    QStringPairList arrPairs;
+    arrPairs += QStringPair("ltmpl"     , "mobile");
+    arrPairs += QStringPair("btmpl"     , "mobile");
+    arrPairs += QStringPair("Email"     , arrParams[0].toString());
+    arrPairs += QStringPair("Passwd"    , arrParams[1].toString());
+    arrPairs += QStringPair("service"   , "grandcentral");
+    arrPairs += QStringPair("continue"  , GV_HTTPS_M);
+    arrPairs += QStringPair("timeStmp"  , "");
+    arrPairs += QStringPair("secTok"    , "");
+    arrPairs += QStringPair("signIn"    , "Sign+in");
+    postRequest (GV_LOGIN_PAGE, arrPairs, UA_IPHONE,
+                 this, SLOT (onLoginResponse1 (QNetworkReply *)));
+
+    return true;
 }//GVDataAccess::login
+
+void
+GVDataAccess::onLoginResponse1 (QNetworkReply *reply)
+{
+    QObject::disconnect (&nwMgr, SIGNAL (finished (QNetworkReply *)),
+                          this , SLOT   (onLoginResponse1 (QNetworkReply *)));
+
+    bool bOk;
+    bool bError = (reply->error () != QNetworkReply::NoError);
+    if (bError) {
+        qWarning ("Error logging in");
+        return;
+    }
+    int iRetCode =
+    reply->attribute (QNetworkRequest::HttpStatusCodeAttribute).toInt (&bOk);
+    if (iRetCode != 200) {
+        qWarning () << "Retcode not 200. it is" << iRetCode;
+    }
+
+    QString strReply = reply->readAll ();
+    qDebug () << "Response: " << strReply << ".";
+
+    MyCookieJar *jar = (MyCookieJar *) nwMgr.cookieJar ();
+    QList<QNetworkCookie> cookies = jar->getAllCookies ();
+    foreach (QNetworkCookie cookie, cookies)
+    {
+        qDebug () << cookie;
+        if (cookie.name() == "gvx")
+        {
+            bLoggedIn = true;
+        }
+    }
+}//GVDataAccess::onLoginResponse
 
 bool
 GVDataAccess::loginCaptcha (const QString &strToken, const QString &strCaptcha)

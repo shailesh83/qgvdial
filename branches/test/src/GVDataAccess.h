@@ -60,6 +60,8 @@ private slots:
     void onLogout (QNetworkReply *reply);
     void onRetrieveContacts (QNetworkReply *reply);
 
+    void onLoginResponse1 (QNetworkReply *reply);
+
 private:
     //! The network access manager to use
     QNetworkAccessManager   nwMgr;

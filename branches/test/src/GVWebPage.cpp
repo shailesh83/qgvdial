@@ -6,7 +6,6 @@
 
 GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 : GVAccess (parent)
-, bUseIphoneUA (true)
 , webPage (this)
 , garbageTimer (this)
 , nwCfg (this)
@@ -164,7 +163,7 @@ GVWebPage::login ()
         return false;
     }
 
-    webPage.setUA (bUseIphoneUA);
+    webPage.setUA (true);
 
     // GV page load complete will begin the login process.
     QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
@@ -191,32 +190,24 @@ GVWebPage::loginStage1 (bool bOk)
 
         qDebug ("Login page loaded");
 
-        QWebElement email = doc().findFirst ("#Email");
-        QWebElement passwd = doc().findFirst ("#Passwd");
-        QWebElement weLogin = doc().findFirst("#gaia_loginform");
-
-        if (email.isNull () || passwd.isNull () || weLogin.isNull ())
-        {
-            // The browser may have logged in using prior credentials.
-            if (isLoggedIn ())
-            {
-                // We logged in using prior credentials. Go directly to the end!
-                bOk = true;
-                completeCurrentWork (GVAW_login, true);
-            }
-            else
-            {
-                qWarning ("Invalid page!");
-            }
-            break;
-        }
-
         QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
                            this   , SLOT   (loginStage2 (bool)));
 
-        email.setAttribute ("value", workCurrent.arrParams[0].toString());
-        passwd.setAttribute ("value", workCurrent.arrParams[1].toString());
-        weLogin.evaluateJavaScript("this.submit();");
+        QString strScript = QString(
+        "var f = null;"
+        "if (document.getElementById) {"
+        "   f = document.getElementById(\"gaia_loginform\");"
+        "} else if (window.gaia_loginform) {"
+        "   f = window.gaia_loginform;"
+        "}"
+        "if (f) {"
+        "   f.Email.value = \"%1\";"
+        "   f.Passwd.value = \"%2\";"
+        "   f.submit();"
+        "}")
+        .arg (workCurrent.arrParams[0].toString())
+        .arg (workCurrent.arrParams[1].toString());
+        webPage.mainFrame ()->evaluateJavaScript (strScript);
 
         bOk = true;
     } while (0); // End cleanup block (not a loop)
@@ -243,58 +234,20 @@ GVWebPage::loginStage2 (bool bOk)
         bOk = false;
 
         QMutexLocker locker(&mutex);
-        if (bUseIphoneUA)
-        {
-            QNetworkCookieJar *jar = webPage.networkAccessManager()->cookieJar();
-            QList<QNetworkCookie> cookies =
+        QNetworkCookieJar *jar = webPage.networkAccessManager()->cookieJar();
+        QList<QNetworkCookie> cookies =
                 jar->cookiesForUrl (webPage.mainFrame()->url ());
-            foreach (QNetworkCookie cookie, cookies)
-            {
-                if (cookie.name() == "gvx")
-                {
-                    bLoggedIn = true;
-                }
-            }
-            QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
-                               this   , SLOT   (loginStage3 (bool)));
-            this->loadUrlString (GV_HTTPS_M "/i/all");
-        }
-        else
+        foreach (QNetworkCookie cookie, cookies)
         {
-            if (!isLoggedIn ())
+            if (cookie.name() == "gvx")
             {
-                qWarning ("Failed to login!");
-                break;
+                bLoggedIn = true;
             }
-
-            // Whats the GV number?
-#define GVSELECTOR "div b[class=\"ms3\"]"
-            QWebElement num = doc().findFirst (GVSELECTOR);
-#undef GVSELECTOR
-            if (num.isNull ())
-            {
-                qWarning ("Failed to get a google voice number!!");
-                break;
-            }
-
-            strSelfNumber = num.toPlainText ();
-            simplify_number (strSelfNumber, false);
-            workCurrent.arrParams += QVariant (strSelfNumber);
-
-#define GVSELECTOR "input[name=\"_rnr_se\"]"
-            QWebElement rnr_se = doc().findFirst (GVSELECTOR);
-#undef GVSELECTOR
-            if (rnr_se.isNull ())
-            {
-                qWarning ("Could not find rnr_se");
-                break;
-            }
-            strRnr_se = rnr_se.attribute ("value");
-
-            bLoggedIn = true;
-            completeCurrentWork (GVAW_login, true);
         }
 
+        QObject::connect (&webPage, SIGNAL (loadFinished (bool)),
+                          this   , SLOT   (loginStage3 (bool)));
+        this->loadUrlString (GV_HTTPS_M "/i/all");
         bOk = true;
     } while (0); // End cleanup block (not a loop)
 
@@ -511,13 +464,6 @@ GVWebPage::dialCallback (bool bCallback)
 
     if (!bCallback)
     {
-        if (!bUseIphoneUA)
-        {
-            qWarning ("Cannot callout if the UA is not the iPhone UA");
-            completeCurrentWork (GVAW_dialOut, false);
-            return (false);
-        }
-
         QString strUA = UA_IPHONE;
         QString strUrl = QString("https://www.google.com/voice/m/x"
                                  "?m=call"

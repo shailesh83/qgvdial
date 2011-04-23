@@ -25,8 +25,8 @@ Singletons::getGVAccess ()
     // Allocation is purposely dynamic for the same reason.
     if (NULL == pGVAccess)
     {
-        //pGVAccess = new GVWebPage;
-        pGVAccess = new GVDataAccess;
+        pGVAccess = new GVWebPage;
+//        pGVAccess = new GVDataAccess;
     }
 
     return (*pGVAccess);
