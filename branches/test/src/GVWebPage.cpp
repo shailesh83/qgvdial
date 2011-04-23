@@ -8,7 +8,9 @@ GVWebPage::GVWebPage(QObject *parent/* = NULL*/)
 : GVAccess (parent)
 , webPage (this)
 , garbageTimer (this)
+#if MOBILITY_PRESENT
 , nwCfg (this)
+#endif
 , pageTimeoutTimer (this)
 , pCurrentReply (NULL)
 , bInDialCancel (false)
@@ -124,7 +126,7 @@ GVWebPage::isLoggedIn ()
 bool
 GVWebPage::isOnline ()
 {
-#if !defined(Q_OS_SYMBIAN) || SYMBIAN_SIGNED
+#if (!defined(Q_OS_SYMBIAN) || SYMBIAN_SIGNED) && MOBILITY_PRESENT
     return nwCfg.isOnline ();
 #else
     // In Symbian with no signing, pretend we're always online.

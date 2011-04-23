@@ -117,8 +117,10 @@ private:
     //! The current page (contacts or inbox)
     int                     nCurrent;
 
+#if MOBILITY_PRESENT
     //! We use this to check if we're online
     QNetworkConfigurationManager nwCfg;
+#endif
 
     //! Timeout timer for web page loading
     QTimer                  pageTimeoutTimer;
