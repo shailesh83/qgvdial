@@ -281,7 +281,7 @@ GVWebPage::loginStage3 (bool bOk)
 
         QRegExp rx("<b\\s*class\\s*=\\s*\"ms3\">(.*)</b>");
         rx.setMinimal (true);
-        if ((strHtml.contains (rx)) && (rx.numCaptures () == 1)) {
+        if ((strHtml.contains (rx)) && (1 == rx.numCaptures ())) {
             strSelfNumber = rx.cap (1);
         } else {
             qWarning ("Failed to get a google voice number!!");
@@ -451,7 +451,7 @@ GVWebPage::onDataCallDone (QNetworkReply * reply)
     do { // Begin cleanup block (not a loop)
         qDebug () << msg;
         QRegExp rx("\"access_number\":\"([+\\d]*)\"");
-        if (msg.contains (rx) && (1 == rx.captureCount ()))
+        if (msg.contains (rx) && (1 == rx.numCaptures ()))
         {
             QMutexLocker locker(&mutex);
             if (GVAW_dialOut != workCurrent.whatwork)
@@ -811,7 +811,9 @@ void
 GVWebPage::garbageTimerTimeout ()
 {
     webPage.settings()->clearIconDatabase ();
+#if !DIABLO_OS
     webPage.settings()->clearMemoryCaches ();
+#endif
 
     garbageTimer.start ();
 }//GVWebPage::garbageTimerTimeout
