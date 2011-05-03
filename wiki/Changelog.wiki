@@ -1,7 +1,7 @@
 #summary Change log
 
 *2011-05-03*
- * Start using ini settings.
+ * Start using ini settings. Almost everything other than the data that needs to be searched is now in settings.
 
 *2011-04-30*
  * Lots of code for the Symbian DTMF. Unsuccessful so far.
