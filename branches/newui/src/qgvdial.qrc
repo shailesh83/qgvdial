@@ -1,0 +1,46 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="Google.png">../icons/Google.png</file>
+        <file alias="Phone.png">../icons/telephone.png</file>
+        <file alias="SMS.png">../icons/email_send.png</file>
+        <file alias="users.png">../icons/users.png</file>
+        <file alias="note.png">../icons/note.png</file>
+        <file alias="left_arrow.png">../icons/left_arrow.png</file>
+        <file alias="tick.png">../icons/tick.png</file>
+        <file alias="in_Missed.png">../icons/in_Missed.png</file>
+        <file alias="in_Placed.png">../icons/in_Placed.png</file>
+        <file alias="in_Received.png">../icons/in_Received.png</file>
+        <file alias="in_Sms.png">../icons/in_Sms.png</file>
+        <file alias="in_Voicemail.png">../icons/in_Voicemail.png</file>
+        <file alias="scrollbar.png">../icons/scrollbar.png</file>
+        <file alias="dialpad.svg">../icons/dialpad.svg</file>
+        <file alias="history.svg">../icons/history.svg</file>
+        <file alias="people.svg">../icons/people.svg</file>
+        <file alias="About.qml">../qml/About.qml</file>
+        <file alias="ActionButtons.qml">../qml/ActionButtons.qml</file>
+        <file alias="ComboBoxPhones.qml">../qml/ComboBoxPhones.qml</file>
+        <file alias="ContactDetails.qml">../qml/ContactDetails.qml</file>
+        <file alias="ContactsList.qml">../qml/ContactsList.qml</file>
+        <file alias="DbgWebWidget.qml">../qml/DbgWebWidget.qml</file>
+        <file alias="DialDisp.qml">../qml/DialDisp.qml</file>
+        <file alias="DigitButton.qml">../qml/DigitButton.qml</file>
+        <file alias="helper.js">../qml/helper.js</file>
+        <file alias="InboxList.qml">../qml/InboxList.qml</file>
+        <file alias="Keypad.qml">../qml/Keypad.qml</file>
+        <file alias="LogView.qml">../qml/LogView.qml</file>
+        <file alias="MainButtons.qml">../qml/MainButtons.qml</file>
+        <file alias="Main.qml">../qml/Main.qml</file>
+        <file alias="MainView.qml">../qml/MainView.qml</file>
+        <file alias="Mosquitto.qml">../qml/Mosquitto.qml</file>
+        <file alias="MsgBox.qml">../qml/MsgBox.qml</file>
+        <file alias="MyButton.qml">../qml/MyButton.qml</file>
+        <file alias="MyTextEdit.qml">../qml/MyTextEdit.qml</file>
+        <file alias="PinSetting.qml">../qml/PinSetting.qml</file>
+        <file alias="Proxy.qml">../qml/Proxy.qml</file>
+        <file alias="RadioButton.qml">../qml/RadioButton.qml</file>
+        <file alias="Scrollbar.qml">../qml/Scrollbar.qml</file>
+        <file alias="Settings.qml">../qml/Settings.qml</file>
+        <file alias="Tab.qml">../qml/Tab.qml</file>
+        <file alias="TabbedUI.qml">../qml/TabbedUI.qml</file>
+    </qresource>
+</RCC>
