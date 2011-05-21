@@ -95,7 +95,6 @@ Rectangle {
             bottom: barStatus.top
         }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 //                          Co-existent Items Begin                           //
 ////////////////////////////////////////////////////////////////////////////////
@@ -145,7 +144,7 @@ Rectangle {
                 }
             }//Tab (Inbox)
             Tab {
-                icon: "history.svg"
+                icon: "settings.svg"
                 color: "black"
 
                 Settings {
