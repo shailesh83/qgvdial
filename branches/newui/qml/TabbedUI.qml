@@ -67,11 +67,10 @@ Rectangle {
             Image {
                 source: tabsModel.children[index].icon
                 anchors {
-                    horizontalCenter: parent.horizontalCenter
-                    top: parent.top
-                    topMargin: 1
-                    bottom: parent.bottom
+                    fill: parent
+                    centerIn: parent
                 }
+                fillMode: Image.PreserveAspectFit
             }
 
             MouseArea {

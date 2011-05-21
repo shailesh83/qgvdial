@@ -175,7 +175,7 @@ Rectangle {
         TabbedUI {
             id: tabbedUI
 
-            tabsHeight: 40
+            tabsHeight: 45
             tabIndex: 3
             tabsModel: tabsModel
             anchors {
