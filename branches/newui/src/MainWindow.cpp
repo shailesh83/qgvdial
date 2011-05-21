@@ -972,6 +972,10 @@ MainWindow::onSigText (const QString &strNumber)
     ContactInfo info;
 
     do { // Begin cleanup block (not a loop)
+        if (strNumber.isEmpty ()) {
+            setStatus ("Number not valid, cannot send text");
+            break;
+        }
         // Get info about this number
         if (!findInfo (strNumber, info)) {
             qWarning () << "Unable to find information for " << strNumber;

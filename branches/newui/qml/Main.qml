@@ -85,53 +85,16 @@ Rectangle {
 
     Item {
         id: mainColumn
-        anchors.fill: parent
-        property int centralHeight: height - barTop.height - barStatus.height
-        property int centralWidth: width
+        property int centralHeight: mainColumn.height - barStatus.height
+        property int centralWidth: mainColumn.width
 
-        Rectangle {
-            id: barTop
-            width: parent.width
-            height: (parent.height + parent.width) / 30
-            anchors.top: parent.top
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+            bottom: barStatus.top
+        }
 
-            color: "black"
-
-            signal clickedTopBar
-
-            Text {
-                text: main.state == '' ? "qgvdial" : "Back to main screen"
-                font.pixelSize: parent.height - 4
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: "white"
-            }
-
-            MouseArea {
-                id: mouseAreaTopBar
-                anchors.fill: parent
-
-                onClicked: {
-                    barTop.clickedTopBar();
-                    main.state = '';
-                }
-
-                onPressAndHold: {
-                    main.sigHide();
-                    barTop.state = '';
-                }
-
-                onPressed: barTop.state = "pressed"
-                onReleased: barTop.state = ''
-            }// MouseArea
-
-            states: [
-                State {
-                    name: "pressed"
-                    PropertyChanges { target: barTop; color: "orange" }
-                }
-            ]
-        }//Rectangle (barTop)
 
 ////////////////////////////////////////////////////////////////////////////////
 //                          Co-existent Items Begin                           //
@@ -183,6 +146,7 @@ Rectangle {
             }//Tab (Inbox)
             Tab {
                 icon: "history.svg"
+                color: "black"
 
                 Settings {
                     id: settingsView
@@ -213,7 +177,7 @@ Rectangle {
             id: tabbedUI
 
             tabsHeight: 40
-            tabIndex: 0
+            tabIndex: 3
             tabsModel: tabsModel
             anchors {
                 top: parent.top
@@ -221,6 +185,8 @@ Rectangle {
                 topMargin: nMargins
                 bottomMargin: nMargins
             }
+            width: mainColumn.centralWidth
+            height: mainColumn.centralHeight
         }
 
         MsgBox {
@@ -239,21 +205,22 @@ Rectangle {
 ////////////////////////////////////////////////////////////////////////////////
 //                           Co-existent Items End                            //
 ////////////////////////////////////////////////////////////////////////////////
-        Rectangle {
-            id: barStatus
-            width: parent.width
-            height: (parent.height + parent.width) / 30
-            anchors.bottom: parent.bottom
-
-            color: "black"
-
-            Text {
-                text: g_strStatus
-                font.pixelSize: (parent.height * 2 / 3)
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: "white"
-            }
-        }//Rectangle (status bar)
     }//Item: Main column that has all the co-existent views
+
+    Rectangle {
+        id: barStatus
+        width: parent.width
+        height: (parent.height + parent.width) / 30
+        anchors.bottom: parent.bottom
+
+        color: "black"
+
+        Text {
+            text: g_strStatus
+            font.pixelSize: (parent.height * 2 / 3)
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: "white"
+        }
+    }//Rectangle (status bar)
 }
