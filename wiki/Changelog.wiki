@@ -1,6 +1,9 @@
 #summary Change log
 
 *2011-05-21*
+ * UI improvements and icons changed
+
+*2011-05-21*
  * Tabbed UI.
  * Fixed some debug error messages.
 
