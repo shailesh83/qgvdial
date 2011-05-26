@@ -2,6 +2,7 @@
 
 *2011-05-21*
  * UI improvements and icons changed
+ * Fix the inbox view time strings
 
 *2011-05-21*
  * Tabbed UI.
