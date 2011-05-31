@@ -1,5 +1,8 @@
 #summary Change log
 
+*2011-05-31*
+ * Add special effects and a close button.
+
 *2011-05-27*
  * Both SMS and Voicemail parsed and fixed once and for all.
 
