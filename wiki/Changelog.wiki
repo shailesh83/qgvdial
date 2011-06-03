@@ -2,6 +2,7 @@
 
 *2011-06-02*
  * Fixed icons for Maemo and Symbian. Hopefully it works.
+ * 64x64 icon
 
 *2011-05-31*
  * Add special effects and a close button.
