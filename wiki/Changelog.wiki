@@ -1,5 +1,7 @@
 #summary Change log
 
+*2011-06-04*
+ * Minor UI improvements
 
 *2011-06-03*
  * Fixed icons for Maemo

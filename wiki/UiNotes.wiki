@@ -1,3 +1,5 @@
 #summary How to navigate the UI
 
- * The top bar in the application is a Back button that goes back to the main qgvdial screen. If you press and hold it, qgvdial will hide itself. This effect has different consequences on different platforms - On Windows and Linux, qgvdial collapses into the system tray. On Maemo, it disappears from the window list, but keeps running in the background. On Symbian, it will lower the window, but can always get to it from the applications list.
+ * A long press on the Close button quits the application. A simple single click will only hide the main window.
+ * Long press on the backspace button on the dialer will clear out the number.
+ * Click on the search icon in the contacts page to clear out the search field.
