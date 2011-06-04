@@ -2,6 +2,7 @@
 
 *2011-06-04*
  * Minor UI improvements
+ * Don't clean up the QML.
 
 *2011-06-03*
  * Fixed icons for Maemo
