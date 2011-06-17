@@ -2,6 +2,8 @@
 
 *2011-06-16*
  * Contact photos!
+ * Bubble up an error string for misconfigured or unconfigured user accounts.
+ * When a different user logs in, make sure that the old cached data is purged
 
 *2011-06-14*
  * Added photo link to contacts table
