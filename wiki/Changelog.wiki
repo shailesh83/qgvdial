@@ -1,5 +1,9 @@
 #summary Change log
 
+*2011-06-24*
+ * Code cleanup and fix an uninitialized variable.
+ * Resize SMS dialog of rotation for Symbian
+
 *2011-06-22*
  * Code refactoring for the Inbox XML handling code.
  * Registered numbers are retrieved by requesting an XML instead of loading a webpage.
