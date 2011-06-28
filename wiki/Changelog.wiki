@@ -1,5 +1,8 @@
 #summary Change log
 
+*2011-06-28*
+ * Remove the SMS Dlg and embed it within the QML.
+
 *2011-06-25*
  * Slightly smaller SMS dialog for symbian
  * Child window base code cleanup
