@@ -17,3 +17,13 @@
 
 *To set the registered phone*
  {{{dbus-send --dest=org.QGVDial.SettingsServer --session --print-reply /org/QGVDial/SettingsServer org.QGVDial.SettingsServer.SetCurrentPhone int32:0}}}
+
+
+*Get an array of cached texts in a date range*
+ {{{dbus-send --dest=org.QGVDial.TextServer --session --print-reply /org/QGVDial/TextServer org.QGVDial.TextServer.getTextsByDate string:"2011-01-01T00:00:00.000Z" string:"2011-07-05T00:00:00.000"}}}
+
+*Get an array of cached texts sent by a contact or number*
+ {{{dbus-send --dest=org.QGVDial.TextServer --session --print-reply /org/QGVDial/TextServer org.QGVDial.TextServer.getTextsByContact string:"1112223333"}}}
+
+OR
+ {{{dbus-send --dest=org.QGVDial.TextServer --session --print-reply /org/QGVDial/TextServer org.QGVDial.TextServer.getTextsByContact string:"contact name"}}}
