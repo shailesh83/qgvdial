@@ -1,5 +1,9 @@
 #summary Change log
 
+*2011-07-10*
+ * Logs start off muted.
+ * Contact pics stored in temp file inside qgvdial folder.
+
 *2011-07-05*
  * Added dbus api to retrieve texts
 
