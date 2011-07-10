@@ -3,6 +3,7 @@
 *2011-07-10*
  * Logs start off muted.
  * Contact pics stored in temp file inside qgvdial folder.
+ * Fix binding loop in contacts
 
 *2011-07-05*
  * Added dbus api to retrieve texts
