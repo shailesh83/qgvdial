@@ -1,5 +1,8 @@
 #summary Change log
 
+*2011-07-19*
+ * Bugfix: SMS and voicemail parsing logic
+
 *2011-07-18*
  * Mark opened inbox entries as read
  * Bugfix: About page links did not work
