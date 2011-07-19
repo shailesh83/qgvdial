@@ -1,5 +1,9 @@
 #summary Change log
 
+*2011-07-18*
+ * Mark opened inbox entries as read
+ * Bugfix: About page links did not work
+
 *2011-07-14*
  * Debug info
 
