@@ -1,5 +1,10 @@
 #summary Change log
 
+*2011-07-26*
+ * mqlib 12.0
+ * Improvements to the mqlib inclusion logic in the pro file
+ * Call and text "text buttons" are now "image buttons"
+
 *2011-07-19*
  * Bugfix: SMS and voicemail parsing logic
 
