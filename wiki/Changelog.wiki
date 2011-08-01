@@ -2,6 +2,7 @@
 
 *2011-07-31*
  * Bugfix: Clear out the old cookies before saving the new ones.
+ * Bugfix: Don't crash if there's a contact search query before login
 
 *2011-07-30*
  * Serialize cookies and shorten the login time!
