@@ -1,5 +1,9 @@
 #summary Change log
 
+*2011-08-05*
+ * GV added a messageText field in the inbox entry. This allows me to show the text of a voicemail or an SMS if I haven't been able to parse it from the HTML.
+ * Added updated field in each contact
+
 *2011-08-04*
  * Bugfix: Cookie settings error
 
