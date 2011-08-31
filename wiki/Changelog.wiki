@@ -1,5 +1,10 @@
 #summary Change log
 
+*2011-08-31*
+ * QML fixes for the search box
+ * Save and cancel buttons put into a separate qml file
+ * Added input method hints for MyTextEdit
+
 *2011-08-29*
  * Bugfix: Mq never started without user intervention
 
