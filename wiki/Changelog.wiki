@@ -1,5 +1,9 @@
 #summary Change log
 
+*2011-09-05*
+ * Bugfix: Contacts update last date was not UTC.
+ * Shifted some of the plaform specific code to the OsDependent class
+
 *2011-09-03*
  * Lots of fixes for the Harmattan build
  * Icon changes and fixes
