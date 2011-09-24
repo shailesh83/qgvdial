@@ -1,5 +1,9 @@
 #summary Change log
 
+*2011-09-21*
+ * Inbox view will now show unread items with a yellow border. Opening the entry will mark it as read and remove the yellow border.
+ * Fixed a bug in the contact list for contacts that had no image.
+
 *2011-09-07*
  * Bugfix: Inbox and voicemail needs to be picked up from a different URL
  * Bugfix: Marking an inbox entry as read also needs to be done at a different URL.
