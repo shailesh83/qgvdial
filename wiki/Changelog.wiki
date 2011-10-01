@@ -1,5 +1,10 @@
 #summary Change log
 
+*2011-10-01*
+ * software input panel closes on second click in the text box
+ * Made it possible for the SMS view to also close the sip.
+ * This should pass the Ovi Store QA.
+
 *2011-09-27*
  * Change the logging method. Do most of it in main.cpp
  * There's no need for a debug logging level.
