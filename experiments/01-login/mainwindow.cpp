@@ -106,7 +106,7 @@ MainWindow::on_actionDo_it_triggered()
 }//MainWindow::on_actionDo_it_triggered
 
 void
-MainWindow::onLogin1(bool success,const QByteArray &response)
+MainWindow::onLogin1(bool success,const QByteArray & /*response*/)
 {
     do { // Begin cleanup block (not a loop)
         if (!success) break;
@@ -169,8 +169,7 @@ MainWindow::onLogin2(bool success, const QByteArray &response)
     do { // Begin cleanup block (not a loop)
         if (!success) break;
 
-        strMoved =
-        isMovedTemporarily (strResponse, this, SLOT(onLogin2(bool,QByteArray)));
+        strMoved = isMovedTemporarily (strResponse);
         if (!strMoved.isEmpty ()) {
             doLogin2 (strMoved);
             break;
@@ -181,8 +180,7 @@ MainWindow::onLogin2(bool success, const QByteArray &response)
 }//MainWindow::onLogin2
 
 QString
-MainWindow::isMovedTemporarily(const QString &strResponse, QObject *receiver,
-                               const char *method)
+MainWindow::isMovedTemporarily(const QString &strResponse)
 {
     QString rv;
     do { // Begin cleanup block (not a loop)

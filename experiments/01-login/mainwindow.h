@@ -27,8 +27,7 @@ public:
     void log(const QString &strLog);
 
 private:
-    QString isMovedTemporarily(const QString &strResponse, QObject *receiver,
-                               const char *method);
+    QString isMovedTemporarily(const QString &strResponse);
 
     bool doLogin2(QString strUrl);
 
