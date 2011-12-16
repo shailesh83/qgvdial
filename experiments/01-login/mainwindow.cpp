@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include "NwReqTracker.h"
 
 #define GV_LOGIN_1 "https://accounts.google.com/ServiceLogin?nui=5&service=grandcentral&ltmpl=mobile&btmpl=mobile&passive=true&continue=https://www.google.com/voice/m"
@@ -7,19 +6,41 @@
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-, ui(new Ui::MainWindow)
+, plainText(NULL)
 , strUser("yuvraaj@gmail.com")
 , nwMgr(this)
 , jar(this)
 {
-    ui->setupUi(this);
+    QWidget *central = new QWidget(this);
+    QBoxLayout *layout = new QBoxLayout(QBoxLayout::TopToBottom, this);
+    plainText = new QPlainTextEdit(this);
+    layout->addWidget (plainText);
+
+    central->setLayout (layout);
+    this->setCentralWidget (central);
+
+    QMenuBar *menuBar = this->menuBar ();
+    QMenu *mnuFile = menuBar->addMenu ("&File");
+    QAction *actDoIt = mnuFile->addAction ("Do it");
+    QAction *actExit = mnuFile->addAction ("E&xit");
+
+    actDoIt->setShortcut (QKeySequence("Ctrl+D"));
+    actExit->setShortcut (QKeySequence("Ctrl+Q"));
+
+    connect(actDoIt, SIGNAL(triggered()), this, SLOT(on_actionDo_it()));
+    connect(actExit, SIGNAL(triggered()), this, SLOT(on_actionExit()));
 
     nwMgr.setCookieJar(&jar);
+
+    QTimer::singleShot (1000, this, SLOT(on_actionDo_it()));
 }//MainWindow::MainWindow
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    if (plainText) {
+        delete plainText;
+        plainText = NULL;
+    }
 }//MainWindow::~MainWindow
 
 void MainWindow::setOrientation(ScreenOrientation orientation)
@@ -68,7 +89,8 @@ void MainWindow::setOrientation(ScreenOrientation orientation)
 void MainWindow::showExpanded()
 {
 #if defined(Q_OS_SYMBIAN) || defined(Q_WS_SIMULATOR)
-    showFullScreen();
+//    showFullScreen();
+    show();
 #elif defined(Q_WS_MAEMO_5)
     showMaximized();
 #else
@@ -79,17 +101,19 @@ void MainWindow::showExpanded()
 void
 MainWindow::log(const QString &strLog)
 {
-    ui->plainTextEdit->appendPlainText(strLog);
+    if (plainText) {
+        plainText->appendPlainText(strLog);
+    }
 }//MainWindow::log
 
 void
-MainWindow::on_actionE_xit_triggered()
+MainWindow::on_actionExit()
 {
     qApp->quit ();
-}//MainWindow::on_actionE_xit_triggered
+}//MainWindow::on_actionExit
 
 void
-MainWindow::on_actionDo_it_triggered()
+MainWindow::on_actionDo_it()
 {
     strUser = QInputDialog::getText(this, "Get User", "Enter user",
                                     QLineEdit::Normal, strUser);
@@ -103,7 +127,7 @@ MainWindow::on_actionDo_it_triggered()
     bool rv = connect(tracker, SIGNAL(sigDone(bool,const QByteArray &)),
                       this   , SLOT (onLogin1(bool,const QByteArray &)));
     Q_ASSERT(rv);
-}//MainWindow::on_actionDo_it_triggered
+}//MainWindow::on_actionDo_it
 
 void
 MainWindow::onLogin1(bool success,const QByteArray & /*response*/)

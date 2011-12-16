@@ -36,8 +36,7 @@ HEADERS  += global.h \
             NwReqTracker.h \
             CookieJar.h
 
-FORMS += mainwindow.ui
-
 # Please do not modify the following two lines. Required for deployment.
 include(deployment.pri)
 qtcAddDeployment()
+

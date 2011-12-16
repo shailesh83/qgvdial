@@ -3,10 +3,6 @@
 
 #include "global.h"
 
-namespace Ui {
-    class MainWindow;
-}
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -32,14 +28,14 @@ private:
     bool doLogin2(QString strUrl);
 
 private slots:
-    void on_actionE_xit_triggered();
-    void on_actionDo_it_triggered();
+    void on_actionExit();
+    void on_actionDo_it();
 
     void onLogin1(bool success,const QByteArray &response);
     void onLogin2(bool success,const QByteArray &response);
 
 private:
-    Ui::MainWindow *ui;
+    QPlainTextEdit *plainText;
     QString strUser, strPass;
 
     QNetworkAccessManager nwMgr;
