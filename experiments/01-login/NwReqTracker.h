@@ -2,6 +2,7 @@
 #define NWREQTRACKER_H
 
 #include "global.h"
+#include <QObject>
 
 class NwReqTracker : public QObject
 {
@@ -17,6 +18,9 @@ private slots:
     void onReplyFinished();
     void onReplyProgress(qint64 bytesReceived, qint64 bytesTotal);
     void onTimedOut();
+
+    void onReplySslErrors (const QList<QSslError> &errors);
+    void onReplyError(QNetworkReply::NetworkError code);
 
 private:
     QNetworkReply  *reply;

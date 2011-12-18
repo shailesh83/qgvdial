@@ -18,6 +18,12 @@ NwReqTracker::NwReqTracker(QNetworkReply *r, QObject *parent, bool autoDel)
     rv = connect (reply, SIGNAL(uploadProgress(qint64,qint64)),
                   this , SLOT(onReplyProgress(qint64,qint64)));
     Q_ASSERT(rv);
+    rv = connect (reply, SIGNAL(sslErrors(QList<QSslError>)),
+                  this , SLOT(onReplySslErrors(QList<QSslError>)));
+    Q_ASSERT(rv);
+    rv = connect (reply, SIGNAL(error(QNetworkReply::NetworkError)),
+                  this , SLOT(onReplyError(QNetworkReply::NetworkError)));
+    Q_ASSERT(rv);
 
     replyTimer.setSingleShot (true);
     replyTimer.setInterval (REPLY_TIMEOUT);
@@ -88,3 +94,26 @@ NwReqTracker::abort()
         this->deleteLater ();
     }
 }//NwReqTracker::abort
+
+void
+NwReqTracker::onReplySslErrors(const QList<QSslError> &errors)
+{
+    bool first = true;
+    QString strError = "SSL Errors: ";
+    foreach(QSslError err, errors) {
+        if (!first) {
+            strError += ", ";
+        }
+        strError += err.errorString ();
+        first = false;
+    }
+
+    Q_WARN(strError);
+}//NwReqTracker::onReplySslErrors
+
+void
+NwReqTracker::onReplyError(QNetworkReply::NetworkError code)
+{
+    QString strErr = QString("NW error %1").arg((int)code);
+    Q_WARN(strErr);
+}//NwReqTracker::onReplyError

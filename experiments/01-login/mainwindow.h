@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "global.h"
+#include <QObject>
 
 class MainWindow : public QMainWindow
 {

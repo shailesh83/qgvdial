@@ -16,7 +16,7 @@ symbian:TARGET.UID3 = 0xE1BCB21A
 #symbian:DEPLOYMENT.installer_header = 0x2002CCCF
 
 # Allow network access on Symbian
-symbian:TARGET.CAPABILITY += NetworkServices
+symbian:TARGET.CAPABILITY += NetworkServices ReadUserData
 
 # If your application uses the Qt Mobility libraries, uncomment
 # the following lines and add the respective components to the

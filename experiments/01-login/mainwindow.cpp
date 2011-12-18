@@ -12,9 +12,9 @@ MainWindow::MainWindow(QWidget *parent)
 , jar(this)
 {
     QWidget *central = new QWidget(this);
-    QBoxLayout *layout = new QBoxLayout(QBoxLayout::TopToBottom, this);
+    QGridLayout *layout = new QGridLayout(this);
     plainText = new QPlainTextEdit(this);
-    layout->addWidget (plainText);
+    layout->addWidget (plainText, 0,0);
 
     central->setLayout (layout);
     this->setCentralWidget (central);
@@ -188,6 +188,7 @@ MainWindow::doLogin2(QString strUrl)
 void
 MainWindow::onLogin2(bool success, const QByteArray &response)
 {
+    bool bLoggedin = false;
     QString strMoved;
     QString strResponse = response;
     do { // Begin cleanup block (not a loop)
@@ -199,7 +200,20 @@ MainWindow::onLogin2(bool success, const QByteArray &response)
             break;
         }
 
-        Q_DEBUG("And we're back: ") << strResponse;
+        Q_DEBUG("And we're back!");
+
+        foreach (QNetworkCookie gvx, jar.getAllCookies ()) {
+            if (gvx.name () == "gvx") {
+                bLoggedin = true;
+                break;
+            }
+        }
+
+        if (bLoggedin) {
+            Q_DEBUG("Login successful!");
+        } else {
+            Q_DEBUG("Login failed!");
+        }
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::onLogin2
 
