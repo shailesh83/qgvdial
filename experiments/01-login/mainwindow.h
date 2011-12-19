@@ -7,6 +7,7 @@
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+
 public:
     enum ScreenOrientation {
         ScreenOrientationLockPortrait,
@@ -29,6 +30,7 @@ private:
     bool doLogin2(QString strUrl);
 
 private slots:
+    void onLogsTimer();
     void on_actionExit();
     void on_actionDo_it();
 
@@ -41,6 +43,10 @@ private:
 
     QNetworkAccessManager nwMgr;
     CookieJar jar;
+
+    QMutex      logsMutex;
+    QStringList logsList;
+    QTimer      logsTimer;
 };
 
 #endif // MAINWINDOW_H

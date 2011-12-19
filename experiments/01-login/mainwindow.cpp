@@ -10,7 +10,10 @@ MainWindow::MainWindow(QWidget *parent)
 , strUser("yuvraaj@gmail.com")
 , nwMgr(this)
 , jar(this)
+, logsMutex(QMutex::Recursive)
+, logsTimer(this)
 {
+    bool rv;
     QWidget *central = new QWidget(this);
     QGridLayout *layout = new QGridLayout(this);
     plainText = new QPlainTextEdit(this);
@@ -27,10 +30,19 @@ MainWindow::MainWindow(QWidget *parent)
     actDoIt->setShortcut (QKeySequence("Ctrl+D"));
     actExit->setShortcut (QKeySequence("Ctrl+Q"));
 
-    connect(actDoIt, SIGNAL(triggered()), this, SLOT(on_actionDo_it()));
-    connect(actExit, SIGNAL(triggered()), this, SLOT(on_actionExit()));
+    rv = connect(actDoIt, SIGNAL(triggered()), this, SLOT(on_actionDo_it()));
+    Q_ASSERT(rv);
+    rv = connect(actExit, SIGNAL(triggered()), this, SLOT(on_actionExit()));
+    Q_ASSERT(rv);
 
     nwMgr.setCookieJar(&jar);
+
+    rv = connect(&logsTimer, SIGNAL(timeout()), this, SLOT(onLogsTimer()));
+    Q_ASSERT(rv);
+
+    logsTimer.setSingleShot (false);
+    logsTimer.setInterval (3000);;
+    logsTimer.start ();
 
     QTimer::singleShot (1000, this, SLOT(on_actionDo_it()));
 }//MainWindow::MainWindow
@@ -101,10 +113,25 @@ void MainWindow::showExpanded()
 void
 MainWindow::log(const QString &strLog)
 {
-    if (plainText) {
+    QMutexLocker locker(&logsMutex);
+    logsList.append (strLog);
+}//MainWindow::log
+
+void
+MainWindow::onLogsTimer()
+{
+    if (!plainText) {
+        return;
+    }
+
+    QMutexLocker locker(&logsMutex);
+    foreach (QString strLog, logsList) {
         plainText->appendPlainText(strLog);
     }
-}//MainWindow::log
+    logsList.clear ();
+
+    logsTimer.start ();
+}//MainWindow::onLogsTimer
 
 void
 MainWindow::on_actionExit()
@@ -160,7 +187,7 @@ MainWindow::doLogin2(QString strUrl)
     url.addQueryItem("ltmpl"    , "mobile");
     url.addQueryItem("btmpl"    , "mobile");
     url.addQueryItem("passive"  , "true");
-    url.addQueryItem("continue"  , "https://www.google.com/voice/m");
+    url.addQueryItem("continue" , "https://www.google.com/voice/m");
     url.addQueryItem("timeStmp" , "");
     url.addQueryItem("secTok"   , "");
 
