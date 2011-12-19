@@ -202,6 +202,8 @@ MainWindow::doLogin2(QString strUrl)
 
     QNetworkRequest req(url);
     req.setRawHeader("User-Agent", UA_IPHONE4);
+    req.setHeader (QNetworkRequest::ContentTypeHeader,
+                   "application/octet-stream");
     QNetworkReply *reply = nwMgr.post(req, url.encodedQuery ());
     NwReqTracker *tracker = new NwReqTracker(reply, this);
 
