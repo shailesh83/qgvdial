@@ -1,0 +1,4 @@
+  * software input panel closes on second click in the text box
+  * Made it possible for the SMS view to also close the sip.
+  * This should pass the Ovi Store QA.
+
