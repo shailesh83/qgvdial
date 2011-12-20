@@ -11,7 +11,8 @@ class NwReqTracker : public QObject
     Q_OBJECT
 public:
     NwReqTracker(QNetworkReply *r, quint32 timeout = NW_REPLY_TIMEOUT,
-                 QObject *parent = 0, bool autoDel = true);
+                 bool bEmitlog = true, bool autoDel = true,
+                 QObject *parent = 0);
     void abort();
     void setTimeout(quint32 timeout);
 
@@ -34,6 +35,7 @@ private:
 
     bool            aborted;
     bool            autoDelete;
+    bool            emitLog;
 };
 
 #endif // NWREQTRACKER_H

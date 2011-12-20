@@ -1,13 +1,14 @@
 #include "NwReqTracker.h"
 
 
-NwReqTracker::NwReqTracker(QNetworkReply *r, quint32 timeout, QObject *parent,
-                           bool autoDel)
+NwReqTracker::NwReqTracker(QNetworkReply *r, quint32 timeout, bool bEmitlog,
+                           bool autoDel, QObject *parent)
 : QObject(parent)
 , reply (r)
 , replyTimer (this)
 , aborted (false)
 , autoDelete(autoDel)
+, emitLog(bEmitlog)
 {
     bool rv = connect (reply, SIGNAL(finished()),
                        this , SLOT(onReplyFinished()));
@@ -98,8 +99,8 @@ NwReqTracker::onTimedOut()
 void
 NwReqTracker::abort()
 {
-    qDebug() << "Abort!!" << (void *) reply;
     aborted = true;
+    qDebug() << "Abort!!" << (void *) reply;
 
     reply->abort ();
 
