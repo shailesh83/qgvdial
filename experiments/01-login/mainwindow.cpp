@@ -14,9 +14,11 @@ MainWindow::MainWindow(QWidget *parent)
 , logsTimer(this)
 {
     bool rv;
+
+    plainText = new QPlainTextEdit(this);
+
     QWidget *central = new QWidget(this);
     QGridLayout *layout = new QGridLayout(this);
-    plainText = new QPlainTextEdit(this);
     layout->addWidget (plainText, 0,0);
 
     central->setLayout (layout);
