@@ -2,7 +2,8 @@
 #include "NwReqTracker.h"
 
 #define GV_LOGIN_1 "https://accounts.google.com/ServiceLogin?nui=5&service=grandcentral&ltmpl=mobile&btmpl=mobile&passive=true&continue=https://www.google.com/voice/m"
-#define GV_LOGIN_2 "https://accounts.google.com/ServiceLogin"
+#define GV_ACCOUNT_SERVICELOGIN "https://accounts.google.com/ServiceLogin"
+#define GV_ACCOUNT_SMSAUTH      "https://accounts.google.com/SmsAuth"
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
@@ -149,7 +150,15 @@ MainWindow::on_actionDo_it()
     strPass = QInputDialog::getText(this, "Password", "Enter pass",
                                     QLineEdit::Password, strPass);
 
-    QNetworkRequest req(QUrl(GV_LOGIN_1));
+    QUrl url(GV_ACCOUNT_SERVICELOGIN);
+    url.addQueryItem("nui"      , "5");
+    url.addQueryItem("service"  , "grandcentral");
+    url.addQueryItem("ltmpl"    , "mobile");
+    url.addQueryItem("btmpl"    , "mobile");
+    url.addQueryItem("passive"  , "true");
+    url.addQueryItem("continue" , "https://www.google.com/voice/m");
+
+    QNetworkRequest req(url);
     req.setRawHeader("User-Agent", UA_IPHONE4);
     NwReqTracker *tracker = new NwReqTracker(nwMgr.get(req), this);
 
@@ -158,18 +167,40 @@ MainWindow::on_actionDo_it()
     Q_ASSERT(rv);
 }//MainWindow::on_actionDo_it
 
+QString
+MainWindow::hasMoved(const QString &strResponse)
+{
+    QString rv;
+    do { // Begin cleanup block (not a loop)
+        if (!strResponse.contains ("Moved Temporarily")) {
+            break;
+        }
+
+        QRegExp rx("a\\s+href=\"(.*)\"\\>", Qt::CaseInsensitive);
+        rx.setMinimal (true);
+        if (!strResponse.contains (rx) || (rx.captureCount () != 1)) {
+            break;
+        }
+
+        rv = rx.cap(1);
+        Q_DEBUG("Moved temporarily to") << rv;
+    } while (0); // End cleanup block (not a loop)
+
+    return rv;
+}//MainWindow::hasMoved
+
 void
 MainWindow::onLogin1(bool success,const QByteArray & /*response*/)
 {
     do { // Begin cleanup block (not a loop)
         if (!success) break;
 
-        doLogin2 (GV_LOGIN_2);
+        postLogin (GV_ACCOUNT_SERVICELOGIN);
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::onLogin1
 
 bool
-MainWindow::doLogin2(QString strUrl)
+MainWindow::postLogin(QString strUrl)
 {
     QUrl url(strUrl);
     QNetworkCookie galx;
@@ -214,20 +245,21 @@ MainWindow::doLogin2(QString strUrl)
     Q_ASSERT(found);
 
     return found;
-}//MainWindow::doLogin2
+}//MainWindow::postLogin
 
 void
 MainWindow::onLogin2(bool success, const QByteArray &response)
 {
     bool bLoggedin = false;
-    QString strMoved;
-    QString strResponse = response;
     do { // Begin cleanup block (not a loop)
         if (!success) break;
 
-        strMoved = isMovedTemporarily (strResponse);
+        QString strMoved;
+        QString strResponse = response;
+
+        strMoved = hasMoved(strResponse);
         if (!strMoved.isEmpty ()) {
-            doLogin2 (strMoved);
+            postLogin (strMoved);
             break;
         }
 
@@ -242,30 +274,60 @@ MainWindow::onLogin2(bool success, const QByteArray &response)
 
         if (bLoggedin) {
             Q_DEBUG("Login successful!");
-        } else {
-            Q_DEBUG("Login failed!");
+            break;
         }
+
+        QRegExp rx("\\<input.*name\\s*=\\s*\\\"smsToken\\\"\\s*"
+                   "value\\s*=\\s*\\\"(.*)\\\"");
+        if (!strResponse.contains (rx) || (rx.captureCount () != 1)) {
+            Q_WARN("Login failed!");
+            break;
+        }
+
+        QString smsToken = rx.cap (1);
+
+        QString smsUserPin =
+        QInputDialog::getText(this, "2 factor authentication",
+                              "Enter token", QLineEdit::Normal);
+        if (smsUserPin.isEmpty ()) {
+            Q_WARN("User didn't enter user pin");
+            break;
+        }
+
+        QUrl url(GV_ACCOUNT_SMSAUTH), url1(GV_ACCOUNT_SMSAUTH);
+        url.addQueryItem("service"  , "grandcentral");
+
+        url1.addQueryItem("timeStmp"    , "");
+        url1.addQueryItem("secTok"      , "");
+        url1.addQueryItem("smsToken"    , smsToken);
+        url1.addQueryItem("email"       , strUser);
+        url1.addQueryItem("smsUserPin"  , smsUserPin);
+        url1.addQueryItem("smsVerifyPin", "Verify");
+        url1.addQueryItem("PersistentCookie", "yes");
+
+        QNetworkRequest req(url);
+        req.setRawHeader("User-Agent", UA_IPHONE4);
+        req.setHeader (QNetworkRequest::ContentTypeHeader,
+                       "application/octet-stream");
+        QNetworkReply *reply = nwMgr.post(req, url1.encodedQuery ());
+        NwReqTracker *tracker = new NwReqTracker(reply, this);
+
+        success = connect(tracker, SIGNAL(sigDone(bool,const QByteArray &)),
+                        this   , SLOT (onLogin3(bool,const QByteArray &)));
+        Q_ASSERT(success);
+
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::onLogin2
 
-QString
-MainWindow::isMovedTemporarily(const QString &strResponse)
+void
+MainWindow::onLogin3(bool success, const QByteArray &response)
 {
-    QString rv;
     do { // Begin cleanup block (not a loop)
-        if (!strResponse.contains ("Moved Temporarily")) {
-            break;
-        }
+        if (!success) break;
 
-        QRegExp rx("a\\s+href=\"(.*)\"\\>", Qt::CaseInsensitive);
-        rx.setMinimal (true);
-        if (!strResponse.contains (rx) || (rx.captureCount () != 1)) {
-            break;
-        }
+        QString strResponse = response;
+        Q_DEBUG(strResponse);
 
-        rv = rx.cap(1);
-        Q_DEBUG("Moved temporarily to") << rv;
+//        postLogin (GV_ACCOUNT_SERVICELOGIN);
     } while (0); // End cleanup block (not a loop)
-
-    return rv;
-}//MainWindow::isMovedTemporarily
+}//MainWindow::onLogin3

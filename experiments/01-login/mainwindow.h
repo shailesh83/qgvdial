@@ -25,9 +25,9 @@ public:
     void log(const QString &strLog);
 
 private:
-    QString isMovedTemporarily(const QString &strResponse);
+    QString hasMoved(const QString &strResponse);
 
-    bool doLogin2(QString strUrl);
+    bool postLogin(QString strUrl);
 
 private slots:
     void onLogsTimer();
@@ -36,6 +36,7 @@ private slots:
 
     void onLogin1(bool success,const QByteArray &response);
     void onLogin2(bool success,const QByteArray &response);
+    void onLogin3(bool success,const QByteArray &response);
 
 private:
     QPlainTextEdit *plainText;

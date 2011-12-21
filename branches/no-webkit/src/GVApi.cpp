@@ -1,7 +1,7 @@
 #include "GVApi.h"
 #include "NwReqTracker.h"
 
-#define GV_ACCOUNTS_SERVICE_LOGIN "https://accounts.google.com/ServiceLogin"
+#define GV_ACCOUNT_SERVICELOGIN "https://accounts.google.com/ServiceLogin"
 
 GVApi::GVApi(bool bEmitLog, QObject *parent)
 : QObject(parent)
@@ -54,7 +54,7 @@ GVApi::login(AsyncTaskToken *token)
         return true;
     }
 
-    QUrl url(GV_ACCOUNTS_SERVICE_LOGIN);
+    QUrl url(GV_ACCOUNT_SERVICELOGIN);
     url.addQueryItem("nui"      , "5");
     url.addQueryItem("service"  , "grandcentral");
     url.addQueryItem("ltmpl"    , "mobile");
@@ -70,57 +70,30 @@ GVApi::login(AsyncTaskToken *token)
                                              this);
 
     bool rv = connect(tracker, SIGNAL(sigDone(bool,const QByteArray&, void*)),
-                      this   , SLOT  (onLogin(bool,const QByteArray&, void*)));
+                      this   , SLOT  (onLogin1(bool,const QByteArray&, void*)));
     Q_ASSERT(rv);
 
     return true;
 }//GVApi::login
 
 void
-GVApi::onLogin(bool success, const QByteArray &response, void *ctx)
+GVApi::onLogin1(bool success, const QByteArray &response, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
-
     do { // Begin cleanup block (not a loop)
         if (!success) break;
 
-        QString strMoved;
-        QString strResponse = response;
-
-        strMoved = hasMoved (strResponse);
-        if (!strMoved.isEmpty ()) {
-            success = redoLogin (strMoved, ctx);
-            break;
-        }
-
-        Q_DEBUG("And we're back!");
-
-        foreach (QNetworkCookie gvx, jar.getAllCookies ()) {
-            if (gvx.name () == "gvx") {
-                loggedIn = true;
-                break;
-            }
-        }
-
-        success = loggedIn;
-
-        if (success) {
-            Q_DEBUG("Login successful!");
-        } else {
-            Q_DEBUG("Login failed!");
-        }
-
-        //TODO: Get the page for _rnr_se
+        postLogin (GV_ACCOUNT_SERVICELOGIN, ctx);
     } while (0); // End cleanup block (not a loop)
 
     if (!success) {
         token->status = ATTS_LOGIN_FAILURE;
         token->emitCompleted ();
     }
-}//GVApi::onLogin
+}//GVApi::onLogin1
 
 bool
-GVApi::redoLogin(QString strUrl, void *ctx)
+GVApi::postLogin(QString strUrl, void *ctx)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
 
@@ -164,8 +137,51 @@ GVApi::redoLogin(QString strUrl, void *ctx)
                                              emitLog, true, this);
 
     bool rv = connect(tracker, SIGNAL(sigDone(bool,const QByteArray&, void*)),
-                      this   , SLOT  (onLogin(bool,const QByteArray&, void*)));
+                      this   , SLOT  (onLogin2(bool,const QByteArray&, void*)));
     Q_ASSERT(rv);
 
     return found;
-}//GVApi::redoLogin
+}//GVApi::postLogin
+
+void
+GVApi::onLogin2(bool success, const QByteArray &response, void *ctx)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+
+    do { // Begin cleanup block (not a loop)
+        if (!success) break;
+
+        QString strMoved;
+        QString strResponse = response;
+
+        strMoved = hasMoved (strResponse);
+        if (!strMoved.isEmpty ()) {
+            success = postLogin (strMoved, ctx);
+            break;
+        }
+
+        Q_DEBUG("And we're back!");
+
+        foreach (QNetworkCookie gvx, jar.getAllCookies ()) {
+            if (gvx.name () == "gvx") {
+                loggedIn = true;
+                break;
+            }
+        }
+
+        success = loggedIn;
+
+        if (success) {
+            Q_DEBUG("Login successful!");
+        } else {
+            Q_DEBUG("Login failed!");
+        }
+
+        //TODO: Get the page for _rnr_se
+    } while (0); // End cleanup block (not a loop)
+
+    if (!success) {
+        token->status = ATTS_LOGIN_FAILURE;
+        token->emitCompleted ();
+    }
+}//GVApi::onLogin2

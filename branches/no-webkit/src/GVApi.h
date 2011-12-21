@@ -16,11 +16,12 @@ public:
 signals:
 
 private slots:
-    void onLogin(bool success, const QByteArray &response, void *ctx);
+    void onLogin1(bool success, const QByteArray &response, void *ctx);
+    void onLogin2(bool success, const QByteArray &response, void *ctx);
 
 private:
     QString hasMoved(const QString &strResponse);
-    bool redoLogin(QString strUrl, void *ctx);
+    bool postLogin(QString strUrl, void *ctx);
 
 private:
     bool emitLog;
