@@ -1,14 +1,15 @@
 #include "NwReqTracker.h"
 
 
-NwReqTracker::NwReqTracker(QNetworkReply *r, quint32 timeout, bool bEmitlog,
-                           bool autoDel, QObject *parent)
+NwReqTracker::NwReqTracker(QNetworkReply *r, void *c, quint32 timeout,
+                           bool bEmitlog, bool autoDel, QObject *parent)
 : QObject(parent)
 , reply (r)
 , replyTimer (this)
 , aborted (false)
 , autoDelete(autoDel)
 , emitLog(bEmitlog)
+, ctx(c)
 {
     bool rv = connect (reply, SIGNAL(finished()),
                        this , SLOT(onReplyFinished()));
@@ -83,7 +84,7 @@ NwReqTracker::onReplyFinished()
     } while (0); // End cleanup block (not a loop)
 
     reply->deleteLater ();
-    emit sigDone (rv, response);
+    emit sigDone (rv, response, ctx);
 
     if (autoDelete) {
         this->deleteLater ();
@@ -133,10 +134,18 @@ NwReqTracker::onReplyError(QNetworkReply::NetworkError code)
 }//NwReqTracker::onReplyError
 
 void
-NwReqTracker::onXferProgress(qint64 /*bytesReceived*/, qint64 /*bytesTotal*/)
+NwReqTracker::onXferProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
     if (aborted) return;
 
     replyTimer.stop ();
+
+    double percent = 50.0;
+    if (bytesTotal != -1) {
+        percent = (double)bytesReceived / bytesTotal;
+    }
+
+    emit sigProgress (percent);
+
     replyTimer.start ();
 }//NwReqTracker::onXferProgress

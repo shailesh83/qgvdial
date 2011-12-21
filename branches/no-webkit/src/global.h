@@ -287,5 +287,7 @@ extern int   logLevel;   //! Log level
 #define MOBILITY_PRESENT 1
 #endif
 
+#include "AsyncTaskToken.h"
+
 #endif //__cplusplus
 #endif //__GLOBAL_H__

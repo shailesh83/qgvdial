@@ -61,7 +61,9 @@ SOURCES  += ../src/main.cpp                 \
             ../src/DialContext.cpp          \
             ../src/ContactsParserObject.cpp \
             ../src/CookieJar.cpp            \
-            ../src/NwReqTracker.cpp
+            ../src/NwReqTracker.cpp \
+    AsyncTaskToken.cpp \
+    GVApi.cpp
 
 HEADERS  += ../src/global.h                 \
             ../src/IObserver.h              \
@@ -96,7 +98,9 @@ HEADERS  += ../src/global.h                 \
             ../src/DialContext.h            \
             ../src/ContactsParserObject.h   \
             ../src/CookieJar.h              \
-            ../src/NwReqTracker.h
+            ../src/NwReqTracker.h \
+    AsyncTaskToken.h \
+    GVApi.h
 
 RESOURCES += ../src/qgvdial.qrc
 
@@ -307,4 +311,8 @@ unix:!symbian:!maemo5:!contains(MEEGO_EDITION,harmattan) {
     dbusservice.files += ../build-files/qgvdial.Call.service
     dbusservice.files += ../build-files/qgvdial.Text.service
 }
+
+
+
+
 
