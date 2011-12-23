@@ -28,19 +28,22 @@ private:
     QString hasMoved(const QString &strResponse);
 
     bool postLogin(QString strUrl);
+    bool parseHiddenLoginFields(const QString &strResponse);
 
 private slots:
     void onLogsTimer();
     void on_actionExit();
     void on_actionDo_it();
 
-    void onLogin1(bool success,const QByteArray &response);
-    void onLogin2(bool success,const QByteArray &response);
-    void onLogin3(bool success,const QByteArray &response);
+    void onLogin1(bool success, const QByteArray &response);
+    void onLogin2(bool success, const QByteArray &response);
+    void onTwoFactorLogin(bool success, const QByteArray &response);
 
 private:
     QPlainTextEdit *plainText;
     QString strUser, strPass;
+
+    QVariantMap hiddenLoginFields;
 
     QNetworkAccessManager nwMgr;
     CookieJar jar;
