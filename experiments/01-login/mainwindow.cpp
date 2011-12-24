@@ -43,6 +43,10 @@ MainWindow::MainWindow(QWidget *parent)
     rv = connect(&logsTimer, SIGNAL(timeout()), this, SLOT(onLogsTimer()));
     Q_ASSERT(rv);
 
+    QNetworkProxy httpProxy, httpsProxy;
+    getSystemProxies (httpProxy, httpsProxy);
+    QNetworkProxy::setApplicationProxy (httpProxy);
+
     logsTimer.setSingleShot (false);
     logsTimer.setInterval (3000);;
     logsTimer.start ();
@@ -200,7 +204,7 @@ MainWindow::onLogin1(bool success,const QByteArray & response)
         QString strResponse = response;
         Q_DEBUG(strResponse);
 
-        if (!parseHiddenLoginFields (strResponse)) {
+        if (!parseHiddenLoginFields (strResponse, hiddenLoginFields)) {
             break;
         }
 
@@ -209,7 +213,7 @@ MainWindow::onLogin1(bool success,const QByteArray & response)
 }//MainWindow::onLogin1
 
 bool
-MainWindow::parseHiddenLoginFields(const QString &strResponse)
+MainWindow::parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret)
 {
 /* To match:
   <input type="hidden" name="continue" id="continue"
@@ -222,31 +226,53 @@ MainWindow::parseHiddenLoginFields(const QString &strResponse)
         return false;
     }
 
-    hiddenLoginFields.clear ();
+    ret.clear ();
     int pos = 0;
     while ((pos = rx1.indexIn (strResponse, pos)) != -1) {
-        QRegExp rx2("name\\s*=\\s*\\\"(.*)\\\".*id=.*value\\s*=\\s*\\\"(.*)\\\"");
+        QString fullMatch = rx1.cap(0);
+        QString oneInstance = rx1.cap(1);
+        QString name, value;
+        QRegExp rx2("\"(.*)\""), rx3("'(.*)'");
         rx2.setMinimal (true);
+        rx3.setMinimal (true);
 
-        QString oneInstance = rx1.cap (0);
-        if (!oneInstance.contains(rx2) || (rx2.captureCount() != 2)) {
-            pos += oneInstance.length();
-            continue;
+        int pos1 = oneInstance.indexOf ("value");
+        if (pos1 == -1) {
+            goto gonext;
         }
 
-        Q_DEBUG(rx2.cap (1)) << "=" << rx2.cap (2);
+        name  = oneInstance.left (pos1);
+        value = oneInstance.mid (pos1);
 
-        hiddenLoginFields[rx2.cap (1)] = rx2.cap (2);
+        if (rx2.indexIn (name) == -1) {
+            goto gonext;
+        }
+        name = rx2.cap (1);
 
-        pos += oneInstance.length();
+        if (rx2.indexIn (value) == -1) {
+            if (rx3.indexIn (value) == -1) {
+                goto gonext;
+            } else {
+                value = rx3.cap (1);
+            }
+        } else {
+            value = rx2.cap (1);
+        }
+
+        Q_DEBUG(name) << "=" << value;
+
+        ret[name] = value;
+
+gonext:
+        pos += fullMatch.indexOf (oneInstance);
     }
 
-    if (hiddenLoginFields.count() == 0) {
+    if (ret.count() == 0) {
         Q_WARN("Invalid login page!");
         return false;
     }
 
-    Q_DEBUG("login fields =") << hiddenLoginFields;
+    Q_DEBUG("login fields =") << ret;
 
     return true;
 }//MainWindow::parseHiddenLoginFields
@@ -317,7 +343,6 @@ MainWindow::onLogin2(bool success, const QByteArray &response)
 
         QString strMoved;
         QString strResponse = response;
-        Q_DEBUG(strResponse);
 
         // There will be 2-3 moved temporarily redirects.
         strMoved = hasMoved(strResponse);
@@ -344,18 +369,16 @@ MainWindow::onLogin2(bool success, const QByteArray &response)
 
         Q_DEBUG("Not logged in yet. Response =") << strResponse;
 
-        // Normal login has failed. We check for this regex to see if the user
-        // has set up two factor authentication.
-        QRegExp rx("\\<input.*name\\s*=\\s*\\\"smsToken\\\"\\s*"
-                   "value\\s*=\\s*\\\"(.*)\\\"");
-        if (!strResponse.contains (rx) || (rx.captureCount () != 1)) {
+        QVariantMap ret;
+        if (!parseHiddenLoginFields (strResponse, ret)) {
+            break;
+        }
+
+        if (!ret.contains ("smsToken")) {
             // It isn't two factor authentication
             Q_WARN("Username or password is incorrect!");
             break;
         }
-
-        // Two factor auth! Pull out the SMS token.
-        QString smsToken = rx.cap (1);
 
         QString smsUserPin =
         QInputDialog::getText(this, "Two factor authentication",
@@ -368,16 +391,17 @@ MainWindow::onLogin2(bool success, const QByteArray &response)
         QUrl url(GV_ACCOUNT_SMSAUTH), url1(GV_ACCOUNT_SMSAUTH);
         url.addQueryItem("service"  , "grandcentral");
 
-        url1.addQueryItem("timeStmp"    , "");
-        url1.addQueryItem("secTok"      , "");
-        url1.addQueryItem("smsToken"    , smsToken);
-        url1.addQueryItem("email"       , strUser);
         url1.addQueryItem("smsUserPin"  , smsUserPin);
         url1.addQueryItem("smsVerifyPin", "Verify");
         url1.addQueryItem("PersistentCookie", "yes");
 
-        Q_DEBUG(QVariant(url).toString ());
-        Q_DEBUG(QVariant(url1).toString ());
+        QStringList keys = ret.keys ();
+        foreach (QString key, keys) {
+            url1.addQueryItem(key, ret[key].toString());
+        }
+
+        Q_DEBUG(QVariant(url).toString());
+        Q_DEBUG(QVariant(url1).toString());
 
         QNetworkRequest req(url);
         req.setRawHeader("User-Agent", UA_IPHONE4);
@@ -403,6 +427,104 @@ MainWindow::onTwoFactorLogin(bool success, const QByteArray &response)
         QString strResponse = response;
         Q_DEBUG(strResponse);
 
+        // After which we should have completed login. Check for coolie "gvx"
+        success = false;
+        foreach (QNetworkCookie gvx, jar.getAllCookies ()) {
+            if (gvx.name () == "gvx") {
+                success = true;
+                break;
+            }
+        }
+
+        if (success) {
+            Q_DEBUG("Login succeeded");
+        } else {
+            Q_WARN("Login failed");
+        }
+
 //        postLogin (GV_ACCOUNT_SERVICELOGIN);
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::onTwoFactorLogin
+
+bool
+MainWindow::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
+{
+#if !DIABLO_OS
+    QNetworkProxyFactory::setUseSystemConfiguration (true);
+#endif
+
+    do { // Begin cleanup block (not a loop)
+        QList<QNetworkProxy> netProxies =
+        QNetworkProxyFactory::systemProxyForQuery (
+        QNetworkProxyQuery(QUrl("http://www.google.com")));
+        http = netProxies[0];
+        if (QNetworkProxy::NoProxy != http.type ()) {
+            Q_DEBUG("Got proxy: host = ") << http.hostName ()
+                           << ", port = " << http.port ();
+            break;
+        }
+
+        // Otherwise Confirm it
+#if defined(Q_WS_X11)
+        QString strHttpProxy = getenv ("http_proxy");
+        if (strHttpProxy.isEmpty ()) {
+            break;
+        }
+
+        int colon = strHttpProxy.lastIndexOf (':');
+        if (-1 != colon) {
+            QString strHost = strHttpProxy.mid (0, colon);
+            QString strPort = strHttpProxy.mid (colon);
+
+            strHost.remove ("http://").remove ("https://");
+
+            strPort.remove (':').remove ('/');
+            int port = strPort.toInt ();
+
+            Q_DEBUG("Found http proxy :") << strHost << ":" << port;
+            http.setHostName (strHost);
+            http.setPort (port);
+            http.setType (QNetworkProxy::HttpProxy);
+        }
+#endif
+    } while (0); // End cleanup block (not a loop)
+
+    do { // Begin cleanup block (not a loop)
+        QList<QNetworkProxy> netProxies =
+        QNetworkProxyFactory::systemProxyForQuery (
+        QNetworkProxyQuery(QUrl("https://www.google.com")));
+        https = netProxies[0];
+        if (QNetworkProxy::NoProxy != https.type ()) {
+            Q_DEBUG("Got proxy: host =") << https.hostName () << ", port = "
+                                         << https.port ();
+            break;
+        }
+
+        // Otherwise Confirm it
+#if defined(Q_WS_X11)
+        QString strHttpProxy = getenv ("https_proxy");
+        if (strHttpProxy.isEmpty ()) {
+            break;
+        }
+
+        int colon = strHttpProxy.lastIndexOf (':');
+        if (-1 != colon) {
+            QString strHost = strHttpProxy.mid (0, colon);
+            QString strPort = strHttpProxy.mid (colon);
+
+            strHost.remove ("http://").remove ("https://");
+
+            strPort.remove (':').remove ('/');
+            int port = strPort.toInt ();
+
+            Q_DEBUG("Found http proxy: ") << strHost << ":" << port;
+            https.setHostName (strHost);
+            https.setPort (port);
+            https.setType (QNetworkProxy::HttpProxy);
+        }
+#endif
+    } while (0); // End cleanup block (not a loop)
+
+    return (true);
+}//MainWindow::getSystemProxies
+

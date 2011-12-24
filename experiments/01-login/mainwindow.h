@@ -28,7 +28,8 @@ private:
     QString hasMoved(const QString &strResponse);
 
     bool postLogin(QString strUrl);
-    bool parseHiddenLoginFields(const QString &strResponse);
+    bool parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret);
+    bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
 
 private slots:
     void onLogsTimer();
