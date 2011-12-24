@@ -391,7 +391,6 @@ MainWindow::postLogin(QString strUrl)
 
     keys = hiddenLoginFields.keys();
     foreach (QString key, keys) {
-        Q_DEBUG("key =") << key << ", value =" << hiddenLoginFields[key];
         allLoginFields[key] = hiddenLoginFields[key];
     }
 
@@ -405,7 +404,7 @@ MainWindow::postLogin(QString strUrl)
     QNetworkRequest req(url);
     req.setRawHeader("User-Agent", UA_IPHONE4);
     req.setHeader (QNetworkRequest::ContentTypeHeader,
-                   "application/octet-stream");
+                   "application/x-www-form-urlencoded");
     QNetworkReply *reply = nwMgr.post(req, url.encodedQuery ());
     NwReqTracker *tracker = new NwReqTracker(reply, this);
 
@@ -449,14 +448,12 @@ MainWindow::onLogin2(bool success, const QByteArray &response)
         }
 
         // If "gvx" was found, then we're logged in.
-        if (bLoggedin) {
-            Q_DEBUG("Login successful!");
+        if (!bLoggedin) {
+            Q_WARN("Login failed!") << strResponse;
             break;
         }
 
-        Q_DEBUG("Not logged in yet. Response =") << strResponse;
-
-        success = doTwoFactorAuth (strResponse);
+        getRnr ();
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::onLogin2
 
@@ -605,48 +602,15 @@ MainWindow::onTwoFactorAutoPost(bool success, const QByteArray &response)
             break;
         }
 
-        QUrl url(nextUrl), url1(nextUrl);
-        QStringList keys = ret.keys ();
+        QStringList keys;
+        keys = ret.keys();
         foreach (QString key, keys) {
-            url1.addQueryItem(key, ret[key].toString());
+            hiddenLoginFields[key] = ret[key];
         }
 
-        Q_DEBUG(QVariant(url).toString());
-        Q_DEBUG(QString(url1.encodedQuery()));
-
-        QNetworkRequest req(url);
-        req.setRawHeader("User-Agent", UA_IPHONE4);
-        req.setHeader (QNetworkRequest::ContentTypeHeader,
-                       "application/x-www-form-urlencoded");
-        QNetworkReply *reply = nwMgr.post(req, url1.encodedQuery ());
-        NwReqTracker *tracker = new NwReqTracker(reply, this);
-
-        bool rv =
-        connect(tracker, SIGNAL(sigDone(bool,const QByteArray &)),
-                this   , SLOT  (onServiceLoginAfterTFA(bool,const QByteArray &)));
-        Q_ASSERT(rv);
+        postLogin (nextUrl);
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::onTwoFactorAutoPost
-
-void
-MainWindow::onServiceLoginAfterTFA(bool success, const QByteArray &response)
-{
-    do { // Begin cleanup block (not a loop)
-        if (!success) break;
-
-        QString strResponse = response;
-        QString strMoved = hasMoved (strResponse);
-        if (!strMoved.isEmpty ()) {
-            QNetworkRequest req(strMoved);
-            NwReqTracker *tracker = new NwReqTracker(nwMgr.get(req), this);
-            success =
-            connect(tracker, SIGNAL(sigDone(bool,const QByteArray &)),
-                    this   , SLOT  (onServiceLoginAfterTFA(bool,const QByteArray &)));
-            Q_ASSERT(success);
-            break;
-        }
-    } while (0); // End cleanup block (not a loop)
-}//MainWindow::onServiceLoginAfterTFA
 
 bool
 MainWindow::getRnr()
@@ -665,10 +629,11 @@ MainWindow::getRnr()
 void
 MainWindow::onGotRnr(bool success, const QByteArray &response)
 {
+    QString strResponse = response;
+
     do { // Begin cleanup block (not a loop)
         if (!success) break;
 
-        QString strResponse = response;
         QString strMoved = hasMoved (strResponse);
         if (!strMoved.isEmpty ()) {
             QNetworkRequest req(strMoved);
@@ -680,10 +645,32 @@ MainWindow::onGotRnr(bool success, const QByteArray &response)
             break;
         }
 
-        if (strResponse.contains ("_rnr_se")) {
-            Q_DEBUG("Login successful");
-        } else {
-            Q_DEBUG(strResponse);
+        success = false;
+        int pos = strResponse.indexOf ("_rnr_se");
+        if (pos == -1) {
+            break;
         }
+
+        int pos1 = strResponse.indexOf (">", pos);
+        if (pos1 == -1) {
+            break;
+        }
+
+        QString searchIn = strResponse.mid (pos, pos1-pos);
+        QRegExp rx("value\\s*=\\s*\\\"(.*)\\\"");
+
+        if (rx.indexIn (searchIn) == -1) {
+            break;
+        }
+
+        QString rnr_se = rx.cap (1);
+        Q_DEBUG(rnr_se);
+
+        success = true;
     } while (0); // End cleanup block (not a loop)
+
+    if (!success) {
+        Q_DEBUG("Did not get rnr_se");
+        Q_DEBUG(strResponse);
+    }
 }//MainWindow::onGotRnr

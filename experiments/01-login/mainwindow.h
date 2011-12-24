@@ -44,7 +44,6 @@ private slots:
     void onLogin2(bool success, const QByteArray &response);
     void onTwoFactorLogin(bool success, const QByteArray &response);
     void onTwoFactorAutoPost(bool success, const QByteArray &response);
-    void onServiceLoginAfterTFA(bool success, const QByteArray &response);
     void onGotRnr(bool success, const QByteArray &response);
 
 private:
