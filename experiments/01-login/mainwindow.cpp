@@ -645,8 +645,6 @@ MainWindow::onServiceLoginAfterTFA(bool success, const QByteArray &response)
             Q_ASSERT(success);
             break;
         }
-
-        getRnr ();
     } while (0); // End cleanup block (not a loop)
 }//MainWindow::onServiceLoginAfterTFA
 
