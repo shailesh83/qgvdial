@@ -31,6 +31,10 @@ private:
     bool parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret);
     bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
 
+    bool beginTwoFactorAuth(const QString &strUrl);
+    bool doTwoFactorAuth(const QString &strResponse);
+    bool getRnr();
+
 private slots:
     void onLogsTimer();
     void on_actionExit();
@@ -39,6 +43,9 @@ private slots:
     void onLogin1(bool success, const QByteArray &response);
     void onLogin2(bool success, const QByteArray &response);
     void onTwoFactorLogin(bool success, const QByteArray &response);
+    void onTwoFactorAutoPost(bool success, const QByteArray &response);
+    void onServiceLoginAfterTFA(bool success, const QByteArray &response);
+    void onGotRnr(bool success, const QByteArray &response);
 
 private:
     QPlainTextEdit *plainText;
