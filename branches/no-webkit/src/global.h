@@ -31,6 +31,8 @@ Contact: yuvraaj@gmail.com
 #include <QtXml>
 #include <QtScript>
 
+#include "NwReqTracker.h"
+
 #ifdef QT_NO_DEBUG
 #define NO_DBGINFO      1
 #else
@@ -52,6 +54,10 @@ Contact: yuvraaj@gmail.com
 #define GV_URL          "http://www.google.com/voice"
 #define GV_HTTPS        "https://www.google.com/voice"
 #define GV_HTTPS_M      "https://www.google.com/voice/m"
+
+#define GOOGLE_ACCOUNTS         "https://accounts.google.com"
+#define GV_ACCOUNT_SERVICELOGIN GOOGLE_ACCOUNTS "/ServiceLogin"
+#define GV_ACCOUNT_SMSAUTH      GOOGLE_ACCOUNTS "/SmsAuth"
 
 #define GOOGLE_SERVICELOGIN "https://www.google.com/accounts/ServiceLogin"
 #define GV_SERVICELOGIN_PARAMS "?nui=5&service=grandcentral&ltmpl=mobile&btmpl=mobile&passive=true&continue="

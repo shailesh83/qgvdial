@@ -5,8 +5,9 @@
 #include <QObject>
 
 #define ATTS_SUCCESS            0
-#define ATTS_INVALID_PARAMS     1
-#define ATTS_LOGIN_FAILURE      2
+#define ATTS_FAILURE            1
+#define ATTS_INVALID_PARAMS     2
+#define ATTS_LOGIN_FAILURE      3
 
 class AsyncTaskToken : public QObject
 {
@@ -17,7 +18,6 @@ public:
 
 signals:
     void completed(AsyncTaskToken *self);
-
     void cancel(AsyncTaskToken *self);
 
 public slots:

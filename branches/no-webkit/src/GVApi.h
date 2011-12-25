@@ -1,3 +1,24 @@
+/*
+qgvdial is a cross platform Google Voice Dialer
+Copyright (C) 2010  Yuvraaj Kelkar
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+Contact: yuvraaj@gmail.com
+*/
+
 #ifndef GVAPI_H
 #define GVAPI_H
 
@@ -11,24 +32,68 @@ class GVApi : public QObject
 public:
     GVApi(bool bEmitLog, QObject *parent = 0);
 
+    bool setProxySettings (bool bEnable,
+                           bool bUseSystemProxy,
+                           const QString &host, int port,
+                           bool bRequiresAuth,
+                           const QString &user, const QString &pass);
+
+////////////////////////////////////////////////////////////////////////////////
+// GV API:
     bool login(AsyncTaskToken *token);
+    bool logout(AsyncTaskToken *token);
+    bool getPhones(AsyncTaskToken *token);
+    bool getInbox(AsyncTaskToken *token);
+////////////////////////////////////////////////////////////////////////////////
 
 signals:
+    //! Two factor auth requires a PIN. Get it.
+    void twoStepAuthentication(AsyncTaskToken *token, QString &result);
+    //! Emitted for each registered phone number
+    void registeredPhone (const GVRegisteredNumber &info);
 
 private slots:
+
+    // Login and two factor
     void onLogin1(bool success, const QByteArray &response, void *ctx);
     void onLogin2(bool success, const QByteArray &response, void *ctx);
+    void onTwoFactorLogin(bool success, const QByteArray &response, void *ctx);
+    void onTFAAutoPost(bool success, const QByteArray &response, void *ctx);
+    void onGotRnr(bool success, const QByteArray &response, void *ctx);
+
+    // Logout
+    void onLogout(bool success, const QByteArray &response, void *ctx);
+
+    // Get phones
+    void onGetPhones(bool success, const QByteArray &response, void *ctx);
+
+    // Get inbox (one page at a time)
+    void onGetInbox(bool success, const QByteArray &response, void *ctx);
 
 private:
     QString hasMoved(const QString &strResponse);
+    bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
+
+    bool doGet(const QString &strUrl, void *ctx, QObject *receiver,
+               const char *method);
+    bool doGet(QUrl url, void *ctx, QObject *receiver, const char *method);
+
+    // Login and two factor
     bool postLogin(QString strUrl, void *ctx);
+    bool parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret);
+    bool beginTwoFactorAuth(const QString &strUrl, void *ctx);
+    bool doTwoFactorAuth(const QString &strResponse, void *ctx);
+    bool getRnr(void *ctx);
 
 private:
     bool emitLog;
+
     bool loggedIn;
+    QString rnr_se, strSelfNumber;
 
     QNetworkAccessManager nwMgr;
     CookieJar jar;
+    QVariantMap hiddenLoginFields;
 };
 
 #endif // GVAPI_H
