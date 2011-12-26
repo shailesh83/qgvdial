@@ -38,12 +38,17 @@ public:
                            bool bRequiresAuth,
                            const QString &user, const QString &pass);
 
+    QList<QNetworkCookie> getAllCookies();
+    void setAllCookies(QList<QNetworkCookie> cookies);
+
 ////////////////////////////////////////////////////////////////////////////////
 // GV API:
     bool login(AsyncTaskToken *token);
     bool logout(AsyncTaskToken *token);
     bool getPhones(AsyncTaskToken *token);
     bool getInbox(AsyncTaskToken *token);
+    bool callOut(AsyncTaskToken *token);
+    bool callBack(AsyncTaskToken *token);
 ////////////////////////////////////////////////////////////////////////////////
 
 signals:
@@ -51,6 +56,8 @@ signals:
     void twoStepAuthentication(AsyncTaskToken *token, QString &result);
     //! Emitted for each registered phone number
     void registeredPhone (const GVRegisteredNumber &info);
+    //! Emitted for every inbox entry
+    void oneInboxEntry (const GVInboxEntry &hevent);
 
 private slots:
 
@@ -70,6 +77,10 @@ private slots:
     // Get inbox (one page at a time)
     void onGetInbox(bool success, const QByteArray &response, void *ctx);
 
+    // Dialing
+    void onCallback(bool success, const QByteArray &response, void *ctx);
+    void onDialout(bool success, const QByteArray &response, void *ctx);
+
 private:
     QString hasMoved(const QString &strResponse);
     bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
@@ -84,6 +95,12 @@ private:
     bool beginTwoFactorAuth(const QString &strUrl, void *ctx);
     bool doTwoFactorAuth(const QString &strResponse, void *ctx);
     bool getRnr(void *ctx);
+
+    // Inbox related
+    bool parseInboxJson(const QString &strJson, const QString &strHtml,
+                        qint32 &msgCount);
+    bool execXQuery(const QString &strQuery, QString &result);
+    bool parseMessageRow(QString &strRow, GVInboxEntry &entry);
 
 private:
     bool emitLog;

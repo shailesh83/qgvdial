@@ -8,6 +8,7 @@
 #define ATTS_FAILURE            1
 #define ATTS_INVALID_PARAMS     2
 #define ATTS_LOGIN_FAILURE      3
+#define ATTS_AC_NOT_CONFIGURED  4
 
 class AsyncTaskToken : public QObject
 {

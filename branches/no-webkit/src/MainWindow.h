@@ -28,6 +28,7 @@ Contact: yuvraaj@gmail.com
 #include "WebWidget.h"
 #include "RegNumberModel.h"
 #include "DialContext.h"
+#include "GVApi.h"
 
 #include <QtDeclarative>
 #include <phonon/MediaObject>
@@ -313,7 +314,7 @@ private:
     bool            bRunMqThread;
 #endif
 
-    CookieJar      *jar;
+    GVApi           gvApi;
 };
 
 #endif // MAINWINDOW_H

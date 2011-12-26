@@ -21,6 +21,9 @@ Contact: yuvraaj@gmail.com
 
 #include "GVApi.h"
 #include "GvXMLParser.h"
+#include "MyXmlErrorHandler.h"
+
+#include <QtXmlPatterns>
 
 GVApi::GVApi(bool bEmitLog, QObject *parent)
 : QObject(parent)
@@ -189,6 +192,18 @@ GVApi::setProxySettings (bool bEnable,
 
     return (true);
 }//GVApi::setProxySettings
+
+QList<QNetworkCookie>
+GVApi::getAllCookies()
+{
+    return jar.getAllCookies ();
+}//GVApi::getAllCookies
+
+void
+GVApi::setAllCookies(QList<QNetworkCookie> cookies)
+{
+    jar.setNewCookies (cookies);
+}//GVApi::setAllCookies
 
 QString
 GVApi::hasMoved(const QString &strResponse)
@@ -954,41 +969,396 @@ GVApi::onGetInbox(bool success, const QByteArray &response, void *ctx)
             Q_DEBUG("End parsing");
         }
 
-        /*
-        QDateTime dtUpdate = workCurrent.arrParams[3].toDateTime ();
-        bool bGotOld = false;
-        int nNew = 0;
-        qint32 nUsableMsgs = 0;
-        if (!parseInboxJson (dtUpdate, xmlHandler.strJson, xmlHandler.strHtml,
-                             bGotOld, nNew, nUsableMsgs))
+        qint32 msgCount = 0;
+        if (!parseInboxJson (xmlHandler.strJson, xmlHandler.strHtml, msgCount))
         {
             Q_WARN("Failed to parse GV Inbox JSON. Data =") << strReply;
             break;
         }
-        if (workCurrent.arrParams.count() < 5) {
-            workCurrent.arrParams.append (nNew);
-        } else {
-            nNew += workCurrent.arrParams[4].toInt();
-            workCurrent.arrParams[4] = nNew;
-        }
+        token->outParams["message_count"] = msgCount;
 
-        QMutexLocker locker(&mutex);
-        nCurrent++;
-
-        bOk = true;
-
-        int count = workCurrent.arrParams[2].toString().toInt ();
-        if (((nCurrent-nFirstPage) >= count) ||
-            (bGotOld) ||
-            (0 == nUsableMsgs)) {
-            completeCurrentWork (GVAW_getInbox, true);
-            break;
-        }
-        */
+        token->status = ATTS_SUCCESS;
+        token->emitCompleted ();
     } while (0); // End cleanup block (not a loop)
 
     if (!success) {
         token->status = ATTS_FAILURE;
-        token->emitCompleted ();;
+        token->emitCompleted ();
     }
 }//GVApi::onGetInbox
+
+bool
+GVApi::parseInboxJson(const QString &strJson, const QString &strHtml,
+                      qint32 &msgCount)
+{
+    bool rv = false;
+
+    QString strFixedHtml = strHtml;
+    strFixedHtml.replace ("&", "&amp;");
+
+    QTemporaryFile fHtml, fSms;
+    if (!fHtml.open()) {
+        qWarning ("Failed to open HTML buffer temporary file");
+        return false;
+    }
+    if (!fSms.open()) {
+        qWarning ("Failed to open SMS buffer temporary file");
+        return false;
+    }
+    fHtml.write(strFixedHtml.toUtf8());
+    fHtml.seek(0);
+
+    do { // Begin cleanup block (not a loop)
+        QString strTemp;
+        QScriptEngine scriptEngine;
+        strTemp = "var topObj = " + strJson;
+        scriptEngine.evaluate (strTemp);
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN("Failed to assign JSon to topObj. error =")
+               << scriptEngine.uncaughtException().toString ()
+               << "JSON =" << strJson;
+            break;
+        }
+
+        strTemp = "var msgParams = []; "
+                  "var msgList = []; "
+                  "for (var msgId in topObj[\"messages\"]) { "
+                  "    msgList.push(msgId); "
+                  "}";
+        scriptEngine.evaluate (strTemp);
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN("Uncaught exception executing script :")
+                << scriptEngine.uncaughtException().toString()
+                << "JSON =" << strJson;
+            break;
+        }
+
+        msgCount = scriptEngine.evaluate("msgList.length;").toInt32 ();
+        if (emitLog) {
+            Q_DEBUG("message count =") << msgCount;
+        }
+
+        for (qint32 i = 0; i < msgCount; i++) {
+            strTemp = QString(
+                    "msgParams = []; "
+                    "for (var params in topObj[\"messages\"][msgList[%1]]) { "
+                    "    msgParams.push(params); "
+                    "}").arg(i);
+            scriptEngine.evaluate (strTemp);
+            if (scriptEngine.hasUncaughtException ()) {
+                Q_WARN("Uncaught exception message loop:")
+                    << scriptEngine.uncaughtException().toString()
+                    << "JSON =" << strJson;
+                break;
+            }
+
+            qint32 nParams =
+            scriptEngine.evaluate ("msgParams.length;").toInt32 ();
+
+            GVInboxEntry inboxEntry;
+            for (qint32 j = 0; j < nParams; j++) {
+                strTemp = QString("msgParams[%1];").arg (j);
+                QString strPName = scriptEngine.evaluate (strTemp).toString ();
+                strTemp = QString(
+                          "topObj[\"messages\"][msgList[%1]][msgParams[%2]];")
+                            .arg (i)
+                            .arg (j);
+                QString strVal = scriptEngine.evaluate (strTemp).toString ();
+
+                if (strPName == "id") {
+                    inboxEntry.id = strVal;
+                } else if (strPName == "phoneNumber") {
+                    inboxEntry.strPhoneNumber = strVal;
+                } else if (strPName == "displayNumber") {
+                    inboxEntry.strDisplayNumber = strVal;
+                } else if (strPName == "startTime") {
+                    bool bOk = false;
+                    quint64 iVal = strVal.toULongLong (&bOk) / 1000;
+                    if (bOk) {
+                        inboxEntry.startTime = QDateTime::fromTime_t (iVal);
+                    }
+                } else if (strPName == "isRead") {
+                    inboxEntry.bRead = (strVal == "true");
+                } else if (strPName == "isSpam") {
+                    inboxEntry.bSpam = (strVal == "true");
+                } else if (strPName == "isTrash") {
+                    inboxEntry.bTrash = (strVal == "true");
+                } else if (strPName == "star") {
+                    inboxEntry.bStar = (strVal == "true");
+                } else if (strPName == "labels") {
+                    if (strVal.contains ("placed")) {
+                        inboxEntry.Type = GVIE_Placed;
+                    } else if (strVal.contains ("received")) {
+                        inboxEntry.Type = GVIE_Received;
+                    } else if (strVal.contains ("missed")) {
+                        inboxEntry.Type = GVIE_Missed;
+                    } else if (strVal.contains ("voicemail")) {
+                        inboxEntry.Type = GVIE_Voicemail;
+                    } else if (strVal.contains ("sms")) {
+                        inboxEntry.Type = GVIE_TextMessage;
+                    } else {
+                        if (emitLog) {
+                            Q_WARN("Unknown label") << strVal;
+                        }
+                    }
+                } else if (strPName == "displayStartDateTime") {
+                } else if (strPName == "displayStartTime") {
+                } else if (strPName == "relativeStartTime") {
+                } else if (strPName == "note") {
+                    inboxEntry.strNote = strVal;
+                } else if (strPName == "type") {
+                } else if (strPName == "children") {
+                } else if (strPName == "messageText") {
+                    inboxEntry.strText = strVal;
+                } else {
+                    if (emitLog) {
+                        Q_DEBUG(QString ("param = %1. value = %2")
+                                        .arg (strPName) .arg (strVal));
+                    }
+                }
+            }
+
+            if (inboxEntry.id.isEmpty()) {
+                qWarning ("Invalid ID");
+                continue;
+            }
+            if (inboxEntry.strPhoneNumber.isEmpty()) {
+                qWarning ("Invalid Phone number");
+                inboxEntry.strPhoneNumber = "Unknown";
+            }
+            if (inboxEntry.strDisplayNumber.isEmpty()) {
+                inboxEntry.strDisplayNumber = "Unknown";
+            }
+            if (!inboxEntry.startTime.isValid ()) {
+                qWarning ("Invalid start time");
+                continue;
+            }
+
+            // Pick up the text from the parsed HTML
+            if (((GVIE_TextMessage == inboxEntry.Type) ||
+                 (GVIE_Voicemail == inboxEntry.Type)))
+            {
+                QString strQuery =
+                    QString("for $i in doc('%1')//div[@id=\"%2\"]\n"
+                    "  return $i//div[@class=\"gc-message-message-display\"]")
+                    .arg (fHtml.fileName ()).arg (inboxEntry.id);
+
+                QString result, resultSms;
+                if (!execXQuery (strQuery, result)) {
+                    Q_WARN("XQuery failed for Message :") << strQuery;
+                    continue;
+                }
+
+                fSms.resize (0);
+                fSms.write (QString("<html>" + result + "</html>").toAscii ());
+                fSms.seek (0);
+
+                strQuery =
+                QString("for $i in doc('%1')//div[@class=\"gc-message-sms-row\"]/span\n"
+                        "  return $i")
+                        .arg (fSms.fileName ());
+                if (!execXQuery (strQuery, resultSms)) {
+                    Q_WARN("XQuery failed for Text :") << strQuery;
+                }
+                resultSms = resultSms.trimmed ();
+
+                QString strSmsRow;
+                if (!resultSms.isEmpty ()) {
+                    result = "<div>" + resultSms + "</div>";
+                }
+
+                if ((parseMessageRow (result, inboxEntry)) &&
+                    (!strSmsRow.isEmpty ())) {
+                    inboxEntry.strText = strSmsRow;
+                }
+            }
+
+            // emit the inbox element
+            emit oneInboxEntry (inboxEntry);
+        }
+
+        rv = true;
+    } while (0); // End cleanup block (not a loop)
+
+    return (rv);
+}//GVApi::parseInboxJson
+
+bool
+GVApi::execXQuery(const QString &strQuery, QString &result)
+{
+    QByteArray outArray;
+    QBuffer buffer(&outArray);
+    buffer.open(QIODevice::ReadWrite);
+
+    MyXmlErrorHandler xmlError;
+    QXmlQuery xQuery;
+    xQuery.setMessageHandler (&xmlError);
+    xQuery.setQuery (strQuery);
+
+    result.clear ();
+
+    QXmlFormatter formatter(xQuery, &buffer);
+    if (!xQuery.isValid() || !xQuery.evaluateTo (&formatter)) {
+        return false;
+    }
+    result = outArray;
+
+    return true;
+}//GVApi::execXQuery
+
+bool
+GVApi::parseMessageRow(QString &strRow, GVInboxEntry &entry)
+{
+    bool rv = false;
+    QString strSmsRow;
+    ConversationEntry convEntry;
+
+    do { // Begin cleanup block (not a loop)
+        QDomDocument doc;
+        doc.setContent (strRow);
+        QDomElement topElement = doc.childNodes ().at (0).toElement ();
+        if (topElement.isNull ()) {
+            qWarning("Top element is null");
+            break;
+        }
+
+        // Children could be either SMS rows or vmail transcription
+        QDomNamedNodeMap attrs;
+        strSmsRow.clear ();
+
+        QDomNodeList smsRow = topElement.childNodes();
+        for (int j = 0; j < smsRow.size (); j++) {
+            if (!smsRow.at(j).isElement()) {
+                continue;
+            }
+
+            QDomElement smsSpan = smsRow.at(j).toElement();
+            if (smsSpan.tagName () != "span") {
+                continue;
+            }
+
+            convEntry.init();
+
+            attrs = smsSpan.attributes();
+            for (int m = 0; m < attrs.size (); m++) {
+                QString strTemp = smsSpan.text ().simplified ();
+                QDomAttr attr = attrs.item(m).toAttr();
+                if (attr.value() == "gc-message-sms-from") {
+                    strSmsRow += "<b>" + strTemp + "</b> ";
+                    convEntry.from = strTemp;
+                } else if (attr.value() == "gc-message-sms-text") {
+                    strSmsRow += strTemp;
+                    convEntry.text += strTemp;
+                } else if (attr.value() == "gc-message-sms-time") {
+                    strSmsRow += " <i>(" + strTemp + ")</i><br>";
+                    convEntry.time = strTemp;
+                } else if (attr.value().startsWith ("gc-word-")) {
+                    if (!strSmsRow.isEmpty ()) {
+                        strSmsRow += ' ';
+                        convEntry.text += ' ';
+                    }
+
+                    strTemp.replace ("&amp", "&");
+                    QRegExp rx("&#(.*)\\;");
+                    rx.setMinimal (true);
+                    while (strTemp.contains (rx)) {
+                        bool bOk;
+                        QString strHex = rx.cap(0).remove("#").remove(";")
+                                                  .remove("&");
+                        char iVal = strHex.toInt (&bOk);
+                        strTemp.replace (rx.cap (0), QString(iVal));
+                    }
+                    strSmsRow += strTemp;
+                    convEntry.text += strTemp;
+                }
+            }// loop thru the parts of a single sms
+
+            entry.conversation.append (convEntry);
+        }//loop through sms row
+
+        entry.strText = strSmsRow;
+
+        rv = true;
+    } while (0); // End cleanup block (not a loop)
+
+    return rv;
+}//GVApi::parseMessageRow
+
+bool
+GVApi::callOut(AsyncTaskToken *token)
+{
+    if (!token) return false;
+
+    // Ensure that the params  are valid
+    if (!token->inParams.contains ("type") ||
+        !token->inParams.contains ("page"))
+    {
+        token->status = ATTS_INVALID_PARAMS;
+        token->emitCompleted ();
+        return true;
+    }
+
+    return true;
+}//GVApi::callOut
+
+bool
+GVApi::callBack(AsyncTaskToken *token)
+{
+    if (!token) return false;
+
+    // Ensure that the params  are valid
+    if (!token->inParams.contains ("type") ||
+        !token->inParams.contains ("page"))
+    {
+        token->status = ATTS_INVALID_PARAMS;
+        token->emitCompleted ();
+        return true;
+    }
+
+    if (rnr_se.isEmpty ()) {
+        token->status = ATTS_AC_NOT_CONFIGURED;
+        token->emitCompleted ();
+        return true;
+    }
+
+    QUrl url(GV_HTTPS "/call/connect/");
+
+    url.addQueryItem("outgoingNumber"   ,
+                     token->inParams["destination"].toString());
+    url.addQueryItem("forwardingNumber" ,
+                     token->inParams["callBack"].toString());
+    url.addQueryItem("phoneType"        ,
+                     token->inParams["callBackType"].toString());
+
+    url.addQueryItem("subscriberNumber" , strSelfNumber);
+    url.addQueryItem("remember"         , "1");
+    url.addQueryItem("_rnr_se"          , rnr_se);
+
+    QNetworkRequest req(url);
+    req.setRawHeader ("User-Agent", UA_IPHONE4);
+    req.setHeader (QNetworkRequest::ContentTypeHeader,
+                   "application/x-www-form-urlencoded");
+
+    QNetworkReply *reply = nwMgr.post(req, url.encodedQuery ());
+    NwReqTracker *tracker = new NwReqTracker(reply, token, NW_REPLY_TIMEOUT,
+                                             emitLog, true, this);
+
+    bool rv =
+    connect(tracker, SIGNAL (sigDone(bool, const QByteArray&, void*)),
+            this   , SLOT(onCallback(bool,QByteArray,void*)));
+    Q_ASSERT(rv);
+
+    return true;
+}//GVApi::callBack
+
+void
+GVApi::onCallback(bool success, const QByteArray &response, void *ctx)
+{
+
+}//GVApi::
+
+void
+GVApi::onDialout(bool success, const QByteArray &response, void *ctx)
+{
+
+}//GVApi::

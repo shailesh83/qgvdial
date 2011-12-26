@@ -57,7 +57,7 @@ MainWindow::MainWindow (QWidget *parent)
 , mqThread (QString("qgvdial:%1").arg(QHostInfo::localHostName())
             .toLatin1().constData (), this)
 #endif
-, jar (NULL)
+, gvApi (true, this)
 {
     initLogging ();
 
@@ -110,20 +110,9 @@ MainWindow::~MainWindow ()
         vmailPlayer = NULL;
     }
 
-    if (NULL != jar) {
-        CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
-        dbMain.saveCookies (jar);
-
-        // The jar that I just deleted was a child of this class. That jar is
-        // now gone. I cannot set NULL as the new cookie jar - that causes a
-        // NULL deref in the Qt code. So, create a new cookie jar just for the
-        // web page so that it can substitute the old pointer with the new one
-        // and be happy.
-        GVAccess &webPage = Singletons::getRef().getGVAccess ();
-        webPage.nwAccessMgr ()->setCookieJar (new CookieJar);
-        delete jar;
-        jar = NULL;
-    }
+    CacheDatabase &dbMain = Singletons::getRef().getDBMain ();
+    QList<QNetworkCookie> cookies = gvApi.getAllCookies ();
+    dbMain.saveCookies (cookies);
 }//MainWindow::~MainWindow
 
 /** Initialize the log file name and timer.
@@ -322,10 +311,9 @@ MainWindow::init ()
         this, SIGNAL(regPhoneChange(const QStringList &,int)));
 
     // Set up cookies
-    jar = new CookieJar(this);
-    dbMain.loadCookies (jar);
-    webPage.nwAccessMgr()->setCookieJar (jar);
-    jar->setParent (this);
+    QList<QNetworkCookie> cookies;
+    dbMain.loadCookies (cookies);
+    gvApi.setAllCookies (cookies);
 
     // The GV access class signals these during the dialling protocol
     rv = connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
@@ -2106,11 +2094,8 @@ MainWindow::onSigCloseVmail()
 void
 MainWindow::onRecreateCookieJar()
 {
-    GVAccess &webPage = Singletons::getRef().getGVAccess ();
-    jar->deleteLater ();
-    jar = new CookieJar(this);
-    webPage.nwAccessMgr()->setCookieJar (jar);
-    jar->setParent (this);
+    QList<QNetworkCookie> empty;
+    gvApi.setAllCookies (empty);
 }//MainWindow::onRecreateCookieJar
 
 void

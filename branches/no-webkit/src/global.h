@@ -93,6 +93,18 @@ enum GVI_Entry_Type {
     GVIE_TextMessage,
 };
 
+struct ConversationEntry {
+    QString from;
+    QString time;
+    QString text;
+
+    void init() {
+        from.clear ();
+        time.clear ();
+        text.clear ();
+    }
+};
+
 struct GVInboxEntry
 {
     QString         id;
@@ -102,6 +114,8 @@ struct GVInboxEntry
     QString         strDisplayNumber;
     QString         strPhoneNumber;
     QString         strText;
+
+    QVector<ConversationEntry> conversation;
 
     QString         strNote;
 
@@ -121,6 +135,7 @@ struct GVInboxEntry
         strDisplayNumber.clear ();
         strPhoneNumber.clear ();
         strText.clear ();
+        conversation.clear ();
         strNote.clear ();
 
         bRead = bSpam = bTrash = bStar = false;
