@@ -315,14 +315,15 @@ MainWindow::init ()
     gvApi.setAllCookies (cookies);
 
     // The GV access class signals these during the dialling protocol
-    rv = connect(&gvApi, SIGNAL(twoStepAuthentication(QString &)),
-                  this , SLOT(onTwoStepAuthentication(QString &)));
+    rv = connect(&gvApi, SIGNAL(twoStepAuthentication(AsyncTaskToken *)),
+                  this , SLOT(onTwoStepAuthentication(AsyncTaskToken *)));
     Q_ASSERT(rv);
     if (!rv) { exit(1); }
     rv =
     connect(&gvApi, SIGNAL (registeredPhone    (const GVRegisteredNumber &)),
              this , SLOT   (gotRegisteredPhone (const GVRegisteredNumber &)));
     Q_ASSERT(rv);
+    if (!rv) { exit(1); }
 
 /*    rv = connect (&webPage    , SIGNAL (dialInProgress (const QString &)),
                        this       , SLOT   (dialInProgress (const QString &)));
@@ -689,6 +690,9 @@ MainWindow::doLogin ()
             break;
         }
 
+        bOk = connect(token, SIGNAL(completed(AsyncTaskToken*)),
+                      this , SLOT(loginCompleted(AsyncTaskToken*)));
+
         token->inParams["user"] = strUser;
         token->inParams["pass"] = strPass;
 
@@ -1050,7 +1054,7 @@ MainWindow::dialNow (const QString &strTarget)
         if (gvApi.getSelfNumber().isEmpty () ||
            (gvApi.getSelfNumber() == "CLIENT_ONLY"))
         {
-            qWarning ("Self number is not valid. Dial canceled");
+            Q_WARN("Self number is not valid. Dial canceled");
             setStatus ("Account not configured");
             showMsgBox ("Account not configured");
             break;
@@ -1217,24 +1221,25 @@ MainWindow::dialInProgress (const QString & /*strNumber*/)
 }//MainWindow::dialInProgress
 
 void
-MainWindow::dialAccessNumber (const QString  &strAccessNumber,
-                              const QVariant &context        )
+MainWindow::dialAccessNumber (AsyncTaskToken *token)
 {
-    DialContext *ctx = (DialContext *) context.value<void *>();
-    do // Begin cleanup block (not a loop)
-    {
-        if (NULL == ctx)
-        {
-            setStatus ("Invalid call out context", 3);
+    DialContext *ctx = (DialContext *) token->callerCtx;
+    do { // Begin cleanup block (not a loop)
+        if (NULL == ctx) {
+            Q_WARN("Invalid call out context");
             setStatus ("Callout failed");
             break;
         }
 
-        if (NULL == ctx->ci)
-        {
-            qWarning ("Invalid call out initiator");
+        if (NULL == ctx->ci) {
+            Q_WARN("Invalid call out initiator");
             setStatus ("Callout failed");
             break;
+        }
+
+        QString strAccessNumber = token->outParams["access_number"].toString();
+        if (strAccessNumber.isEmpty ()) {
+            Q_WARN("Invalid access number");
         }
 
         ctx->ci->initiateCall (strAccessNumber);
@@ -1263,6 +1268,10 @@ MainWindow::dialComplete (AsyncTaskToken *token)
             this->showMsgBox (gvApi.getLastErrorString ());
         }
     } else {
+        if (bDialout) {
+            dialAccessNumber (token);
+        }
+
         setStatus (QString("Dial successful to %1.")
                    .arg(token->inParams["destination"].toString()));
     }
@@ -2109,10 +2118,10 @@ MainWindow::onRecreateCookieJar()
 }//MainWindow::onRecreateCookieJar
 
 void
-MainWindow::onTwoStepAuthentication(QString &result)
+MainWindow::onTwoStepAuthentication(AsyncTaskToken *token)
 {
     int rv = QInputDialog::getInt (this, "Enter security token", "Token: ", 0, 0);
-    result = QString("%1").arg (rv);
+    token->inParams["user_pin"] = QString("%1").arg (rv);
 }//MainWindow::onTwoStepAuthentication
 
 void

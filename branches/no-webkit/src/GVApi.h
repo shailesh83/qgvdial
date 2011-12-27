@@ -61,7 +61,7 @@ public:
 
 signals:
     //! Two factor auth requires a PIN. Get it.
-    void twoStepAuthentication(AsyncTaskToken *token, QString &result);
+    void twoStepAuthentication(AsyncTaskToken *token);
     //! Emitted for each registered phone number
     void registeredPhone (const GVRegisteredNumber &info);
     //! Emitted for every inbox entry
@@ -87,7 +87,7 @@ private slots:
 
     // Dialing
     void onCallback(bool success, const QByteArray &response, void *ctx);
-    void onDialout(bool success, const QByteArray &response, void *ctx);
+    void onCallout(bool success, const QByteArray &response, void *ctx);
 
 private:
     QString hasMoved(const QString &strResponse);
@@ -96,10 +96,16 @@ private:
     bool doGet(QUrl url, void *ctx, QObject *receiver, const char *method);
     bool doGet(const QString &strUrl, void *ctx, QObject *receiver,
                const char *method);
-    bool doPost(QUrl url, QByteArray postData, void *ctx,
+
+    bool doPost(QUrl url, QByteArray postData, QString contentType, void *ctx,
                 QObject *receiver, const char *method);
+    bool doPostForm(QUrl url, QByteArray postData, void *ctx,
+                    QObject *receiver, const char *method);
+    bool doPostText(QUrl url, QByteArray postData, void *ctx,
+                    QObject *receiver, const char *method);
 
     // Login and two factor
+    bool doLogin1(QString strUrl, AsyncTaskToken *token);
     bool postLogin(QString strUrl, void *ctx);
     bool parseHiddenLoginFields(const QString &strResponse, QVariantMap &ret);
     bool beginTwoFactorAuth(const QString &strUrl, void *ctx);
@@ -123,7 +129,7 @@ private:
     QString strLastErrorMessage;
 
     QNetworkAccessManager nwMgr;
-    CookieJar jar;
+    CookieJar *jar;
     QVariantMap hiddenLoginFields;
 };
 

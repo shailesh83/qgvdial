@@ -30,8 +30,9 @@ GVApi::GVApi(bool bEmitLog, QObject *parent)
 , emitLog(bEmitLog)
 , loggedIn(false)
 , nwMgr(this)
-, jar(this)
+, jar(new CookieJar(NULL))
 {
+    nwMgr.setCookieJar (jar);
 }//GVApi::GVApi
 
 bool
@@ -153,14 +154,19 @@ GVApi::doGet(const QString &strUrl, void *ctx, QObject *receiver,
 }//GVApi::doGet
 
 bool
-GVApi::doPost(QUrl url, QByteArray postData, void *ctx,
+GVApi::doPost(QUrl url, QByteArray postData, QString contentType, void *ctx,
               QObject *receiver, const char *method)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QNetworkRequest req(url);
     req.setRawHeader("User-Agent", UA_IPHONE4);
-    req.setHeader (QNetworkRequest::ContentTypeHeader,
-                   "application/x-www-form-urlencoded");
+    req.setHeader (QNetworkRequest::ContentTypeHeader, contentType);
+
+    req.setHeader (QNetworkRequest::CookieHeader,
+                   QVariant::fromValue(jar->getAllCookies ()));
+
+    Q_DEBUG(req.header (QNetworkRequest::CookieHeader).toString ());
+
     QNetworkReply *reply = nwMgr.post(req, postData);
     NwReqTracker *tracker = new NwReqTracker(reply, ctx, NW_REPLY_TIMEOUT,
                                              emitLog, this);
@@ -171,6 +177,21 @@ GVApi::doPost(QUrl url, QByteArray postData, void *ctx,
 
     return (rv);
 }//GVApi::doPost
+
+bool
+GVApi::doPostForm(QUrl url, QByteArray postData, void *ctx,
+                  QObject *receiver, const char *method)
+{
+    return doPost (url, postData, "application/x-www-form-urlencoded", ctx,
+                   receiver, method);
+}//GVApi::doPostForm
+
+bool
+GVApi::doPostText(QUrl url, QByteArray postData, void *ctx,
+                  QObject *receiver, const char *method)
+{
+    return doPost (url, postData, "text/plain", ctx, receiver, method);
+}//GVApi::doPostForm
 
 bool
 GVApi::setProxySettings (bool bEnable,
@@ -219,13 +240,13 @@ GVApi::setProxySettings (bool bEnable,
 QList<QNetworkCookie>
 GVApi::getAllCookies()
 {
-    return jar.getAllCookies ();
+    return jar->getAllCookies ();
 }//GVApi::getAllCookies
 
 void
 GVApi::setAllCookies(QList<QNetworkCookie> cookies)
 {
-    jar.setNewCookies (cookies);
+    jar->setNewCookies (cookies);
 }//GVApi::setAllCookies
 
 QString
@@ -256,10 +277,6 @@ GVApi::hasMoved(const QString &strResponse)
         }
 
         rv = rx.cap(1);
-
-        if (emitLog) {
-            Q_DEBUG("Moved temporarily to") << rv;
-        }
     } while (0); // End cleanup block (not a loop)
 
     return rv;
@@ -297,7 +314,13 @@ GVApi::login(AsyncTaskToken *token)
         return true;
     }
 
-    QUrl url(GV_ACCOUNT_SERVICELOGIN);
+    return doLogin1 (GV_ACCOUNT_SERVICELOGIN, token);
+}//GVApi::login
+
+bool
+GVApi::doLogin1(QString strUrl, AsyncTaskToken *token)
+{
+    QUrl url(strUrl);
     url.addQueryItem("nui"      , "5");
     url.addQueryItem("service"  , "grandcentral");
     url.addQueryItem("ltmpl"    , "mobile");
@@ -310,7 +333,7 @@ GVApi::login(AsyncTaskToken *token)
     Q_ASSERT(rv);
 
     return rv;
-}//GVApi::login
+}//GVApi::doLogin1
 
 void
 GVApi::onLogin1(bool success, const QByteArray &response, void *ctx)
@@ -320,6 +343,26 @@ GVApi::onLogin1(bool success, const QByteArray &response, void *ctx)
 
     do { // Begin cleanup block (not a loop)
         if (!success) break;
+
+        QString strMoved = hasMoved (strResponse);
+        if (!strMoved.isEmpty ()) {
+            doLogin1 (strMoved, token);
+            break;
+        }
+
+        // We may have completed login already. Check for cookie "gvx"
+        foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
+            if (cookie.name () == "gvx") {
+                loggedIn = true;
+                break;
+            }
+        }
+
+        // If "gvx" was found, then we're logged in.
+        if (loggedIn) {
+            success = getRnr (token);
+            break;
+        }
 
         if (!parseHiddenLoginFields (strResponse, hiddenLoginFields)) {
             Q_WARN("Failed to parse hidden fields");
@@ -411,7 +454,7 @@ GVApi::postLogin(QString strUrl, void *ctx)
     bool found = false;
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
 
-    foreach (QNetworkCookie cookie, jar.getAllCookies ()) {
+    foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
         if (cookie.name () == "GALX") {
             galx = cookie;
             found = true;
@@ -449,8 +492,8 @@ GVApi::postLogin(QString strUrl, void *ctx)
         }
     }
 
-    found = doPost(url, url.encodedQuery(), ctx,
-                   this, SLOT (onLogin2(bool,const QByteArray &,void *)));
+    found = doPostForm(url, url.encodedQuery(), ctx, this,
+                       SLOT (onLogin2(bool,const QByteArray &,void *)));
     Q_ASSERT(found);
 
     return found;
@@ -479,8 +522,8 @@ GVApi::onLogin2(bool success, const QByteArray &response, void *ctx)
             break;
         }
 
-        // After this we should have completed login. Check for coolie "gvx"
-        foreach (QNetworkCookie cookie, jar.getAllCookies ()) {
+        // After this we should have completed login. Check for cookie "gvx"
+        foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
             if (cookie.name () == "gvx") {
                 loggedIn = true;
                 break;
@@ -535,9 +578,9 @@ GVApi::onTwoFactorLogin(bool success, const QByteArray &response, void *ctx)
 
         Q_DEBUG(strResponse);
 
-        // After which we should have completed login. Check for coolie "gvx"
+        // After which we should have completed login. Check for cookie "gvx"
         success = false;
-        foreach (QNetworkCookie gvx, jar.getAllCookies ()) {
+        foreach (QNetworkCookie gvx, jar->getAllCookies ()) {
             if (gvx.name () == "gvx") {
                 success = true;
                 break;
@@ -548,6 +591,7 @@ GVApi::onTwoFactorLogin(bool success, const QByteArray &response, void *ctx)
             Q_DEBUG("Login succeeded");
             token->status = ATTS_SUCCESS;
             token->emitCompleted ();
+            token = NULL;
             break;
         }
 
@@ -557,8 +601,10 @@ GVApi::onTwoFactorLogin(bool success, const QByteArray &response, void *ctx)
     if (!success) {
         Q_WARN("Login failed.") << strResponse;
 
-        token->status = ATTS_LOGIN_FAILURE;
-        token->emitCompleted ();
+        if (token) {
+            token->status = ATTS_LOGIN_FAILURE;
+            token->emitCompleted ();
+        }
     }
 }//GVApi::onTwoFactorLogin
 
@@ -571,7 +617,7 @@ GVApi::doTwoFactorAuth(const QString &strResponse, void *ctx)
     bool rv = false;
 
     do { // Begin cleanup block (not a loop)
-        foreach (QNetworkCookie cookie, jar.getAllCookies ()) {
+        foreach (QNetworkCookie cookie, jar->getAllCookies ()) {
             if (cookie.name () == "GALX") {
                 galx = cookie;
                 foundgalx = true;
@@ -594,12 +640,13 @@ GVApi::doTwoFactorAuth(const QString &strResponse, void *ctx)
             break;
         }
 
-        QString smsUserPin;
-        emit twoStepAuthentication(token, smsUserPin);
-        if (smsUserPin.isEmpty ()) {
+        emit twoStepAuthentication(token);
+        if (!token->inParams.contains ("user_pin")) {
             Q_WARN("User didn't enter user pin");
             break;
         }
+
+        QString smsUserPin = token->inParams["user_pin"].toString();
 
         QUrl url(GV_ACCOUNT_SMSAUTH), url1(GV_ACCOUNT_SMSAUTH);
         url.addQueryItem("service"          , "grandcentral");
@@ -615,8 +662,8 @@ GVApi::doTwoFactorAuth(const QString &strResponse, void *ctx)
             url1.addQueryItem(key, ret[key].toString());
         }
 
-        rv = doPost(url, url1.encodedQuery(), ctx, this,
-                    SLOT(onTFAAutoPost(bool, const QByteArray &, void *)));
+        rv = doPostForm(url, url1.encodedQuery(), ctx, this,
+                        SLOT(onTFAAutoPost(bool, const QByteArray &, void *)));
         Q_ASSERT(rv);
     } while (0); // End cleanup block (not a loop)
 
@@ -713,6 +760,7 @@ GVApi::onGotRnr(bool success, const QByteArray &response, void *ctx)
 
         token->status = ATTS_SUCCESS;
         token->emitCompleted ();
+        token = NULL;
 
         success = true;
     } while (0); // End cleanup block (not a loop)
@@ -720,14 +768,21 @@ GVApi::onGotRnr(bool success, const QByteArray &response, void *ctx)
     if (!success) {
         Q_WARN("Login failed.") << strResponse;
 
-        token->status = ATTS_LOGIN_FAILURE;
-        token->emitCompleted ();
+        if (token) {
+            token->status = ATTS_LOGIN_FAILURE;
+            token->emitCompleted ();
+        }
     }
 }//GVApi::onGotRnr
 
 bool
 GVApi::logout(AsyncTaskToken *token)
 {
+    Q_ASSERT(token);
+    if (!token) {
+        return false;
+    }
+
     bool rv = doGet(GV_HTTPS "/account/signout", token, this,
                     SLOT (onLogout(bool, const QByteArray&, void*)));
     Q_ASSERT(rv);
@@ -746,8 +801,13 @@ GVApi::onLogout(bool /*success*/, const QByteArray & /*response*/, void *ctx)
 bool
 GVApi::getPhones(AsyncTaskToken *token)
 {
+    Q_ASSERT(token);
+    if (!token) {
+        return false;
+    }
+
     bool rv = doGet (GV_HTTPS "/b/0/settings/tab/phones", token, this,
-                     SLOT (onLogout(bool, const QByteArray&, void*)));
+                     SLOT (onGetPhones(bool, const QByteArray&, void*)));
     Q_ASSERT(rv);
 
     return rv;
@@ -926,20 +986,26 @@ GVApi::onGetPhones(bool success, const QByteArray &response, void *ctx)
 
         token->status = ATTS_SUCCESS;
         token->emitCompleted ();;
+        token = NULL;
 
         success = true;
     } while (0); // End cleanup block (not a loop)
 
     if (!success) {
-        token->status = ATTS_FAILURE;
-        token->emitCompleted ();;
+        if (token) {
+            token->status = ATTS_FAILURE;
+            token->emitCompleted ();
+        }
     }
 }//GVApi::onGetPhones
 
 bool
 GVApi::getInbox(AsyncTaskToken *token)
 {
-    if (!token) return false;
+    Q_ASSERT(token);
+    if (!token) {
+        return false;
+    }
 
     // Ensure that the params  are valid
     if (!token->inParams.contains ("type") ||
@@ -1011,11 +1077,16 @@ GVApi::onGetInbox(bool success, const QByteArray &response, void *ctx)
 
         token->status = ATTS_SUCCESS;
         token->emitCompleted ();
+        token = NULL;
+
+        success = true;
     } while (0); // End cleanup block (not a loop)
 
     if (!success) {
-        token->status = ATTS_FAILURE;
-        token->emitCompleted ();
+        if (token) {
+            token->status = ATTS_FAILURE;
+            token->emitCompleted ();
+        }
     }
 }//GVApi::onGetInbox
 
@@ -1319,7 +1390,10 @@ GVApi::parseMessageRow(QString &strRow, GVInboxEntry &entry)
 bool
 GVApi::callOut(AsyncTaskToken *token)
 {
-    if (!token) return false;
+    Q_ASSERT(token);
+    if (!token) {
+        return false;
+    }
 
     // Ensure that the params  are valid
     if (!token->inParams.contains ("destination"))
@@ -1336,24 +1410,86 @@ GVApi::callOut(AsyncTaskToken *token)
     url.addQueryItem("v" , "7");
 
     QByteArray content;
-    QList<QNetworkCookie> allCookies = jar.getAllCookies ();
+    QList<QNetworkCookie> allCookies = jar->getAllCookies ();
     foreach (QNetworkCookie cookie, allCookies) {
         if (cookie.name () == "gvx") {
             content = "{\"gvx\":\"" + cookie.value() + "\"}";
         }
     }
 
-    bool rv = doPost (url, content, token, this,
-                      SLOT(onDialout(bool,QByteArray,void*)));
+    if (content.isEmpty ()) {
+        token->status = ATTS_FAILURE;
+        token->emitCompleted ();
+        return true;
+    }
+
+    bool rv = doPostText (url, content, token, this,
+                          SLOT(onCallout(bool,QByteArray,void*)));
     Q_ASSERT(rv);
 
     return rv;
 }//GVApi::callOut
 
+void
+GVApi::onCallout(bool success, const QByteArray &response, void *ctx)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    QString strReply = response;
+
+    do { // Begin cleanup block (not a loop)
+        if (!success) {
+            Q_WARN("Failed to call out");
+            break;
+        }
+        success = false;
+
+        QString strMoved = hasMoved (strReply);
+        if (!strMoved.isEmpty ()) {
+            success = doGet (strMoved, token, this,
+                             SLOT(onCallout(bool,QByteArray,void*)));
+            break;
+        }
+
+        QString strTemp = strReply.mid (strReply.indexOf (",\n"));
+        if (strTemp.startsWith (',')) {
+            strTemp = strTemp.mid (strTemp.indexOf ('{'));
+        }
+
+        QScriptEngine scriptEngine(this);
+        strTemp = QString("var topObj = %1; "
+                          "topObj.call_through_response.access_number;")
+                          .arg(strTemp);
+        strTemp = scriptEngine.evaluate (strTemp).toString ();
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN("Failed to parse call out response: ") << strReply;
+            Q_WARN("Error is: ") << strTemp;
+            break;
+        }
+
+        token->outParams["access_number"] = strTemp;
+
+        token->status = ATTS_SUCCESS;
+        token->emitCompleted ();
+        token = NULL;
+
+        success = true;
+    } while (0); // End cleanup block (not a loop)
+
+    if (!success) {
+        if (token) {
+            token->status = ATTS_FAILURE;
+            token->emitCompleted ();
+        }
+    }
+}//GVApi::onCallout
+
 bool
 GVApi::callBack(AsyncTaskToken *token)
 {
-    if (!token) return false;
+    Q_ASSERT(token);
+    if (!token) {
+        return false;
+    }
 
     // Ensure that the params  are valid
     if (!token->inParams.contains ("destination"))
@@ -1382,8 +1518,8 @@ GVApi::callBack(AsyncTaskToken *token)
     url.addQueryItem("remember"         , "1");
     url.addQueryItem("_rnr_se"          , rnr_se);
 
-    bool rv = doPost(url, url.encodedQuery(), token, this,
-                     SLOT(onCallback(bool,QByteArray,void*)));
+    bool rv = doPostForm(url, url.encodedQuery(), token, this,
+                         SLOT(onCallback(bool,QByteArray,void*)));
     Q_ASSERT(rv);
 
     return true;
@@ -1395,16 +1531,13 @@ GVApi::onCallback(bool success, const QByteArray &response, void *ctx)
     Q_WARN("NEED TO FIX!");
 }//GVApi::onCallback
 
-void
-GVApi::onDialout(bool success, const QByteArray &response, void *ctx)
-{
-    Q_WARN("NEED TO FIX!");
-}//GVApi::onDialout
-
 bool
 GVApi::sendSms(AsyncTaskToken *token)
 {
-    if (!token) return false;
+    Q_ASSERT(token);
+    if (!token) {
+        return false;
+    }
 
     // Ensure that the params  are valid
     if (!token->inParams.contains ("destination") ||
@@ -1428,8 +1561,8 @@ GVApi::sendSms(AsyncTaskToken *token)
     url.addQueryItem("remember"         , "1");
     url.addQueryItem("_rnr_se"          , rnr_se);
 
-    bool rv = doPost(url, url.encodedQuery(), token, this,
-                     SLOT(onCallback(bool,QByteArray,void*)));
+    bool rv = doPostForm(url, url.encodedQuery(), token, this,
+                         SLOT(onCallback(bool,QByteArray,void*)));
     Q_ASSERT(rv);
 
     return true;
@@ -1438,7 +1571,10 @@ GVApi::sendSms(AsyncTaskToken *token)
 bool
 GVApi::getVoicemail(AsyncTaskToken *token)
 {
-    if (!token) return false;
+    Q_ASSERT(token);
+    if (!token) {
+        return false;
+    }
 
     // Ensure that the params  are valid
     if (!token->inParams.contains ("destination") ||
@@ -1455,7 +1591,10 @@ GVApi::getVoicemail(AsyncTaskToken *token)
 bool
 GVApi::markInboxEntryAsRead(AsyncTaskToken *token)
 {
-    if (!token) return false;
+    Q_ASSERT(token);
+    if (!token) {
+        return false;
+    }
 
     // Ensure that the params  are valid
     if (!token->inParams.contains ("id"))

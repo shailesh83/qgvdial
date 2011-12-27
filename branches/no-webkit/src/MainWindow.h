@@ -106,9 +106,6 @@ private slots:
     void onSigDialComplete (DialContext *ctx, bool ok);
     //! Invoked when dialing has started
     void dialInProgress (const QString &strNumber);
-    //! Invoked to perform a dial
-    void dialAccessNumber (const QString  &strAccessNumber,
-                           const QVariant &context        );
     //! Invoked when a number dial is completed.
     void dialComplete (AsyncTaskToken *token);
 
@@ -194,7 +191,7 @@ private slots:
     void onRecreateCookieJar();
 
     //! When two step authentication happens
-    void onTwoStepAuthentication(QString &result);
+    void onTwoStepAuthentication(AsyncTaskToken *token);
 
     //! Invoked when the desktop is resized (useful only on mobile platforms)
     void onDesktopResized();
@@ -229,6 +226,8 @@ private:
     void setUsername(const QString &strUsername);
     void setPassword(const QString &strPassword);
 
+    //! Invoked to perform a dial
+    void dialAccessNumber (AsyncTaskToken *token);
     void fallbackDialout (DialContext *ctx);
 
     void clearSmsDestinations();
