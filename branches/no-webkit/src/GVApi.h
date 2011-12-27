@@ -56,6 +56,7 @@ public:
     bool callBack(AsyncTaskToken *token);
     bool sendSms(AsyncTaskToken *token);
     bool getVoicemail(AsyncTaskToken *token);
+    bool markInboxEntryAsRead(AsyncTaskToken *token);
 ////////////////////////////////////////////////////////////////////////////////
 
 signals:

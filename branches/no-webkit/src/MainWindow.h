@@ -25,7 +25,6 @@ Contact: yuvraaj@gmail.com
 #include "global.h"
 #include "GVContactsTable.h"
 #include "GVInbox.h"
-#include "WebWidget.h"
 #include "RegNumberModel.h"
 #include "DialContext.h"
 #include "GVApi.h"
@@ -241,6 +240,8 @@ private:
     QObject * getMainPage();
 
 private:
+    GVApi           gvApi;
+
     // Tray, icons, widgets
     QIcon           icoQgv;
     QSystemTrayIcon *pSystray;
@@ -311,8 +312,6 @@ private:
     MqClientThread  mqThread;
     bool            bRunMqThread;
 #endif
-
-    GVApi           gvApi;
 };
 
 #endif // MAINWINDOW_H

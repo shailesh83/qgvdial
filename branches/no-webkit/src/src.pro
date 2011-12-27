@@ -54,7 +54,6 @@ SOURCES  += ../src/main.cpp                 \
             ../src/SMSEntryDeleteButton.cpp \
             ../src/ChildWindowBase.cpp      \
             ../src/GVInbox.cpp              \
-            ../src/WebWidget.cpp            \
             ../src/RegNumberModel.cpp       \
             ../src/ContactsModel.cpp        \
             ../src/ContactDetailsModel.cpp  \
@@ -92,7 +91,6 @@ HEADERS  += ../src/global.h                 \
             ../src/SMSEntryDeleteButton.h   \
             ../src/ChildWindowBase.h        \
             ../src/GVInbox.h                \
-            ../src/WebWidget.h              \
             ../src/RegNumberModel.h         \
             ../src/ContactsModel.h          \
             ../src/ContactDetailsModel.h    \
@@ -113,7 +111,6 @@ OTHER_FILES  += ../src/winrsrc.rc           \
                 ../qml/ComboBoxPhones.qml   \
                 ../qml/ContactDetails.qml   \
                 ../qml/ContactsList.qml     \
-                ../qml/DbgWebWidget.qml     \
                 ../qml/DialDisp.qml         \
                 ../qml/DigitButton.qml      \
                 ../qml/ExpandView.qml       \

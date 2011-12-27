@@ -30,10 +30,11 @@ using namespace std;
 
 MainWindow::MainWindow (QWidget *parent)
 : QDeclarativeView (parent)
+, gvApi (true, this)
 , icoQgv (":/qgv.png")
 , pSystray (NULL)
 , oContacts (this)
-, oInbox (this)
+, oInbox (gvApi, this)
 , vmailPlayer (NULL)
 , statusTimer (this)
 #ifdef Q_WS_MAEMO_5
@@ -57,7 +58,6 @@ MainWindow::MainWindow (QWidget *parent)
 , mqThread (QString("qgvdial:%1").arg(QHostInfo::localHostName())
             .toLatin1().constData (), this)
 #endif
-, gvApi (true, this)
 {
     initLogging ();
 
@@ -502,8 +502,6 @@ MainWindow::init ()
 void
 MainWindow::initQML ()
 {
-    qmlRegisterType<WebWidget>("org.qgvdial.WebWidget", 1, 0, "MyWebWidget");
-
     OsDependent &osd = Singletons::getRef().getOSD ();
     bool bTempFalse = false;
     int iTempZero = 0;

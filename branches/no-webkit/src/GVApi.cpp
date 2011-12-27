@@ -1335,11 +1335,11 @@ GVApi::callOut(AsyncTaskToken *token)
     url.addQueryItem("f" , "");
     url.addQueryItem("v" , "7");
 
-    QString content;
+    QByteArray content;
     QList<QNetworkCookie> allCookies = jar.getAllCookies ();
     foreach (QNetworkCookie cookie, allCookies) {
         if (cookie.name () == "gvx") {
-            content = QString("{\"gvx\":\"%1\"}").arg(cookie.value());
+            content = "{\"gvx\":\"" + cookie.value() + "\"}";
         }
     }
 
@@ -1451,3 +1451,19 @@ GVApi::getVoicemail(AsyncTaskToken *token)
 
     return false;
 }//GVApi::getVoicemail
+
+bool
+GVApi::markInboxEntryAsRead(AsyncTaskToken *token)
+{
+    if (!token) return false;
+
+    // Ensure that the params  are valid
+    if (!token->inParams.contains ("id"))
+    {
+        token->status = ATTS_INVALID_PARAMS;
+        token->emitCompleted ();
+        return true;
+    }
+
+    return false;
+}//GVApi::markInboxEntryAsRead
