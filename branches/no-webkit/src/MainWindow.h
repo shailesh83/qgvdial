@@ -82,12 +82,12 @@ private slots:
     //! Invoked when the user clicks the login button on QML.
     void doLogin ();
     //! Called when the web component completes login - with success or failure
-    void loginCompleted (bool bOk, const QVariantList &arrParams);
+    void loginCompleted (AsyncTaskToken *token);
 
     //! Called when the logout button is clicked
     void doLogout ();
     //! Called when the web component completes logoff - with success or failure
-    void logoutCompleted (bool bOk, const QVariantList &arrParams);
+    void logoutCompleted (AsyncTaskToken *token);
     //! Invoked when the system ray is clicked
     void systray_activated (QSystemTrayIcon::ActivationReason reason);
 
@@ -111,7 +111,7 @@ private slots:
     void dialAccessNumber (const QString  &strAccessNumber,
                            const QVariant &context        );
     //! Invoked when a number dial is completed.
-    void dialComplete (bool bOk, const QVariantList &params);
+    void dialComplete (AsyncTaskToken *token);
 
     //! Invoked when the user finally clicks on the send SMS button
     void sendSMS (const QStringList &arrNumbers, const QString &strText);
@@ -121,12 +121,12 @@ private slots:
     //! Invoked every time a new registered phone is retrieved
     void gotRegisteredPhone (const GVRegisteredNumber &info);
     //! Invoked every time a new registered phone is retrieved
-    void gotAllRegisteredPhones (bool bOk, const QVariantList &arrParams);
+    void gotAllRegisteredPhones (AsyncTaskToken *token);
 
     //! Invoked by the inbox page when a voice mail is to be downloaded
     void retrieveVoicemail (const QString &strVmailLink);
     //! Invoked by GVAccess when the voice mail download has completed
-    void onVmailDownloaded (bool bOk, const QVariantList &arrParams);
+    void onVmailDownloaded (AsyncTaskToken *token);
     //! Invoked when the vmail player changes state
     void onVmailPlayerStateChanged(Phonon::State newState,
                                    Phonon::State oldState);
@@ -271,8 +271,6 @@ private:
     QString         strUser;
     //! Password
     QString         strPass;
-    //! Our own GV phone number
-    QString         strSelfNumber;
 
     //! Model for registered phone numbers
     RegNumberModel  modelRegNumber;

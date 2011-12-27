@@ -39,6 +39,7 @@ Singletons::getRef ()
     return (singleton);
 }//Singletons::getRef
 
+/*
 GVAccess &
 Singletons::getGVAccess ()
 {
@@ -52,6 +53,7 @@ Singletons::getGVAccess ()
 
     return (*pGVAccess);
 }//Singletons::getGVAccess
+*/
 
 OsDependent &
 Singletons::getOSD ()

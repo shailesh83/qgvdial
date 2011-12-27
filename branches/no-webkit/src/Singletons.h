@@ -40,7 +40,7 @@ class Singletons : public QObject
 public:
     static Singletons & getRef ();
 
-    GVAccess            & getGVAccess ();
+//    GVAccess            & getGVAccess ();
     OsDependent         & getOSD ();
     CacheDatabase       & getDBMain ();
     ObserverFactory     & getObserverFactory ();

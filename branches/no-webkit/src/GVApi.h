@@ -41,6 +41,11 @@ public:
     QList<QNetworkCookie> getAllCookies();
     void setAllCookies(QList<QNetworkCookie> cookies);
 
+    QString getSelfNumber();
+    QString getLastErrorString();
+
+    void cancel(AsyncTaskToken *token);
+
 ////////////////////////////////////////////////////////////////////////////////
 // GV API:
     bool login(AsyncTaskToken *token);
@@ -49,6 +54,8 @@ public:
     bool getInbox(AsyncTaskToken *token);
     bool callOut(AsyncTaskToken *token);
     bool callBack(AsyncTaskToken *token);
+    bool sendSms(AsyncTaskToken *token);
+    bool getVoicemail(AsyncTaskToken *token);
 ////////////////////////////////////////////////////////////////////////////////
 
 signals:
@@ -85,9 +92,11 @@ private:
     QString hasMoved(const QString &strResponse);
     bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
 
+    bool doGet(QUrl url, void *ctx, QObject *receiver, const char *method);
     bool doGet(const QString &strUrl, void *ctx, QObject *receiver,
                const char *method);
-    bool doGet(QUrl url, void *ctx, QObject *receiver, const char *method);
+    bool doPost(QUrl url, QByteArray postData, void *ctx,
+                QObject *receiver, const char *method);
 
     // Login and two factor
     bool postLogin(QString strUrl, void *ctx);
@@ -106,7 +115,11 @@ private:
     bool emitLog;
 
     bool loggedIn;
-    QString rnr_se, strSelfNumber;
+    QString rnr_se;
+    //! The users Google Voice number
+    QString strSelfNumber;
+    //! A message box displayable error string
+    QString strLastErrorMessage;
 
     QNetworkAccessManager nwMgr;
     CookieJar jar;

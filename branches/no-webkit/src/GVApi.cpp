@@ -127,12 +127,15 @@ GVApi::getSystemProxies (QNetworkProxy &http, QNetworkProxy &https)
 bool
 GVApi::doGet(QUrl url, void *ctx, QObject *receiver, const char *method)
 {
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+
     QNetworkRequest req(url);
     req.setRawHeader("User-Agent", UA_IPHONE4);
 
     NwReqTracker *tracker = new NwReqTracker(nwMgr.get(req), ctx,
                                              NW_REPLY_TIMEOUT, emitLog, true,
                                              this);
+    token->apiCtx = tracker;
 
     bool rv =
     connect(tracker, SIGNAL (sigDone(bool, const QByteArray&, void*)),
@@ -148,6 +151,26 @@ GVApi::doGet(const QString &strUrl, void *ctx, QObject *receiver,
 {
     return doGet(QUrl(strUrl), ctx, receiver, method);
 }//GVApi::doGet
+
+bool
+GVApi::doPost(QUrl url, QByteArray postData, void *ctx,
+              QObject *receiver, const char *method)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    QNetworkRequest req(url);
+    req.setRawHeader("User-Agent", UA_IPHONE4);
+    req.setHeader (QNetworkRequest::ContentTypeHeader,
+                   "application/x-www-form-urlencoded");
+    QNetworkReply *reply = nwMgr.post(req, postData);
+    NwReqTracker *tracker = new NwReqTracker(reply, ctx, NW_REPLY_TIMEOUT,
+                                             emitLog, this);
+    token->apiCtx = ctx;
+    bool rv = connect(tracker, SIGNAL(sigDone(bool,const QByteArray &,void *)),
+                      receiver, method);
+    Q_ASSERT(rv);
+
+    return (rv);
+}//GVApi::doPost
 
 bool
 GVApi::setProxySettings (bool bEnable,
@@ -206,6 +229,18 @@ GVApi::setAllCookies(QList<QNetworkCookie> cookies)
 }//GVApi::setAllCookies
 
 QString
+GVApi::getSelfNumber()
+{
+    return strSelfNumber;
+}//GVApi::getSelfNumber
+
+QString
+GVApi::getLastErrorString()
+{
+    return strLastErrorMessage;
+}//GVApi::getLastErrorString
+
+QString
 GVApi::hasMoved(const QString &strResponse)
 {
     QString rv;
@@ -229,6 +264,18 @@ GVApi::hasMoved(const QString &strResponse)
 
     return rv;
 }//GVApi::hasMoved
+
+void
+GVApi::cancel(AsyncTaskToken *token)
+{
+    NwReqTracker *tracker = (NwReqTracker *)token->apiCtx;
+    if (tracker) {
+        Q_WARN("API context not valid. Cannot cancel");
+        return;
+    }
+
+    tracker->abort ();
+}//GVApi::cancel
 
 bool
 GVApi::login(AsyncTaskToken *token)
@@ -258,8 +305,8 @@ GVApi::login(AsyncTaskToken *token)
     url.addQueryItem("passive"  , "true");
     url.addQueryItem("continue" , "https://www.google.com/voice/m");
 
-    bool rv =
-    doGet (url, token, this, SLOT(onLogin1(bool, const QByteArray&, void*)));
+    bool rv = doGet (url, token, this,
+                     SLOT(onLogin1(bool, const QByteArray&, void*)));
     Q_ASSERT(rv);
 
     return rv;
@@ -402,15 +449,8 @@ GVApi::postLogin(QString strUrl, void *ctx)
         }
     }
 
-    QNetworkRequest req(url);
-    req.setRawHeader("User-Agent", UA_IPHONE4);
-    req.setHeader (QNetworkRequest::ContentTypeHeader,
-                   "application/x-www-form-urlencoded");
-    QNetworkReply *reply = nwMgr.post(req, url.encodedQuery ());
-    NwReqTracker *tracker = new NwReqTracker(reply, ctx, NW_REPLY_TIMEOUT,
-                                             emitLog, this);
-    found = connect(tracker, SIGNAL(sigDone(bool,const QByteArray &,void *)),
-                    this   , SLOT (onLogin2(bool,const QByteArray &,void *)));
+    found = doPost(url, url.encodedQuery(), ctx,
+                   this, SLOT (onLogin2(bool,const QByteArray &,void *)));
     Q_ASSERT(found);
 
     return found;
@@ -575,16 +615,8 @@ GVApi::doTwoFactorAuth(const QString &strResponse, void *ctx)
             url1.addQueryItem(key, ret[key].toString());
         }
 
-        QNetworkRequest req(url);
-        req.setRawHeader("User-Agent", UA_IPHONE4);
-        req.setHeader (QNetworkRequest::ContentTypeHeader,
-                       "application/x-www-form-urlencoded");
-        QNetworkReply *reply = nwMgr.post(req, url1.encodedQuery ());
-        NwReqTracker *tracker = new NwReqTracker(reply, this);
-
-        rv =
-        connect(tracker, SIGNAL    (sigDone(bool, const QByteArray &, void *)),
-                this   , SLOT(onTFAAutoPost(bool, const QByteArray &, void *)));
+        rv = doPost(url, url1.encodedQuery(), ctx, this,
+                    SLOT(onTFAAutoPost(bool, const QByteArray &, void *)));
         Q_ASSERT(rv);
     } while (0); // End cleanup block (not a loop)
 
@@ -1290,15 +1322,32 @@ GVApi::callOut(AsyncTaskToken *token)
     if (!token) return false;
 
     // Ensure that the params  are valid
-    if (!token->inParams.contains ("type") ||
-        !token->inParams.contains ("page"))
+    if (!token->inParams.contains ("destination"))
     {
         token->status = ATTS_INVALID_PARAMS;
         token->emitCompleted ();
         return true;
     }
 
-    return true;
+    QUrl url(GV_HTTPS_M "/x");
+    url.addQueryItem("m" , "call");
+    url.addQueryItem("n" , token->inParams["destination"].toString());
+    url.addQueryItem("f" , "");
+    url.addQueryItem("v" , "7");
+
+    QString content;
+    QList<QNetworkCookie> allCookies = jar.getAllCookies ();
+    foreach (QNetworkCookie cookie, allCookies) {
+        if (cookie.name () == "gvx") {
+            content = QString("{\"gvx\":\"%1\"}").arg(cookie.value());
+        }
+    }
+
+    bool rv = doPost (url, content, token, this,
+                      SLOT(onDialout(bool,QByteArray,void*)));
+    Q_ASSERT(rv);
+
+    return rv;
 }//GVApi::callOut
 
 bool
@@ -1307,8 +1356,7 @@ GVApi::callBack(AsyncTaskToken *token)
     if (!token) return false;
 
     // Ensure that the params  are valid
-    if (!token->inParams.contains ("type") ||
-        !token->inParams.contains ("page"))
+    if (!token->inParams.contains ("destination"))
     {
         token->status = ATTS_INVALID_PARAMS;
         token->emitCompleted ();
@@ -1326,26 +1374,16 @@ GVApi::callBack(AsyncTaskToken *token)
     url.addQueryItem("outgoingNumber"   ,
                      token->inParams["destination"].toString());
     url.addQueryItem("forwardingNumber" ,
-                     token->inParams["callBack"].toString());
+                     token->inParams["source"].toString());
     url.addQueryItem("phoneType"        ,
-                     token->inParams["callBackType"].toString());
+                     token->inParams["sourceType"].toString());
 
     url.addQueryItem("subscriberNumber" , strSelfNumber);
     url.addQueryItem("remember"         , "1");
     url.addQueryItem("_rnr_se"          , rnr_se);
 
-    QNetworkRequest req(url);
-    req.setRawHeader ("User-Agent", UA_IPHONE4);
-    req.setHeader (QNetworkRequest::ContentTypeHeader,
-                   "application/x-www-form-urlencoded");
-
-    QNetworkReply *reply = nwMgr.post(req, url.encodedQuery ());
-    NwReqTracker *tracker = new NwReqTracker(reply, token, NW_REPLY_TIMEOUT,
-                                             emitLog, true, this);
-
-    bool rv =
-    connect(tracker, SIGNAL (sigDone(bool, const QByteArray&, void*)),
-            this   , SLOT(onCallback(bool,QByteArray,void*)));
+    bool rv = doPost(url, url.encodedQuery(), token, this,
+                     SLOT(onCallback(bool,QByteArray,void*)));
     Q_ASSERT(rv);
 
     return true;
@@ -1354,11 +1392,62 @@ GVApi::callBack(AsyncTaskToken *token)
 void
 GVApi::onCallback(bool success, const QByteArray &response, void *ctx)
 {
-
-}//GVApi::
+    Q_WARN("NEED TO FIX!");
+}//GVApi::onCallback
 
 void
 GVApi::onDialout(bool success, const QByteArray &response, void *ctx)
 {
+    Q_WARN("NEED TO FIX!");
+}//GVApi::onDialout
 
-}//GVApi::
+bool
+GVApi::sendSms(AsyncTaskToken *token)
+{
+    if (!token) return false;
+
+    // Ensure that the params  are valid
+    if (!token->inParams.contains ("destination") ||
+        !token->inParams.contains ("text"))
+    {
+        token->status = ATTS_INVALID_PARAMS;
+        token->emitCompleted ();
+        return true;
+    }
+
+    QUrl url(GV_HTTPS "/call/connect/");
+
+    url.addQueryItem("outgoingNumber"   ,
+                     token->inParams["destination"].toString());
+    url.addQueryItem("forwardingNumber" ,
+                     token->inParams["callBack"].toString());
+    url.addQueryItem("phoneType"        ,
+                     token->inParams["callBackType"].toString());
+
+    url.addQueryItem("subscriberNumber" , strSelfNumber);
+    url.addQueryItem("remember"         , "1");
+    url.addQueryItem("_rnr_se"          , rnr_se);
+
+    bool rv = doPost(url, url.encodedQuery(), token, this,
+                     SLOT(onCallback(bool,QByteArray,void*)));
+    Q_ASSERT(rv);
+
+    return true;
+}//GVApi::sendSms
+
+bool
+GVApi::getVoicemail(AsyncTaskToken *token)
+{
+    if (!token) return false;
+
+    // Ensure that the params  are valid
+    if (!token->inParams.contains ("destination") ||
+        !token->inParams.contains ("text"))
+    {
+        token->status = ATTS_INVALID_PARAMS;
+        token->emitCompleted ();
+        return true;
+    }
+
+    return false;
+}//GVApi::getVoicemail
