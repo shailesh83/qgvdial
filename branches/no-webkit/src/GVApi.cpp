@@ -1517,23 +1517,12 @@ GVApi::callBack(AsyncTaskToken *token)
     }
 
     QString strContent, strTemp;
-    QUrl url(GV_HTTPS "/call/connect/");
+    QUrl url(GV_HTTPS "/call/connect");
 
-    strTemp = token->inParams["destination"].toString();
-    url.addQueryItem("outgoingNumber", strTemp);
-    strContent += QString("outgoingNumber=%1").arg (strTemp);
-
-    strTemp = token->inParams["source"].toString();
-    url.addQueryItem("forwardingNumber", strTemp);
-    strContent += QString("&forwardingNumber=%1").arg (strTemp);
-
-    strTemp = token->inParams["sourceType"].toString();
-    url.addQueryItem("phoneType", strTemp);
-    strContent += QString("&phoneType=%1").arg (strTemp);
-
-    url.addQueryItem("subscriberNumber" , strSelfNumber);
-    url.addQueryItem("remember"         , "1");
-    url.addQueryItem("_rnr_se"          , rnr_se);
+    strContent = QString("outgoingNumber=%1&forwardingNumber=%2&phoneType=%3")
+                    .arg (token->inParams["destination"].toString())
+                    .arg (token->inParams["source"].toString())
+                    .arg (token->inParams["sourceType"].toString());
 
     strContent += QString("&subscriberNumber=%1&remember=1&_rnr_se=%2")
                     .arg (strSelfNumber, rnr_se);
@@ -1565,7 +1554,7 @@ GVApi::onCallback(bool success, const QByteArray &response, void *ctx)
             break;
         }
 
-#if 1
+#if 0
         Q_DEBUG(strReply);
 #endif
 
@@ -1574,11 +1563,8 @@ GVApi::onCallback(bool success, const QByteArray &response, void *ctx)
             strTemp = strTemp.mid (strTemp.indexOf ('{'));
         }
 
-
         QScriptEngine scriptEngine(this);
-        strTemp = QString("var topObj = %1; "
-                          "topObj.call_through_response.access_number;")
-                          .arg(strTemp);
+        strTemp = QString("var topObj = %1; topObj.ok;").arg(strTemp);
         strTemp = scriptEngine.evaluate (strTemp).toString ();
         if (scriptEngine.hasUncaughtException ()) {
             Q_WARN("Failed to parse call out response: ") << strReply;
@@ -1586,7 +1572,10 @@ GVApi::onCallback(bool success, const QByteArray &response, void *ctx)
             break;
         }
 
-        token->outParams["access_number"] = strTemp;
+        if (strTemp != "true") {
+            Q_WARN("Failed to call back! response ok= ") << strTemp;
+            break;
+        }
 
         token->status = ATTS_SUCCESS;
         token->emitCompleted ();
@@ -1734,7 +1723,7 @@ GVApi::onMarkAsRead(bool success, const QByteArray &response, void *ctx)
         }
 
         if (strTemp != "true") {
-            Q_WARN("Failed to mark read!");
+            Q_WARN("Failed to mark read! response ok= ") << strTemp;
             break;
         }
 
