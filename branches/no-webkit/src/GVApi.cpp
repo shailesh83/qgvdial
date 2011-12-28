@@ -733,7 +733,7 @@ GVApi::onGotRnr(bool success, const QByteArray &response, void *ctx)
         QString strMoved = hasMoved (strResponse);
         if (!strMoved.isEmpty ()) {
             success = doGet(strMoved, ctx, this,
-                            SLOT(onGotRnr(bool,const QByteArray &)));
+                            SLOT(onGotRnr(bool,const QByteArray &, void *)));
             Q_ASSERT(success);
             break;
         }
