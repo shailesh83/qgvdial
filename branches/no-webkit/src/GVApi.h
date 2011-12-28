@@ -89,6 +89,9 @@ private slots:
     void onCallback(bool success, const QByteArray &response, void *ctx);
     void onCallout(bool success, const QByteArray &response, void *ctx);
 
+    // Mark inbox entry as "read"
+    void onMarkAsRead(bool success, const QByteArray &response, void *ctx);
+
 private:
     QString hasMoved(const QString &strResponse);
     bool getSystemProxies (QNetworkProxy &http, QNetworkProxy &https);
@@ -97,8 +100,11 @@ private:
     bool doGet(const QString &strUrl, void *ctx, QObject *receiver,
                const char *method);
 
-    bool doPost(QUrl url, QByteArray postData, QString contentType, void *ctx,
-                QObject *receiver, const char *method);
+    bool doPost(QUrl url, QByteArray postData, const char *contentType,
+                const char *ua, void *ctx, QObject *receiver,
+                const char *method);
+    bool doPost(QUrl url, QByteArray postData, const char *contentType,
+                void *ctx, QObject *receiver, const char *method);
     bool doPostForm(QUrl url, QByteArray postData, void *ctx,
                     QObject *receiver, const char *method);
     bool doPostText(QUrl url, QByteArray postData, void *ctx,

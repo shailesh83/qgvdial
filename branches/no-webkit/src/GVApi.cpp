@@ -25,6 +25,9 @@ Contact: yuvraaj@gmail.com
 
 #include <QtXmlPatterns>
 
+#define CONTENT_IS_FORM "application/x-www-form-urlencoded"
+#define CONTENT_IS_TEXT "text/plain"
+
 GVApi::GVApi(bool bEmitLog, QObject *parent)
 : QObject(parent)
 , emitLog(bEmitLog)
@@ -154,18 +157,16 @@ GVApi::doGet(const QString &strUrl, void *ctx, QObject *receiver,
 }//GVApi::doGet
 
 bool
-GVApi::doPost(QUrl url, QByteArray postData, QString contentType, void *ctx,
-              QObject *receiver, const char *method)
+GVApi::doPost(QUrl url, QByteArray postData, const char *contentType,
+              const char *ua, void *ctx, QObject *receiver, const char *method)
 {
     AsyncTaskToken *token = (AsyncTaskToken *)ctx;
     QNetworkRequest req(url);
-    req.setRawHeader("User-Agent", UA_IPHONE4);
+    req.setRawHeader("User-Agent", ua);
     req.setHeader (QNetworkRequest::ContentTypeHeader, contentType);
 
     req.setHeader (QNetworkRequest::CookieHeader,
                    QVariant::fromValue(jar->getAllCookies ()));
-
-    Q_DEBUG(req.header (QNetworkRequest::CookieHeader).toString ());
 
     QNetworkReply *reply = nwMgr.post(req, postData);
     NwReqTracker *tracker = new NwReqTracker(reply, ctx, NW_REPLY_TIMEOUT,
@@ -179,18 +180,24 @@ GVApi::doPost(QUrl url, QByteArray postData, QString contentType, void *ctx,
 }//GVApi::doPost
 
 bool
+GVApi::doPost(QUrl url, QByteArray postData, const char *contentType, void *ctx,
+              QObject *receiver, const char *method)
+{
+    return doPost(url, postData, contentType, UA_IPHONE4, ctx, receiver, method);
+}//GVApi::doPost
+
+bool
 GVApi::doPostForm(QUrl url, QByteArray postData, void *ctx,
                   QObject *receiver, const char *method)
 {
-    return doPost (url, postData, "application/x-www-form-urlencoded", ctx,
-                   receiver, method);
+    return doPost (url, postData, CONTENT_IS_FORM, ctx, receiver, method);
 }//GVApi::doPostForm
 
 bool
 GVApi::doPostText(QUrl url, QByteArray postData, void *ctx,
                   QObject *receiver, const char *method)
 {
-    return doPost (url, postData, "text/plain", ctx, receiver, method);
+    return doPost (url, postData, CONTENT_IS_TEXT, ctx, receiver, method);
 }//GVApi::doPostForm
 
 bool
@@ -1455,6 +1462,10 @@ GVApi::onCallout(bool success, const QByteArray &response, void *ctx)
             strTemp = strTemp.mid (strTemp.indexOf ('{'));
         }
 
+#if 0
+        Q_DEBUG(strTemp);
+#endif
+
         QScriptEngine scriptEngine(this);
         strTemp = QString("var topObj = %1; "
                           "topObj.call_through_response.access_number;")
@@ -1505,20 +1516,29 @@ GVApi::callBack(AsyncTaskToken *token)
         return true;
     }
 
+    QString strContent, strTemp;
     QUrl url(GV_HTTPS "/call/connect/");
 
-    url.addQueryItem("outgoingNumber"   ,
-                     token->inParams["destination"].toString());
-    url.addQueryItem("forwardingNumber" ,
-                     token->inParams["source"].toString());
-    url.addQueryItem("phoneType"        ,
-                     token->inParams["sourceType"].toString());
+    strTemp = token->inParams["destination"].toString();
+    url.addQueryItem("outgoingNumber", strTemp);
+    strContent += QString("outgoingNumber=%1").arg (strTemp);
+
+    strTemp = token->inParams["source"].toString();
+    url.addQueryItem("forwardingNumber", strTemp);
+    strContent += QString("&forwardingNumber=%1").arg (strTemp);
+
+    strTemp = token->inParams["sourceType"].toString();
+    url.addQueryItem("phoneType", strTemp);
+    strContent += QString("&phoneType=%1").arg (strTemp);
 
     url.addQueryItem("subscriberNumber" , strSelfNumber);
     url.addQueryItem("remember"         , "1");
     url.addQueryItem("_rnr_se"          , rnr_se);
 
-    bool rv = doPostForm(url, url.encodedQuery(), token, this,
+    strContent += QString("&subscriberNumber=%1&remember=1&_rnr_se=%2")
+                    .arg (strSelfNumber, rnr_se);
+
+    bool rv = doPostForm(url, strContent.toAscii (), token, this,
                          SLOT(onCallback(bool,QByteArray,void*)));
     Q_ASSERT(rv);
 
@@ -1528,7 +1548,59 @@ GVApi::callBack(AsyncTaskToken *token)
 void
 GVApi::onCallback(bool success, const QByteArray &response, void *ctx)
 {
-    Q_WARN("NEED TO FIX!");
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    QString strReply = response;
+
+    do { // Begin cleanup block (not a loop)
+        if (!success) {
+            Q_WARN("Failed to call back");
+            break;
+        }
+        success = false;
+
+        QString strMoved = hasMoved (strReply);
+        if (!strMoved.isEmpty ()) {
+            success = doGet (strMoved, token, this,
+                             SLOT(onCallout(bool,QByteArray,void*)));
+            break;
+        }
+
+#if 1
+        Q_DEBUG(strReply);
+#endif
+
+        QString strTemp = strReply.mid (strReply.indexOf (",\n"));
+        if (strTemp.startsWith (',')) {
+            strTemp = strTemp.mid (strTemp.indexOf ('{'));
+        }
+
+
+        QScriptEngine scriptEngine(this);
+        strTemp = QString("var topObj = %1; "
+                          "topObj.call_through_response.access_number;")
+                          .arg(strTemp);
+        strTemp = scriptEngine.evaluate (strTemp).toString ();
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN("Failed to parse call out response: ") << strReply;
+            Q_WARN("Error is: ") << strTemp;
+            break;
+        }
+
+        token->outParams["access_number"] = strTemp;
+
+        token->status = ATTS_SUCCESS;
+        token->emitCompleted ();
+        token = NULL;
+
+        success = true;
+    } while (0); // End cleanup block (not a loop)
+
+    if (!success) {
+        if (token) {
+            token->status = ATTS_FAILURE;
+            token->emitCompleted ();
+        }
+    }
 }//GVApi::onCallback
 
 bool
@@ -1604,5 +1676,79 @@ GVApi::markInboxEntryAsRead(AsyncTaskToken *token)
         return true;
     }
 
-    return false;
+    // This method call needs to also be added as content data
+    QString strContent = QString("messages=%1&read=1&_rnr_se=%2")
+                            .arg(token->inParams["id"].toString()).arg(rnr_se);
+
+    QUrl url(GV_HTTPS "/b/0/inbox/mark");
+    bool rv =
+    doPost(url, strContent.toAscii(), CONTENT_IS_FORM, UA_DESKTOP, token, this,
+           SLOT(onMarkAsRead(bool, QByteArray, void*)));
+    Q_ASSERT(rv);
+
+    return (rv);
 }//GVApi::markInboxEntryAsRead
+
+void
+GVApi::onMarkAsRead(bool success, const QByteArray &response, void *ctx)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    QString strReply = response;
+
+    do { // Begin cleanup block (not a loop)
+        if (!success) {
+            Q_WARN("Failed to mark entry as read");
+            break;
+        }
+        success = false;
+
+        QString strMoved = hasMoved (strReply);
+        if (!strMoved.isEmpty ()) {
+            QUrl url(strMoved);
+            QString strContent = QString("messages=%1&read=1&_rnr_se=%2")
+                                    .arg(token->inParams["id"].toString())
+                                    .arg(rnr_se);
+            success = doPost(url, strContent.toAscii(), CONTENT_IS_FORM, UA_DESKTOP,
+                             token, this,
+                             SLOT(onMarkAsRead(bool, QByteArray, void*)));
+            Q_ASSERT(success);
+            break;
+        }
+
+#if 0
+        Q_DEBUG(strReply);
+#endif
+
+        QString strTemp = strReply.mid (strReply.indexOf (",\n"));
+        if (strTemp.startsWith (',')) {
+            strTemp = strTemp.mid (strTemp.indexOf ('{'));
+        }
+
+        QScriptEngine scriptEngine(this);
+        strTemp = QString("var topObj = %1; topObj.ok;").arg(strTemp);
+        strTemp = scriptEngine.evaluate (strTemp).toString ();
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN("Failed to parse response: ") << strReply;
+            Q_WARN("Error is: ") << strTemp;
+            break;
+        }
+
+        if (strTemp != "true") {
+            Q_WARN("Failed to mark read!");
+            break;
+        }
+
+        token->status = ATTS_SUCCESS;
+        token->emitCompleted ();
+        token = NULL;
+
+        success = true;
+    } while (0); // End cleanup block (not a loop)
+
+    if (!success) {
+        if (token) {
+            token->status = ATTS_FAILURE;
+            token->emitCompleted ();
+        }
+    }
+}//GVApi::onMarkAsRead

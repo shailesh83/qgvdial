@@ -1125,7 +1125,7 @@ MainWindow::dialNow (const QString &strTarget)
             success = gvApi.callOut (token);
         } else {
             token->inParams["source"] = gvRegNumber.strNumber;
-            token->inParams["sourceType"] = gvRegNumber.chType;
+            token->inParams["sourceType"] = QString(gvRegNumber.chType);
             success = gvApi.callBack (token);
         }
     } while (0); // End cleanup block (not a loop)
