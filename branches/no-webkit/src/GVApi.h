@@ -89,8 +89,14 @@ private slots:
     void onCallback(bool success, const QByteArray &response, void *ctx);
     void onCallout(bool success, const QByteArray &response, void *ctx);
 
+    // Send sms
+    void onSendSms(bool success, const QByteArray &response, void *ctx);
+
     // Mark inbox entry as "read"
     void onMarkAsRead(bool success, const QByteArray &response, void *ctx);
+
+    // Get voicemail
+    void onVmail(bool success, const QByteArray &response, void *ctx);
 
 private:
     QString hasMoved(const QString &strResponse);
@@ -117,6 +123,9 @@ private:
     bool beginTwoFactorAuth(const QString &strUrl, void *ctx);
     bool doTwoFactorAuth(const QString &strResponse, void *ctx);
     bool getRnr(void *ctx);
+
+    // Send SMS
+    bool doSendSms(QUrl url, AsyncTaskToken *token);
 
     // Inbox related
     bool parseInboxJson(const QString &strJson, const QString &strHtml,

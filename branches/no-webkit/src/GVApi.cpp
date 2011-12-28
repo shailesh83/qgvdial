@@ -1550,7 +1550,7 @@ GVApi::onCallback(bool success, const QByteArray &response, void *ctx)
         QString strMoved = hasMoved (strReply);
         if (!strMoved.isEmpty ()) {
             success = doGet (strMoved, token, this,
-                             SLOT(onCallout(bool,QByteArray,void*)));
+                             SLOT(onCallback(bool,QByteArray,void*)));
             break;
         }
 
@@ -1609,25 +1609,100 @@ GVApi::sendSms(AsyncTaskToken *token)
         return true;
     }
 
-    QUrl url(GV_HTTPS "/call/connect/");
+    QUrl url(GV_HTTPS_M "/x");
 
-    url.addQueryItem("outgoingNumber"   ,
-                     token->inParams["destination"].toString());
-    url.addQueryItem("forwardingNumber" ,
-                     token->inParams["callBack"].toString());
-    url.addQueryItem("phoneType"        ,
-                     token->inParams["callBackType"].toString());
+    url.addQueryItem("m" , "sms");
+    url.addQueryItem("n" , token->inParams["destination"].toString());
+    url.addQueryItem("f" , "");
+    url.addQueryItem("v" , "7");
+    url.addQueryItem("txt",token->inParams["text"].toString());
 
-    url.addQueryItem("subscriberNumber" , strSelfNumber);
-    url.addQueryItem("remember"         , "1");
-    url.addQueryItem("_rnr_se"          , rnr_se);
+    return doSendSms (url, token);
+}//GVApi::sendSms
 
-    bool rv = doPostForm(url, url.encodedQuery(), token, this,
-                         SLOT(onCallback(bool,QByteArray,void*)));
+bool
+GVApi::doSendSms(QUrl url, AsyncTaskToken *token)
+{
+    QByteArray content;
+    QList<QNetworkCookie> allCookies = jar->getAllCookies ();
+    foreach (QNetworkCookie cookie, allCookies) {
+        if (cookie.name () == "gvx") {
+            content = "{\"gvx\":\"" + cookie.value() + "\"}";
+        }
+    }
+
+    if (content.isEmpty ()) {
+        token->status = ATTS_FAILURE;
+        token->emitCompleted ();
+        return true;
+    }
+
+    bool rv = doPostText (url, content, token, this,
+                          SLOT(onSendSms(bool,QByteArray,void*)));
     Q_ASSERT(rv);
 
-    return true;
-}//GVApi::sendSms
+    return (rv);
+}//GVApi::doSendSms
+
+void
+GVApi::onSendSms(bool success, const QByteArray &response, void *ctx)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    QString strReply = response;
+
+    do { // Begin cleanup block (not a loop)
+        if (!success) {
+            Q_WARN("Failed to send text");
+            break;
+        }
+        success = false;
+
+        QString strMoved = hasMoved (strReply);
+        if (!strMoved.isEmpty ()) {
+            QUrl url(strMoved);
+            success = doSendSms (url, token);
+            break;
+        }
+
+#if 0
+        Q_DEBUG(strReply);
+#endif
+
+        QString strTemp = strReply.mid (strReply.indexOf (",\n"));
+        if (strTemp.startsWith (',')) {
+            strTemp = strTemp.mid (strTemp.indexOf ('{'));
+        }
+
+        QScriptEngine scriptEngine(this);
+        strTemp = QString("var topObj = %1; "
+                          "topObj.send_sms_response.status.status;")
+                    .arg(strTemp);
+        strTemp = scriptEngine.evaluate (strTemp).toString ();
+        if (scriptEngine.hasUncaughtException ()) {
+            Q_WARN("Failed to parse call out response: ") << strReply;
+            Q_WARN("Error is: ") << strTemp;
+            break;
+        }
+
+        if (strTemp != "0") {
+            Q_WARN("Failed to send text! response status= ") << strTemp;
+            break;
+        }
+
+        token->status = ATTS_SUCCESS;
+        token->emitCompleted ();
+        token = NULL;
+
+        success = true;
+    } while (0); // End cleanup block (not a loop)
+
+    if (!success) {
+        if (token) {
+            token->status = ATTS_FAILURE;
+            token->emitCompleted ();
+        }
+    }
+}//GVApi::onSendSms
 
 bool
 GVApi::getVoicemail(AsyncTaskToken *token)
@@ -1638,16 +1713,65 @@ GVApi::getVoicemail(AsyncTaskToken *token)
     }
 
     // Ensure that the params  are valid
-    if (!token->inParams.contains ("destination") ||
-        !token->inParams.contains ("text"))
+    if (!token->inParams.contains ("vmail_link") ||
+        !token->inParams.contains ("file_location"))
     {
         token->status = ATTS_INVALID_PARAMS;
         token->emitCompleted ();
         return true;
     }
 
-    return false;
+    QString strLink = QString (GV_HTTPS "/b/0/media/send_voicemail/%1")
+                        .arg(token->inParams["vmail_link"].toString());
+    return doGet(strLink, token, this, SLOT(onVmail(bool, QByteArray, void*)));
 }//GVApi::getVoicemail
+
+void
+GVApi::onVmail(bool success, const QByteArray &response, void *ctx)
+{
+    AsyncTaskToken *token = (AsyncTaskToken *)ctx;
+    QString strReply = response;
+
+    do { // Begin cleanup block (not a loop)
+        if (!success) {
+            Q_WARN("Failed to send text");
+            break;
+        }
+        success = false;
+
+        QString strMoved = hasMoved (strReply);
+        if (!strMoved.isEmpty ()) {
+            success = doGet(strMoved, token, this,
+                             SLOT(onVmail(bool, QByteArray, void*)));
+            break;
+        }
+
+        QFile file(token->inParams["file_location"].toString());
+        if (!file.open(QFile::ReadWrite)) {
+            Q_WARN("Failed to open the vmail file. Abort!");
+            break;
+        }
+
+        if (emitLog) {
+            Q_DEBUG(QString ("Saving vmail in %1").arg(file.fileName ()));
+        }
+
+        file.write(response);
+
+        token->status = ATTS_SUCCESS;
+        token->emitCompleted ();
+        token = NULL;
+
+        success = true;
+    } while (0); // End cleanup block (not a loop)
+
+    if (!success) {
+        if (token) {
+            token->status = ATTS_FAILURE;
+            token->emitCompleted ();
+        }
+    }
+}//GVApi::onVmail
 
 bool
 GVApi::markInboxEntryAsRead(AsyncTaskToken *token)

@@ -902,7 +902,15 @@ MainWindow::on_actionE_xit_triggered ()
 #endif
 
     qApp->quit ();
+
+    QTimer::singleShot (300, this, SLOT(dieNow()));
 }//MainWindow::on_actionE_xit_triggered
+
+void
+MainWindow::dieNow()
+{
+    exit(0);
+}//MainWindow::dieNow
 
 void
 MainWindow::getContactsDone (bool bOk)

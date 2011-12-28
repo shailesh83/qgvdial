@@ -69,6 +69,7 @@ private slots:
 
     //! Invoked when the application is supposed to exit
     void on_actionE_xit_triggered();
+    void dieNow();
     //! The Singleton Application class invokes this function
     void messageReceived (const QString &message);
     void onSigHide ();
