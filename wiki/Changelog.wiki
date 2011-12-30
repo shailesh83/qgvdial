@@ -1,5 +1,13 @@
 #summary Change log
 
+*2011-12-29*
+ * No webkit.
+
+*2011-12-28*
+ * The main qgvdial code no longer uses webkit to log in or make calls or anything. There's now a coalasced API class that uses QNAM classes for HTTP GET and POST.
+ * This class is capable of multiple simultaneous requests - it does not serialize access to Google Voice.
+ * It should pave the way for a cleaner and more robust application.
+
 *2011-10-01*
  * software input panel closes on second click in the text box
  * Made it possible for the SMS view to also close the sip.
