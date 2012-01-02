@@ -1,5 +1,9 @@
 #summary Change log
 
+*2012-01-02*
+ * Improved speed of cleanup of temp files.
+ * Contacts search should now be faster.
+
 *2011-12-29*
  * No webkit.
 
