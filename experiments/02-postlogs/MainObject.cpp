@@ -16,11 +16,12 @@ void
 MainObject::doWork()
 {
     QUrl url("http://ec2-50-18-18-251.us-west-1.compute.amazonaws.com/pytest/getMonth.py");
-    url.addQueryItem("name", "uv");
+    url.addQueryItem("param1", "woh");
+    url.addQueryItem("param2", "wah");
 
     QNetworkRequest req(url);
     req.setHeader (QNetworkRequest::ContentTypeHeader, CONTENT_IS_FORM);
-    reply = mgr.post(req, url.encodedQuery());
+    reply = mgr.post(req, QByteArray("This is the post data"));
 }//MainObject::doWork
 
 void
