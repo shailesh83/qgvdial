@@ -10,8 +10,8 @@ public:
     MainObject(QObject *parent = NULL);
 
 private slots:
-    void doWork();
-    void doWork1();
+    void doGet();
+    void doPost();
 
     void onFinished(QNetworkReply *reply);
 
