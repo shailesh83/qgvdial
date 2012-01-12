@@ -2,6 +2,7 @@
 
 *2012-01-11*
  * Flush log file before sending logs to the server
+ * Fix the mosquitto update issue
 
 *2012-01-05*
  * Logs can now be uploaded
