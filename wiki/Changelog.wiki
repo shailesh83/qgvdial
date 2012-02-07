@@ -1,5 +1,9 @@
 #summary Change log
 
+*2012-02-06*
+ * GVApi: Removed duplicated log message
+ * TpObserver: this should fix the crashes on Telepathy capable platforms on incoming phone calls.
+
 *2012-01-11*
  * Flush log file before sending logs to the server
  * Fix the mosquitto update issue
