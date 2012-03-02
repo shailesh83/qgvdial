@@ -1,7 +1,11 @@
 #summary Change log
 
+*2012-03-01*
+ * Fixed the Inbox and contacts refresh
+ * Fixed the message box to look as classy as Meego
+
 *2012-02-29*
-* Accounts that are not configured can now be pointed out to the user
+ * Accounts that are not configured can now be pointed out to the user
 
 *2012-02-14*
  * Pull down to refresh: Contacts and Inbox
