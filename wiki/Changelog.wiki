@@ -2,6 +2,7 @@
 
 *2012-03-03*
  * Fixed the fonts on the message box for Harmattan, Maemo, Symbian and desktop
+ * Account Review Prompt from Google. Show the webpage and drop login.
 
 *2012-03-01*
  * Fixed the Inbox and contacts refresh
