@@ -1,5 +1,9 @@
 #summary Change log
 
+*2012-03-13*
+ * Fix the Windows installer
+ * 
+
 *2012-03-06*
  * Better identification of accounts that have not completed GV set up.
  * Google accounts form outside the US use a longer more protracted method of login. I've finally nailed it.
