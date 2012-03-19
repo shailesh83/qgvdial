@@ -1,8 +1,10 @@
 #summary Change log
 
+*2012-03-18*
+ * Minor fixes to the error messages and a fix for the QML.
+
 *2012-03-13*
  * Fix the Windows installer
- * 
 
 *2012-03-06*
  * Better identification of accounts that have not completed GV set up.
