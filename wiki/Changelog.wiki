@@ -1,5 +1,9 @@
 #summary Change log
 
+*2012-05-11*
+ * Changed the NW code to better handle HTTP redirects.
+ * Changed the Cookie code to be consistent across all platforms.
+
 *2012-05-09*
  * Fallback dialout works correctly for Symbian, Maemo and Harmattan!!
  * Added Haptic feedback to Symbian and Harmattan
