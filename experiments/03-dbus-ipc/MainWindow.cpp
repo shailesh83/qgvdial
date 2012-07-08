@@ -93,8 +93,8 @@ MainWindow::init()
     if (option == 1) {          // Client
         client = new QGVNotifyProxyIface("net.yuvraaj.qgvnotify.control", "/",
                                          QDBusConnection::sessionBus(), 0);
-        connect(client, SIGNAL(RequestClientInfo(const QString &)),
-                this  , SLOT(onRequestClientInfo(const QString &)));
+        connect(client, SIGNAL(CommandForClient(const QString &)),
+                this  , SLOT(onCommandForClient(const QString &)));
     } else if (option == 2) {   // Server
         ctrlService = new CtrlService(this);
         new QGVNotifyIfaceAdapter(ctrlService);
@@ -111,7 +111,7 @@ MainWindow::init()
 }//MainWindow::init
 
 void
-MainWindow::onRequestClientInfo(const QString &command)
+MainWindow::onCommandForClient(const QString &command)
 {
     Q_DEBUG("command = ") << command;
 
@@ -119,8 +119,13 @@ MainWindow::onRequestClientInfo(const QString &command)
         Q_WARN("client is NULL");
         return;
     }
-    client->ReportUser("me@gmail.com");
-}//MainWindow::onRequestClientInfo
+
+    if (command == "getUser") {
+        client->ReportUser("me@gmail.com");
+    } else if (command == "quitAll") {
+        close();
+    }
+}//MainWindow::onCommandForClient
 
 void
 MainWindow::onTimerTick()
@@ -134,4 +139,12 @@ MainWindow::onTimerTick()
 
     QTimer::singleShot(5 * 1000, this, SLOT(onTimerTick()));
 }//MainWindow::onTimerTick
+
+void
+MainWindow::closeEvent(QCloseEvent * /*event*/)
+{
+    if (NULL != ctrlService) {
+        ctrlService->requestAllQuit();
+    }
+}//MainWindow::closeEvent
 

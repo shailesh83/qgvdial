@@ -14,6 +14,12 @@ CtrlService::ReportUser(const QString &user)
 void
 CtrlService::requestUserInfo()
 {
-    emit RequestClientInfo("getUser");
+    emit CommandForClient("getUser");
 }//CtrlService::requestUserInfo
+
+void
+CtrlService::requestAllQuit()
+{
+    emit CommandForClient("quitAll");
+}//CtrlService::requestAllQuit
 

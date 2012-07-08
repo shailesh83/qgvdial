@@ -11,12 +11,13 @@ public:
     explicit CtrlService(QObject *parent = NULL);
 
     void requestUserInfo();
+    void requestAllQuit();
 
 public Q_SLOTS:
     void ReportUser(const QString &user);
 
 Q_SIGNALS:
-    void RequestClientInfo(const QString &command);
+    void CommandForClient(const QString &command);
 };
 
 #endif//CTRLSERVICE_H

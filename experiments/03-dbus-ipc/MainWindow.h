@@ -19,13 +19,14 @@ public slots:
 private slots:
     void onCleanupLogsArray();
     void init();
-    void onRequestClientInfo(const QString &command);
+    void onCommandForClient(const QString &command);
 
     void onTimerTick();
 
 private:
     QString baseDir();
     void initLogging ();
+    void closeEvent(QCloseEvent *event);
 
 private:
     //! Mutex to protect access to all logs related variables

@@ -1,6 +1,6 @@
 <node>
     <interface name="net.yuvraaj.qgvnotify.control">
-        <signal name="RequestClientInfo">
+        <signal name="CommandForClient">
             <arg type="s" name="command" />
         </signal>
         <method name="ReportUser">
