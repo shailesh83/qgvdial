@@ -38,9 +38,9 @@ private:
     //! kick timer
     bool            bKickLocksTimer;
 
-    // Object for service
+    //! Object for DBus service
     CtrlService    *ctrlService;
-    // Object for client
+    //! Object for DBus client
     QGVNotifyProxyIface *client;
 };
 
