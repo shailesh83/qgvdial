@@ -121,7 +121,8 @@ MainWindow::onCommandForClient(const QString &command)
     }
 
     if (command == "getUser") {
-        client->ReportUser("me@gmail.com");
+        client->ReportUser("me@gmail.com", "/tmp/settings", "/tmp/logs",
+                           qApp->applicationPid());
     } else if (command == "quitAll") {
         close();
     }

@@ -14,7 +14,8 @@ public:
     void requestAllQuit();
 
 public Q_SLOTS:
-    void ReportUser(const QString &user);
+    void ReportUser(const QString &user, const QString &settingsFile,
+                    const QString &logsFile, qulonglong clientPid);
 
 Q_SIGNALS:
     void CommandForClient(const QString &command);
