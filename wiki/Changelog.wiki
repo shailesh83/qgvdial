@@ -1,5 +1,8 @@
 #summary Change log
 
+*2012-08-08*
+ * Two factor authentication now works again
+
 *2012-07-16*
  * Voicemail funkiness fixed
  * Contacts list images were sometimes not seen
