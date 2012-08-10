@@ -1,5 +1,9 @@
 #summary Change log
 
+*2012-08-09*
+ * Fixed a dial bug
+ * Delete inbox entry
+
 *2012-08-08*
  * Two factor authentication now works again
 
