@@ -1,5 +1,9 @@
 #summary Change log
 
+*2012-09-04*
+ * New Login page
+ * Symbian build fix for qt-components
+
 *2012-08-27*
  * Fix deletion of entries
  * GPlus link in texts
