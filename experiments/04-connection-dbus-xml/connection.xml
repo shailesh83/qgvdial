@@ -209,7 +209,7 @@
     </method>
     <signal name="AliasesChanged">
       <arg type="a(us)"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_us1"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_us"/>
     </signal>
   </interface>
   <interface name="org.freedesktop.Telepathy.Connection.Interface.SimplePresence">
