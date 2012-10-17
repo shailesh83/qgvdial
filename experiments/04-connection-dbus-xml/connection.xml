@@ -2,7 +2,7 @@
   <interface name="org.freedesktop.Telepathy.Connection.Interface.ContactBlocking">
     <method name="RequestBlockedContacts">
       <arg name="Contacts" type="a{us}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_a_us"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_us"/>
     </method>
     <method name="UnblockContacts">
       <arg name="Contacts" type="au" direction="in"/>
@@ -15,9 +15,9 @@
     </method>
     <signal name="BlockedContactsChanged">
       <arg type="a{us}"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_us"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_us"/>
       <arg type="a{us}"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_a_us"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_dict_us"/>
     </signal>
   </interface>
   <interface name="org.freedesktop.Telepathy.Connection.Interface.ContactGroups">
@@ -104,9 +104,9 @@
       <arg type="a{u(uus)}"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_u_uus"/>
       <arg type="a{us}"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_a_us"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_dict_us"/>
       <arg type="a{us}"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In2" value="Qt_Type_a_us"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In2" value="Qt_Type_dict_us"/>
     </signal>
     <signal name="ContactListStateChanged">
       <arg type="u"/>
@@ -162,7 +162,7 @@
       <arg name="Contacts" type="au" direction="in"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
       <arg name="Tokens" type="a{us}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_a_us"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_us"/>
     </method>
     <method name="GetAvatarTokens">
       <arg name="Contacts" type="au" direction="in"/>
@@ -191,13 +191,13 @@
   <interface name="org.freedesktop.Telepathy.Connection.Interface.Aliasing">
     <method name="SetAliases">
       <arg name="Aliases" type="a{us}" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_us"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_us"/>
     </method>
     <method name="GetAliases">
       <arg name="Contacts" type="au" direction="in"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
       <arg name="Aliases" type="a{us}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_a_us"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_us"/>
     </method>
     <method name="RequestAliases">
       <arg name="Contacts" type="au" direction="in"/>
@@ -258,7 +258,7 @@
     <method name="AddStatus">
       <arg name="Status" type="s" direction="in"/>
       <arg name="Parameters" type="a{sv}" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_a_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_dict_sv"/>
     </method>
     <signal name="PresenceUpdate">
       <arg type="a{u(ua{sa{sv}})}"/>
@@ -268,18 +268,18 @@
   <interface name="org.freedesktop.Telepathy.Connection.Interface.Requests">
     <method name="EnsureChannel">
       <arg name="Request" type="a{sv}" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_sv"/>
       <arg name="Yours" type="b" direction="out"/>
       <arg name="Channel" type="o" direction="out"/>
       <arg name="Properties" type="a{sv}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out2" value="Qt_Type_a_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out2" value="Qt_Type_dict_sv"/>
     </method>
     <method name="CreateChannel">
       <arg name="Request" type="a{sv}" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_sv"/>
       <arg name="Channel" type="o" direction="out"/>
       <arg name="Properties" type="a{sv}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out1" value="Qt_Type_a_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out1" value="Qt_Type_dict_sv"/>
     </method>
     <signal name="ChannelClosed">
       <arg type="o"/>
@@ -352,7 +352,7 @@
     <signal name="ConnectionError">
       <arg type="s"/>
       <arg type="a{sv}"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_a_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_dict_sv"/>
     </signal>
     <signal name="NewChannel">
       <arg type="o"/>

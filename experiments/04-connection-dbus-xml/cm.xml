@@ -3,7 +3,7 @@
     <method name="RequestConnection">
       <arg name="Protocol" type="s" direction="in"/>
       <arg name="Parameters" type="a{sv}" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="RequestConnectionParamters"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_dict_sv"/>
       <arg name="Bus_Name" type="s" direction="out"/>
       <arg name="Object_Path" type="o" direction="out"/>
     </method>
@@ -13,7 +13,7 @@
     <method name="GetParameters">
       <arg name="Protocol" type="s" direction="in"/>
       <arg name="Parameters" type="a(susv)" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="ParamtersList"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_a_susv"/>
     </method>
     <signal name="NewConnection">
       <arg type="s"/>
