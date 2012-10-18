@@ -1,6 +1,7 @@
 #!/bin/bash
 
-rm cm_* connection_* protocol_*
+rm -f cm_* connection_* protocol_*
+
 qdbusxml2cpp -v -a cm_adapter -p cm_proxy -v -i shared_data_types.h cm.xml
 echo cm.xml done.
 qdbusxml2cpp -v -a connection_adapter -p connection_proxy -v -i shared_data_types.h connection.xml

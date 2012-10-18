@@ -92,17 +92,17 @@
       <arg name="Interfaces" type="as" direction="in"/>
       <arg name="Hold" type="b" direction="in"/>
       <arg name="Attributes" type="a{ua{sv}}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_a_ua_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_u_dict_sv"/>
     </method>
     <signal name="ContactsChanged">
       <arg type="a{u(uus)}"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_u_uus"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_u_uus"/>
       <arg type="au"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_au"/>
     </signal>
     <signal name="ContactsChangedWithID">
       <arg type="a{u(uus)}"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_u_uus"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_u_uus"/>
       <arg type="a{us}"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_dict_us"/>
       <arg type="a{us}"/>
@@ -119,7 +119,7 @@
       <arg name="Interfaces" type="as" direction="in"/>
       <arg name="Hold" type="b" direction="in"/>
       <arg name="Attributes" type="a{ua{sv}}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_a_ua_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_u_dict_sv"/>
     </method>
   </interface>
   <interface name="org.freedesktop.Telepathy.Connection.Interface.Capabilities">
@@ -217,7 +217,7 @@
       <arg name="Contacts" type="au" direction="in"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
       <arg name="Presence" type="a{u(uss)}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_a_u_uss"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_u_uss"/>
     </method>
     <method name="SetPresence">
       <arg name="Status" type="s" direction="in"/>
@@ -225,13 +225,13 @@
     </method>
     <signal name="PresencesChanged">
       <arg type="a{u(uss)}"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_u_uss"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_u_uss"/>
     </signal>
   </interface>
   <interface name="org.freedesktop.Telepathy.Connection.Interface.Presence">
     <method name="SetStatus">
       <arg name="Statuses" type="a{sa{sv}}" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_sa_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_s_dict_sv"/>
     </method>
     <method name="SetLastActivityTime">
       <arg name="Time" type="u" direction="in"/>
@@ -245,13 +245,13 @@
     </method>
     <method name="GetStatuses">
       <arg name="Available_Statuses" type="a{s(ubba{ss})}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_a_s_ubba_ss"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_s_ubb_dict_ss"/>
     </method>
     <method name="GetPresence">
       <arg name="Contacts" type="au" direction="in"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_au"/>
       <arg name="Presence" type="a{u(ua{sa{sv}})}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_a_u_ua_sa_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_dict_u_u_dict_s_dict_sv"/>
     </method>
     <method name="ClearStatus">
     </method>
@@ -262,7 +262,7 @@
     </method>
     <signal name="PresenceUpdate">
       <arg type="a{u(ua{sa{sv}})}"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_u_ua_sa_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_u_u_dict_s_dict_sv"/>
     </signal>
   </interface>
   <interface name="org.freedesktop.Telepathy.Connection.Interface.Requests">
@@ -286,7 +286,7 @@
     </signal>
     <signal name="NewChannels">
       <arg type="a(oa{sv})"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_oa_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_o_dict_sv"/>
     </signal>
   </interface>
   <interface name="org.freedesktop.Telepathy.Connection">
