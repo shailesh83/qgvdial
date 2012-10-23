@@ -1,5 +1,9 @@
 #summary Change log
 
+*2012-10-23*
+ * Rewrote the sms/vmail parse routine to fix blank inbox entries.
+ * Also fixed unicode characters in texts and voicemail
+
 *2012-09-21*
  * Added a refresh GV API. Updated notify to use it.
 
