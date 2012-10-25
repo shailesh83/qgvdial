@@ -3,7 +3,7 @@
     <method name="RequestConnection">
       <arg name="Protocol" type="s" direction="in"/>
       <arg name="Parameters" type="a{sv}" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_dict_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
       <arg name="Bus_Name" type="s" direction="out"/>
       <arg name="Object_Path" type="o" direction="out"/>
     </method>

@@ -258,7 +258,7 @@
     <method name="AddStatus">
       <arg name="Status" type="s" direction="in"/>
       <arg name="Parameters" type="a{sv}" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_dict_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
     </method>
     <signal name="PresenceUpdate">
       <arg type="a{u(ua{sa{sv}})}"/>
@@ -268,18 +268,18 @@
   <interface name="org.freedesktop.Telepathy.Connection.Interface.Requests">
     <method name="EnsureChannel">
       <arg name="Request" type="a{sv}" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QVariantMap"/>
       <arg name="Yours" type="b" direction="out"/>
       <arg name="Channel" type="o" direction="out"/>
       <arg name="Properties" type="a{sv}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out2" value="Qt_Type_dict_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out2" value="QVariantMap"/>
     </method>
     <method name="CreateChannel">
       <arg name="Request" type="a{sv}" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QVariantMap"/>
       <arg name="Channel" type="o" direction="out"/>
       <arg name="Properties" type="a{sv}" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out1" value="Qt_Type_dict_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out1" value="QVariantMap"/>
     </method>
     <signal name="ChannelClosed">
       <arg type="o"/>
@@ -352,7 +352,7 @@
     <signal name="ConnectionError">
       <arg type="s"/>
       <arg type="a{sv}"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_dict_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
     </signal>
     <signal name="NewChannel">
       <arg type="o"/>

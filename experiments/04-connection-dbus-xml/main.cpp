@@ -1,10 +1,13 @@
-#include <QtCore>
-#include "shared_data_types.h"
+#include "gen/cm_adapter.h"
+#include "QGVConnectionManager.h"
 
 int
 main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+
+    QGVConnectionManager *cm = new QGVConnectionManager;
+    new ConnectionManagerAdaptor(cm);
 
 /*
     MyDemo* demo = new MyDemo;

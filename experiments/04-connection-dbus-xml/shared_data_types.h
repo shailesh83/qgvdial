@@ -5,8 +5,7 @@
 #include <QtDBus>
 
 ////////////////////////////////////////////////////////////////////////////////
-// a{sv}
-typedef QMap<QString, QVariant> Qt_Type_dict_sv;
+// a{sv} = QVariantMap
 
 ////////////////////////////////////////////////////////////////////////////////
 // a(susv)
@@ -83,7 +82,7 @@ Q_DECLARE_METATYPE(Qt_Type_a_usuuuu)
 
 ////////////////////////////////////////////////////////////////////////////////
 // a{ua{sv}}
-typedef QMap<unsigned, Qt_Type_dict_sv> Qt_Type_dict_u_dict_sv;
+typedef QMap<unsigned, QVariantMap> Qt_Type_dict_u_dict_sv;
 Q_DECLARE_METATYPE(Qt_Type_dict_u_dict_sv)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +113,7 @@ Q_DECLARE_METATYPE(Qt_Type_a_osuu)
 ////////////////////////////////////////////////////////////////////////////////
 // a{u(ua{sa{sv}})}: Lets do it in steps:
 // 1. a{sa{sv}}
-typedef QMap<QString, Qt_Type_dict_sv> Qt_Type_dict_s_dict_sv;
+typedef QMap<QString, QVariantMap> Qt_Type_dict_s_dict_sv;
 Q_DECLARE_METATYPE(Qt_Type_dict_s_dict_sv)
 
 // 2. (u$1) = (ua{sa{sv}})
@@ -152,7 +151,7 @@ Q_DECLARE_METATYPE(Qt_Type_dict_s_ubb_dict_ss)
 // 1. (oa{sv})
 struct Struct_o_dict_sv {
     QString o;
-    Qt_Type_dict_sv dict_sv;
+    QVariantMap vmap;
 };
 Q_DECLARE_METATYPE(Struct_o_dict_sv)
 

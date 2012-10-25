@@ -17,7 +17,7 @@
     </method>
     <method name="IdentifyAccount">
       <arg name="Parameters" type="a{sv}" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_dict_sv"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="QVariantMap"/>
       <arg name="Account_ID" type="s" direction="out"/>
     </method>
   </interface>

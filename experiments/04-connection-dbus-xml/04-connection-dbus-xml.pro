@@ -5,25 +5,29 @@ INCLUDEPATH += .
 
 QT += dbus
 
+MOC_DIR = moc
+OBJECTS_DIR = obj
+
 # Input
-HEADERS += shared_data_types.h      \
-           cm_adapter.h             \
-           connection_adapter.h     \
-           protocol_adapter.h       \
+HEADERS += global.h                     \
+           shared_data_types.h          \
+           gen/cm_adapter.h             \
+           gen/connection_adapter.h     \
+           gen/protocol_adapter.h       \
            QGVConnectionManager.h
 
-SOURCES += cm_adapter.cpp           \
-           connection_adapter.cpp   \
-           main.cpp                 \
-           protocol_adapter.cpp     \
+SOURCES += gen/cm_adapter.cpp           \
+           gen/connection_adapter.cpp   \
+           gen/protocol_adapter.cpp     \
+           main.cpp                     \
            QGVConnectionManager.cpp
 
 exists(not-really) {
-HEADERS += cm_proxy.h               \
-           connection_proxy.h       \
-           protocol_proxy.h
+HEADERS += gen/cm_proxy.h               \
+           gen/connection_proxy.h       \
+           gen/protocol_proxy.h
 
-SOURCES += cm_proxy.cpp             \
-           connection_proxy.cpp     \
+SOURCES += gen/cm_proxy.cpp             \
+           gen/connection_proxy.cpp     \
            protocol_proxy.cpp
 }
