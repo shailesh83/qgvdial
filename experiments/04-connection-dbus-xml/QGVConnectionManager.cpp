@@ -71,7 +71,7 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
             } else if (key == "password") {
                 password = Parameters[key].toString();
             } else {
-                qWarning() << "Unknown parameter key \"" << key << "\"";
+                Q_WARN(QString("Unknown parameter key \"%1\"").arg(key));
                 // Ignore it. Move on.
             }
         }
