@@ -10,6 +10,9 @@ class QGVConnectionManager: public QObject
 public:
     QGVConnectionManager(QObject *parent = NULL);
     virtual ~QGVConnectionManager();
+    
+    bool registerObject();
+    void unregisterObject();
 
 public: // PROPERTIES
 public Q_SLOTS: // METHODS

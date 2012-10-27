@@ -14,13 +14,15 @@ HEADERS += global.h                     \
            gen/cm_adapter.h             \
            gen/connection_adapter.h     \
            gen/protocol_adapter.h       \
-           QGVConnectionManager.h
+           QGVConnectionManager.h       \
+           QGVConnection.h
 
 SOURCES += gen/cm_adapter.cpp           \
            gen/connection_adapter.cpp   \
            gen/protocol_adapter.cpp     \
            main.cpp                     \
-           QGVConnectionManager.cpp
+           QGVConnectionManager.cpp     \
+           QGVConnection.cpp
 
 exists(not-really) {
 HEADERS += gen/cm_proxy.h               \
