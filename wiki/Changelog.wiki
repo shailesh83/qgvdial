@@ -1,5 +1,9 @@
 #summary Change log
 
+*2012-10-31*
+ * Buttons for Meego are different from generic
+ * When the NW configuratio changes, recreate the access manager so that the default connection is re-created.
+
 *2012-10-23*
  * Rewrote the sms/vmail parse routine to fix blank inbox entries.
  * Also fixed unicode characters in texts and voicemail
