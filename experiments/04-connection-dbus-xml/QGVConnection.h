@@ -7,10 +7,6 @@ class QGVConnection : public QObject
 {
     Q_OBJECT
     
-public:
-    QGVConnection(QObject *parent = NULL);
-    ~QGVConnection();
-    
 public Q_SLOTS: // METHODS
     void AddClientInterest(const QStringList &Tokens);
     void Connect();
@@ -31,6 +27,16 @@ Q_SIGNALS: // SIGNALS
     void NewChannel(const QDBusObjectPath &in0, const QString &in1, uint in2, uint in3, bool in4);
     void SelfHandleChanged(uint in0);
     void StatusChanged(uint in0, uint in1);
+
+        
+public:
+    QGVConnection(QObject *parent = NULL);
+    ~QGVConnection();
+    
+    void setSelfHandle(uint h);
+
+private:
+    uint m_selfHandle;
 };
 
 #endif//_QGV_CONNECTION_H_

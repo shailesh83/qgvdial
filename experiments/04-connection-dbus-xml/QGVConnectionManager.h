@@ -2,6 +2,9 @@
 #define _QGVCONNECTIONMANAGER_H_
 
 #include "global.h"
+#include "QGVConnection.h"
+
+typedef QList<QGVConnection *> QGVConnectionList;
 
 class QGVConnectionManager: public QObject
 {
@@ -21,6 +24,10 @@ public Q_SLOTS: // METHODS
     QString RequestConnection(const QString &Protocol, const QVariantMap &Parameters, QDBusObjectPath &Object_Path);
 Q_SIGNALS: // SIGNALS
     void NewConnection(const QString &in0, const QDBusObjectPath &in1, const QString &in2);
+    
+private:
+    QGVConnectionList m_connectionList;
+    uint m_connectionHandleCounter;
 };
 
 #endif//_QGVCONNECTIONMANAGER_H_

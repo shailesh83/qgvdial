@@ -34,15 +34,13 @@ QGVConnection::GetInterfaces()
 QString
 QGVConnection::GetProtocol()
 {
-    QString rv;
-    return rv;
+    return QGV_ProtocolName;
 }//QGVConnection::GetProtocol
 
 uint
 QGVConnection::GetSelfHandle()
 {
-    uint rv;
-    return rv;
+    return m_selfHandle;
 }//QGVConnection::GetSelfHandle
 
 uint
@@ -95,3 +93,9 @@ QGVConnection::RequestHandles(uint Handle_Type, const QStringList &Identifiers)
     Qt_Type_au rv;
     return rv;
 }//QGVConnection::RequestHandles
+
+void
+QGVConnection::setSelfHandle(uint h)
+{
+    m_selfHandle = h;
+}//QGVConnection::SetSelfHandle

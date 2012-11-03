@@ -1,5 +1,4 @@
 #include "QGVConnectionManager.h"
-#include "QGVConnection.h"
 #include "gen/connection_adapter.h"
 #include "gen/cm_adapter.h"
 
@@ -9,15 +8,20 @@
 #define CM_Param_Flags_Secret         8
 #define CM_Param_Flags_DBus_Property 16
 
-#define QGV_ProtocolName "qgv"
-
 QGVConnectionManager::QGVConnectionManager(QObject *parent)
 : QObject(parent)
+, m_connectionHandleCounter(0)
 {
 }//QGVConnectionManager::QGVConnectionManager
 
 QGVConnectionManager::~QGVConnectionManager()
 {
+    QGVConnection *conn;
+    foreach (conn, m_connectionList) {
+        delete conn;
+    }
+    
+    m_connectionList.clear();
 }//QGVConnectionManager::~QGVConnectionManager
 
 bool
@@ -62,7 +66,9 @@ QGVConnectionManager::GetParameters(const QString &Protocol)
         return rv;
     }
 
-    susv.s1 = "username";   // name
+    // I could have used "username", but "account" is the well known name for
+    // this parameter
+    susv.s1 = "account";
     susv.u  = CM_Param_Flags_Required | CM_Param_Flags_Register;
     susv.s2 = "s";          // signature
     susv.v  = QString();    // default value
@@ -102,7 +108,7 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
         QString username, password;
 
         foreach (QString key, Parameters.keys()) {
-            if (key == "username") {
+            if (key == "account") {
                 username = Parameters[key].toString();
             } else if (key == "password") {
                 password = Parameters[key].toString();
@@ -113,7 +119,7 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
         }
         
         // Create the connection objects and associate them together
-        QGVConnection *conn = new QGVConnection(this);
+        QGVConnection *conn = new QGVConnection(this);;
         if (NULL == conn) {
             Q_WARN("Failed to create connection object");
             break;
@@ -123,8 +129,15 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
             delete conn;
             break;
         }
+        
+        conn->setSelfHandle(++m_connectionHandleCounter);
+        m_connectionList.append(conn);
+
+        //TODO: Set up object path from the connection object that we just got.
+        // Object_Path = 
 
         //TODO: Must emit NewConnection on success
+        emit NewConnection(QString(), Object_Path, QString());
     } while(0); // End cleanup block
 
     return rv;
