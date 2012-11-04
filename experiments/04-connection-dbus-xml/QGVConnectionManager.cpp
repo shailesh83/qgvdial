@@ -2,6 +2,9 @@
 #include "gen/connection_adapter.h"
 #include "gen/cm_adapter.h"
 
+#define QGV_CM_OBJECT_PATH  TP_CM_OBJECT_PATH  "/qgvtp"
+#define QGV_CM_SERVICE_PATH TP_CM_SERVICE_PATH ".qgvtp"
+
 #define CM_Param_Flags_Required       1
 #define CM_Param_Flags_Register       2
 #define CM_Param_Flags_Has_Default    4
@@ -20,7 +23,7 @@ QGVConnectionManager::~QGVConnectionManager()
     foreach (conn, m_connectionList) {
         delete conn;
     }
-    
+
     m_connectionList.clear();
 }//QGVConnectionManager::~QGVConnectionManager
 
@@ -31,28 +34,30 @@ QGVConnectionManager::registerObject()
         Q_WARN("Failed to allocate CM DBus adapter");
         return false;
     }
-    
-    QDBusConnection sesionBus = QDBusConnection::sessionBus();
-    bool rv = sesionBus.registerService("net.yuvraaj.qgvdial.PhoneIntegration");
-    if (rv) {
-        Q_WARN("Couldn't register CM service");
-        return rv;
-    }
-    
-    rv = sesionBus.registerObject("/", this);
-    if (rv) {
+
+    QDBusConnection sessionBus = QDBusConnection::sessionBus();
+    bool rv = sessionBus.registerObject(QGV_CM_OBJECT_PATH, this);
+    if (!rv) {
         Q_WARN("Couldn't register CM object");
         return rv;
     }
-    
+    rv = sessionBus.registerService (QGV_CM_SERVICE_PATH);
+    if (!rv) {
+        Q_WARN("Couldn't register CM object");
+        return rv;
+    }
+
     Q_DEBUG("CM object registered");
-    
+
     return rv;
 }//QGVConnectionManager::registerObject
 
 void
 QGVConnectionManager::unregisterObject()
 {
+    QDBusConnection sessionBus = QDBusConnection::sessionBus();
+    sessionBus.unregisterService (QGV_CM_SERVICE_PATH);
+    sessionBus.unregisterObject(QGV_CM_OBJECT_PATH);
 }//QGVConnectionManager::unregisterObject
 
 Qt_Type_a_susv
@@ -117,9 +122,9 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
                 // Ignore it. Move on.
             }
         }
-        
+
         // Create the connection objects and associate them together
-        QGVConnection *conn = new QGVConnection(this);;
+        QGVConnection *conn = new QGVConnection(username, password, this);
         if (NULL == conn) {
             Q_WARN("Failed to create connection object");
             break;
@@ -129,12 +134,12 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
             delete conn;
             break;
         }
-        
+
         conn->setSelfHandle(++m_connectionHandleCounter);
         m_connectionList.append(conn);
 
         //TODO: Set up object path from the connection object that we just got.
-        // Object_Path = 
+        // Object_Path =
 
         //TODO: Must emit NewConnection on success
         emit NewConnection(QString(), Object_Path, QString());

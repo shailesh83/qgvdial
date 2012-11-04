@@ -170,10 +170,4 @@ Q_DECLARE_METATYPE(Struct_uss)
 typedef QMap<unsigned, Struct_uss> Qt_Type_dict_u_uss;
 Q_DECLARE_METATYPE(Qt_Type_dict_u_uss)
 
-////////////////////////////////////////////////////////////////////////////////
-// All the rest starting from here is common to all files.
-////////////////////////////////////////////////////////////////////////////////
-
-#define QGV_ProtocolName "qgv"
-
 #endif//__SHARED_DATA_TYPES__

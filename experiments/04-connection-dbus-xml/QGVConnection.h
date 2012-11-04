@@ -30,13 +30,14 @@ Q_SIGNALS: // SIGNALS
 
         
 public:
-    QGVConnection(QObject *parent = NULL);
+    QGVConnection(const QString &u, const QString &p, QObject *parent = NULL);
     ~QGVConnection();
     
     void setSelfHandle(uint h);
 
 private:
     uint m_selfHandle;
+    QString user, pass;
 };
 
 #endif//_QGV_CONNECTION_H_

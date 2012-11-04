@@ -1,7 +1,10 @@
 #include "QGVConnection.h"
 
-QGVConnection::QGVConnection(QObject *parent /*= NULL*/)
+QGVConnection::QGVConnection(const QString &u, const QString &p,
+                             QObject *parent /*= NULL*/)
 : QObject(parent)
+, user(u)
+, pass(p)
 {
 }//QGVConnection::QGVConnection
 
