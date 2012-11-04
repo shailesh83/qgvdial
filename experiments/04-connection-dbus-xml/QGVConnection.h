@@ -6,7 +6,16 @@
 class QGVConnection : public QObject
 {
     Q_OBJECT
-    
+
+    Q_PROPERTY(QString m_dbusObjectPath
+               READ getDBusObjectPath)
+    Q_PROPERTY(QString m_dbusBusName
+               READ getDBusBusName)
+
+    Q_PROPERTY(int m_selfHandle
+               READ getSelfHandle
+               WRITE setSelfHandle)
+
 public Q_SLOTS: // METHODS
     void AddClientInterest(const QStringList &Tokens);
     void Connect();
@@ -28,16 +37,25 @@ Q_SIGNALS: // SIGNALS
     void SelfHandleChanged(uint in0);
     void StatusChanged(uint in0, uint in1);
 
-        
+
 public:
     QGVConnection(const QString &u, const QString &p, QObject *parent = NULL);
     ~QGVConnection();
-    
+
     void setSelfHandle(uint h);
+    int getSelfHandle();
+
+    bool registerObject();
+    bool unregisterObject();
+
+    QString getDBusObjectPath();
+    QString getDBusBusName();
 
 private:
-    uint m_selfHandle;
-    QString user, pass;
+    uint    m_selfHandle;
+    QString m_user, m_pass;
+    QString m_dbusObjectPath;
+    QString m_dbusBusName;
 };
 
 #endif//_QGV_CONNECTION_H_

@@ -1,10 +1,11 @@
 #include "QGVConnection.h"
+#include "gen/connection_adapter.h"
 
 QGVConnection::QGVConnection(const QString &u, const QString &p,
                              QObject *parent /*= NULL*/)
 : QObject(parent)
-, user(u)
-, pass(p)
+, m_user(u)
+, m_pass(p)
 {
 }//QGVConnection::QGVConnection
 
@@ -102,3 +103,67 @@ QGVConnection::setSelfHandle(uint h)
 {
     m_selfHandle = h;
 }//QGVConnection::SetSelfHandle
+
+int
+QGVConnection::getSelfHandle()
+{
+    return m_selfHandle;
+}//QGVConnection::getSelfHandle
+
+QString
+QGVConnection::getDBusObjectPath()
+{
+    return m_dbusObjectPath;
+}//QGVConnection::getDBusObjectPath
+
+QString
+QGVConnection::getDBusBusName()
+{
+    return m_dbusBusName;
+}//QGVConnection::getDBusBusName
+
+bool
+QGVConnection::registerObject()
+{
+    if (NULL == new ConnectionAdaptor(this)) {
+        Q_WARN("Failed to create connection adapter object");
+        return false;
+    }
+
+    m_dbusObjectPath = QGV_CONN_OBJECT_PREFIX + m_user;
+    m_dbusObjectPath.replace('@', '_');
+
+    m_dbusBusName = QGV_CONN_SERVICE_PREFIX + m_user;
+    m_dbusBusName.replace('@', '_');
+
+    QDBusConnection sessionBus = QDBusConnection::sessionBus();
+    bool rv = sessionBus.registerObject(m_dbusObjectPath, this);
+
+    do { // Begin cleanup block (not a loop)
+        if (!rv) {
+            Q_WARN("Couldn't register Connection object to user ") << m_user;
+            break;
+        }
+        rv = sessionBus.registerService (m_dbusBusName);
+        if (!rv) {
+            Q_WARN("Couldn't register Connection bus for user ") << m_user;
+            sessionBus.unregisterObject (m_dbusObjectPath);
+            break;
+        }
+
+        Q_DEBUG("Connection registered for user ") << m_user;
+    } while (0); // End cleanup block (not a loop)
+
+    if (!rv) {
+        m_dbusObjectPath.clear ();
+        m_dbusBusName.clear ();
+    }
+
+    return rv;
+}//QGVConnection::registerObject
+
+bool
+QGVConnection::unregisterObject()
+{
+    QDBusConnection sessionBus = QDBusConnection::sessionBus();
+}//QGVConnection::unregisterObject

@@ -4,7 +4,7 @@
 #include "global.h"
 #include "QGVConnection.h"
 
-typedef QList<QGVConnection *> QGVConnectionList;
+typedef QMap<QString, QGVConnection *> QGVConnectionMap;
 
 class QGVConnectionManager: public QObject
 {
@@ -13,7 +13,7 @@ class QGVConnectionManager: public QObject
 public:
     QGVConnectionManager(QObject *parent = NULL);
     virtual ~QGVConnectionManager();
-    
+
     bool registerObject();
     void unregisterObject();
 
@@ -24,9 +24,9 @@ public Q_SLOTS: // METHODS
     QString RequestConnection(const QString &Protocol, const QVariantMap &Parameters, QDBusObjectPath &Object_Path);
 Q_SIGNALS: // SIGNALS
     void NewConnection(const QString &in0, const QDBusObjectPath &in1, const QString &in2);
-    
+
 private:
-    QGVConnectionList m_connectionList;
+    QGVConnectionMap m_connectionMap;
     uint m_connectionHandleCounter;
 };
 

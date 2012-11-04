@@ -1,9 +1,5 @@
 #include "QGVConnectionManager.h"
-#include "gen/connection_adapter.h"
 #include "gen/cm_adapter.h"
-
-#define QGV_CM_OBJECT_PATH  TP_CM_OBJECT_PATH  "/qgvtp"
-#define QGV_CM_SERVICE_PATH TP_CM_SERVICE_PATH ".qgvtp"
 
 #define CM_Param_Flags_Required       1
 #define CM_Param_Flags_Register       2
@@ -20,11 +16,11 @@ QGVConnectionManager::QGVConnectionManager(QObject *parent)
 QGVConnectionManager::~QGVConnectionManager()
 {
     QGVConnection *conn;
-    foreach (conn, m_connectionList) {
+    foreach (conn, m_connectionMap) {
         delete conn;
     }
 
-    m_connectionList.clear();
+    m_connectionMap.clear();
 }//QGVConnectionManager::~QGVConnectionManager
 
 bool
@@ -44,6 +40,7 @@ QGVConnectionManager::registerObject()
     rv = sessionBus.registerService (QGV_CM_SERVICE_PATH);
     if (!rv) {
         Q_WARN("Couldn't register CM object");
+        sessionBus.unregisterObject (QGV_CM_OBJECT_PATH);
         return rv;
     }
 
@@ -103,6 +100,8 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
                                         QDBusObjectPath &Object_Path)
 {
     QString rv;
+    QGVConnection *conn = NULL;
+    bool newConn = false;
 
     do { // Begin cleanup block
         if (Protocol != QGV_ProtocolName) {
@@ -123,27 +122,39 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
             }
         }
 
+        if (m_connectionMap.contains (username)) {
+            conn = m_connectionMap[username];
+            break;
+        }
+
         // Create the connection objects and associate them together
-        QGVConnection *conn = new QGVConnection(username, password, this);
+        conn = new QGVConnection(username, password, this);
         if (NULL == conn) {
             Q_WARN("Failed to create connection object");
             break;
         }
-        if (NULL == new ConnectionAdaptor(conn)) {
-            Q_WARN("Failed to create connection adapter object");
+
+        if (!conn->registerObject ()) {
             delete conn;
+            conn = NULL;
             break;
         }
 
         conn->setSelfHandle(++m_connectionHandleCounter);
-        m_connectionList.append(conn);
+        m_connectionMap[username] = conn;
 
-        //TODO: Set up object path from the connection object that we just got.
-        // Object_Path =
-
-        //TODO: Must emit NewConnection on success
-        emit NewConnection(QString(), Object_Path, QString());
+        // Must emit NewConnection on success
+        newConn = true;
     } while(0); // End cleanup block
+
+    if (NULL != conn) {
+        Object_Path = QDBusObjectPath(conn->getDBusObjectPath ());
+        rv = conn->getDBusBusName ();
+
+        if (newConn) {
+            emit NewConnection(rv, Object_Path, QGV_ProtocolName);
+        }
+    }
 
     return rv;
 }//QGVConnectionManager::RequestConnection

@@ -23,10 +23,20 @@
 #define TP_OBJECT_PATH    "org/freedesktop/Telepathy"
 // org/freedesktop/Telepathy/ConnectionManager
 #define TP_CM_OBJECT_PATH TP_OBJECT_PATH "/ConnectionManager"
+// org/freedesktop/Telepathy/Connection
+#define TP_CONN_OBJECT_PATH TP_OBJECT_PATH "/Connection"
 
 #define TP_SERVICE_PATH   "org.freedesktop.Telepathy"
 // org.freedesktop.Telepathy.ConnectionManager
 #define TP_CM_SERVICE_PATH TP_SERVICE_PATH ".ConnectionManager"
+// org.freedesktop.Telepathy.Connection
+#define TP_CONN_SERVICE_PATH TP_SERVICE_PATH ".Connection"
+
+
+#define QGV_CM_OBJECT_PATH  TP_CM_OBJECT_PATH  "/qgvtp"
+#define QGV_CM_SERVICE_PATH TP_CM_SERVICE_PATH ".qgvtp"
+#define QGV_CONN_OBJECT_PREFIX  TP_CONN_OBJECT_PATH  "/qgvtp/qgv/"
+#define QGV_CONN_SERVICE_PREFIX TP_CONN_SERVICE_PATH ".qgvtp.qgv/"
 
 #endif //__cplusplus
 #endif //__GLOBAL_H__
