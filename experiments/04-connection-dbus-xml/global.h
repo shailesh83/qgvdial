@@ -32,6 +32,29 @@
 // org.freedesktop.Telepathy.Connection
 #define TP_CONN_SERVICE_PATH TP_SERVICE_PATH ".Connection"
 
+#define ofdT_Conn_Iface TP_CONN_SERVICE_PATH ".Interface"
+// org.freedesktop.Telepathy.Connection.Interface.ContactBlocking
+#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".ContactBlocking"
+// org.freedesktop.Telepathy.Connection.Interface.ContactGroups
+#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".ContactGroups"
+// org.freedesktop.Telepathy.Connection.Interface.ContactList
+#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".ContactList"
+// org.freedesktop.Telepathy.Connection.Interface.Contacts
+#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".Contacts"
+// org.freedesktop.Telepathy.Connection.Interface.Capabilities
+#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".Capabilities"
+// org.freedesktop.Telepathy.Connection.Interface.Avatars
+#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".Avatars"
+// org.freedesktop.Telepathy.Connection.Interface.Aliasing
+#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".Aliasing"
+// org.freedesktop.Telepathy.Connection.Interface.SimplePresence
+#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".SimplePresence"
+// org.freedesktop.Telepathy.Connection.Interface.Presence
+#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".Presence"
+// org.freedesktop.Telepathy.Connection.Interface.Requests
+#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".Requests"
+
+////////////////////////////////////////////////////////////////////////////////
 
 #define QGV_CM_OBJECT_PATH  TP_CM_OBJECT_PATH  "/qgvtp"
 #define QGV_CM_SERVICE_PATH TP_CM_SERVICE_PATH ".qgvtp"

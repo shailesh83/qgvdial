@@ -137,9 +137,9 @@ QGVConnection::registerObject()
     m_dbusBusName.replace('@', '_');
 
     QDBusConnection sessionBus = QDBusConnection::sessionBus();
-    bool rv = sessionBus.registerObject(m_dbusObjectPath, this);
-
+    bool rv = false;
     do { // Begin cleanup block (not a loop)
+        rv = sessionBus.registerObject(m_dbusObjectPath, this);
         if (!rv) {
             Q_WARN("Couldn't register Connection object to user ") << m_user;
             break;
@@ -162,8 +162,10 @@ QGVConnection::registerObject()
     return rv;
 }//QGVConnection::registerObject
 
-bool
+void
 QGVConnection::unregisterObject()
 {
     QDBusConnection sessionBus = QDBusConnection::sessionBus();
+    sessionBus.unregisterObject (m_dbusObjectPath);
+    sessionBus.unregisterService (m_dbusBusName);
 }//QGVConnection::unregisterObject

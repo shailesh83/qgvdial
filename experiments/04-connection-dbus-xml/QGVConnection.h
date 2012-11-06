@@ -46,7 +46,7 @@ public:
     int getSelfHandle();
 
     bool registerObject();
-    bool unregisterObject();
+    void unregisterObject();
 
     QString getDBusObjectPath();
     QString getDBusBusName();
