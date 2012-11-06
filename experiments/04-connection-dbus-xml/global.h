@@ -36,23 +36,23 @@
 // org.freedesktop.Telepathy.Connection.Interface.ContactBlocking
 #define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".ContactBlocking"
 // org.freedesktop.Telepathy.Connection.Interface.ContactGroups
-#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".ContactGroups"
+#define ofdT_Conn_Iface_ContactGroups ofdT_Conn_Iface ".ContactGroups"
 // org.freedesktop.Telepathy.Connection.Interface.ContactList
-#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".ContactList"
+#define ofdT_Conn_Iface_ContactList ofdT_Conn_Iface ".ContactList"
 // org.freedesktop.Telepathy.Connection.Interface.Contacts
-#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".Contacts"
+#define ofdT_Conn_Iface_Contacts ofdT_Conn_Iface ".Contacts"
 // org.freedesktop.Telepathy.Connection.Interface.Capabilities
-#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".Capabilities"
+#define ofdT_Conn_Iface_Capabilities ofdT_Conn_Iface ".Capabilities"
 // org.freedesktop.Telepathy.Connection.Interface.Avatars
-#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".Avatars"
+#define ofdT_Conn_Iface_Avatars ofdT_Conn_Iface ".Avatars"
 // org.freedesktop.Telepathy.Connection.Interface.Aliasing
-#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".Aliasing"
+#define ofdT_Conn_Iface_Aliasing ofdT_Conn_Iface ".Aliasing"
 // org.freedesktop.Telepathy.Connection.Interface.SimplePresence
-#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".SimplePresence"
+#define ofdT_Conn_Iface_SimplePresence ofdT_Conn_Iface ".SimplePresence"
 // org.freedesktop.Telepathy.Connection.Interface.Presence
-#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".Presence"
+#define ofdT_Conn_Iface_Presence ofdT_Conn_Iface ".Presence"
 // org.freedesktop.Telepathy.Connection.Interface.Requests
-#define ofdT_Conn_Iface_ContactBlocking ofdT_Conn_Iface ".Requests"
+#define ofdT_Conn_Iface_Requests ofdT_Conn_Iface ".Requests"
 
 ////////////////////////////////////////////////////////////////////////////////
 
