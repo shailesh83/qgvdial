@@ -290,17 +290,41 @@
     </signal>
   </interface>
   <interface name="org.freedesktop.Telepathy.Connection">
-    <method name="RemoveClientInterest">
-      <arg name="Tokens" type="as" direction="in"/>
+    <method name="Connect">
     </method>
-    <method name="AddClientInterest">
-      <arg name="Tokens" type="as" direction="in"/>
+    <method name="Disconnect">
     </method>
-    <method name="RequestHandles">
+    <method name="GetInterfaces">
+      <arg name="Interfaces" type="as" direction="out"/>
+    </method>
+    <method name="GetProtocol">
+      <arg name="Protocol" type="s" direction="out"/>
+    </method>
+    <method name="GetSelfHandle">
+      <arg name="Self_Handle" type="u" direction="out"/>
+    </method>
+    <method name="GetStatus">
+      <arg name="Status" type="u" direction="out"/>
+    </method>
+    <method name="HoldHandles">
       <arg name="Handle_Type" type="u" direction="in"/>
-      <arg name="Identifiers" type="as" direction="in"/>
-      <arg name="Handles" type="au" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_au"/>
+      <arg name="Handles" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_au"/>
+    </method>
+    <method name="InspectHandles">
+      <arg name="Handle_Type" type="u" direction="in"/>
+      <arg name="Handles" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_au"/>
+      <arg name="Identifiers" type="as" direction="out"/>
+    </method>
+    <method name="ListChannels">
+      <arg name="Channel_Info" type="a(osuu)" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_a_osuu"/>
+    </method>
+    <method name="ReleaseHandles">
+      <arg name="Handle_Type" type="u" direction="in"/>
+      <arg name="Handles" type="au" direction="in"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_au"/>
     </method>
     <method name="RequestChannel">
       <arg name="Type" type="s" direction="in"/>
@@ -309,50 +333,20 @@
       <arg name="Suppress_Handler" type="b" direction="in"/>
       <arg name="Object_Path" type="o" direction="out"/>
     </method>
-    <method name="ReleaseHandles">
+    <method name="RequestHandles">
       <arg name="Handle_Type" type="u" direction="in"/>
-      <arg name="Handles" type="au" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_au"/>
+      <arg name="Identifiers" type="as" direction="in"/>
+      <arg name="Handles" type="au" direction="out"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_au"/>
     </method>
-    <method name="ListChannels">
-      <arg name="Channel_Info" type="a(osuu)" direction="out"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.Out0" value="Qt_Type_a_osuu"/>
+    <method name="AddClientInterest">
+      <arg name="Tokens" type="as" direction="in"/>
     </method>
-    <method name="InspectHandles">
-      <arg name="Handle_Type" type="u" direction="in"/>
-      <arg name="Handles" type="au" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_au"/>
-      <arg name="Identifiers" type="as" direction="out"/>
+    <method name="RemoveClientInterest">
+      <arg name="Tokens" type="as" direction="in"/>
     </method>
-    <method name="HoldHandles">
-      <arg name="Handle_Type" type="u" direction="in"/>
-      <arg name="Handles" type="au" direction="in"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="Qt_Type_au"/>
-    </method>
-    <method name="GetStatus">
-      <arg name="Status" type="u" direction="out"/>
-    </method>
-    <method name="GetSelfHandle">
-      <arg name="Self_Handle" type="u" direction="out"/>
-    </method>
-    <method name="GetProtocol">
-      <arg name="Protocol" type="s" direction="out"/>
-    </method>
-    <method name="GetInterfaces">
-      <arg name="Interfaces" type="as" direction="out"/>
-    </method>
-    <method name="Disconnect">
-    </method>
-    <method name="Connect">
-    </method>
-    <signal name="StatusChanged">
+    <signal name="SelfHandleChanged">
       <arg type="u"/>
-      <arg type="u"/>
-    </signal>
-    <signal name="ConnectionError">
-      <arg type="s"/>
-      <arg type="a{sv}"/>
-      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
     </signal>
     <signal name="NewChannel">
       <arg type="o"/>
@@ -361,7 +355,13 @@
       <arg type="u"/>
       <arg type="b"/>
     </signal>
-    <signal name="SelfHandleChanged">
+    <signal name="ConnectionError">
+      <arg type="s"/>
+      <arg type="a{sv}"/>
+      <annotation name="com.trolltech.QtDBus.QtTypeName.In1" value="QVariantMap"/>
+    </signal>
+    <signal name="StatusChanged">
+      <arg type="u"/>
       <arg type="u"/>
     </signal>
   </interface>

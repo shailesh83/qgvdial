@@ -3,6 +3,12 @@
 
 #include "global.h"
 
+enum QGVConnectionStatus {
+    QGVCS_Connected = 0,
+    QGVCS_Connecting = 1,
+    QGVCS_Disconnected = 2
+};
+
 class QGVConnection : public QObject
 {
     Q_OBJECT
@@ -29,14 +35,16 @@ public Q_SLOTS: // METHODS
     Qt_Type_a_osuu ListChannels();
     void ReleaseHandles(uint Handle_Type, const Qt_Type_au &Handles);
     void RemoveClientInterest(const QStringList &Tokens);
-    QDBusObjectPath RequestChannel(const QString &Type, uint Handle_Type, uint Handle, bool Suppress_Handler);
+    QDBusObjectPath RequestChannel(const QString &Type, uint Handle_Type,
+                                   uint Handle, bool Suppress_Handler);
     Qt_Type_au RequestHandles(uint Handle_Type, const QStringList &Identifiers);
+
 Q_SIGNALS: // SIGNALS
     void ConnectionError(const QString &in0, const QVariantMap &in1);
-    void NewChannel(const QDBusObjectPath &in0, const QString &in1, uint in2, uint in3, bool in4);
+    void NewChannel(const QDBusObjectPath &in0, const QString &in1, uint in2,
+                    uint in3, bool in4);
     void SelfHandleChanged(uint in0);
     void StatusChanged(uint in0, uint in1);
-
 
 public:
     QGVConnection(const QString &u, const QString &p, QObject *parent = NULL);
@@ -56,6 +64,8 @@ private:
     QString m_user, m_pass;
     QString m_dbusObjectPath;
     QString m_dbusBusName;
+
+    QGVConnectionStatus m_connStatus;
 };
 
 #endif//_QGV_CONNECTION_H_

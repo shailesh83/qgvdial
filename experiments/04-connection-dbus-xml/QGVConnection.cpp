@@ -6,6 +6,7 @@ QGVConnection::QGVConnection(const QString &u, const QString &p,
 : QObject(parent)
 , m_user(u)
 , m_pass(p)
+, m_connStatus(QGVCS_Disconnected)
 {
 }//QGVConnection::QGVConnection
 
