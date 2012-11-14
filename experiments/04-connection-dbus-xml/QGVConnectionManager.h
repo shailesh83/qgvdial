@@ -6,7 +6,7 @@
 
 typedef QMap<QString, QGVConnection *> QGVConnectionMap;
 
-class QGVConnectionManager: public QObject
+class QGVConnectionManager: public QObject, protected QDBusContext
 {
     Q_OBJECT
 

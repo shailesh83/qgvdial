@@ -9,18 +9,24 @@ enum QGVConnectionStatus {
     QGVCS_Disconnected = 2
 };
 
-class QGVConnection : public QObject
+class QGVConnection : public QObject, protected QDBusContext
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString m_dbusObjectPath
-               READ getDBusObjectPath)
-    Q_PROPERTY(QString m_dbusBusName
-               READ getDBusBusName)
+    Q_PROPERTY(QString m_dbusObjectPath READ getDBusObjectPath)
+    Q_PROPERTY(QString m_dbusBusName    READ getDBusBusName)
 
     Q_PROPERTY(int m_selfHandle
                READ getSelfHandle
                WRITE setSelfHandle)
+
+public: // DBus Interface properties
+    Q_PROPERTY(bool HasImmortalHandles  READ hasImmortalHandles)
+    bool hasImmortalHandles() const;
+
+    Q_PROPERTY(QStringList  Interfaces  READ GetInterfaces)
+    Q_PROPERTY(uint         SelfHandle  READ GetSelfHandle)
+    Q_PROPERTY(uint         Status      READ GetStatus)
 
 public Q_SLOTS: // METHODS
     void AddClientInterest(const QStringList &Tokens);
@@ -64,6 +70,7 @@ private:
     QString m_user, m_pass;
     QString m_dbusObjectPath;
     QString m_dbusBusName;
+    bool    m_hasImmortalHandle;
 
     QGVConnectionStatus m_connStatus;
 };

@@ -364,6 +364,10 @@
       <arg type="u"/>
       <arg type="u"/>
     </signal>
+    <property name="Interfaces" type="as" access="read" />
+    <property name="SelfHandle" type="u" access="read" />
+    <property name="Status" type="u" access="read" />
+    <property name="HasImmortalHandles" type="b" access="read" />
   </interface>
 <!--
 -->

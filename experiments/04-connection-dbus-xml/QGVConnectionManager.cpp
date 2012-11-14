@@ -32,15 +32,15 @@ QGVConnectionManager::registerObject()
     }
 
     QDBusConnection sessionBus = QDBusConnection::sessionBus();
-    bool rv = sessionBus.registerObject(QGV_CM_OBJECT_PATH, this);
+    bool rv = sessionBus.registerObject(QGV_CM_OP, this);
     if (!rv) {
         Q_WARN("Couldn't register CM object");
         return rv;
     }
-    rv = sessionBus.registerService (QGV_CM_SERVICE_PATH);
+    rv = sessionBus.registerService (QGV_CM_SP);
     if (!rv) {
         Q_WARN("Couldn't register CM object");
-        sessionBus.unregisterObject (QGV_CM_OBJECT_PATH);
+        sessionBus.unregisterObject (QGV_CM_OP);
         return rv;
     }
 
@@ -53,8 +53,8 @@ void
 QGVConnectionManager::unregisterObject()
 {
     QDBusConnection sessionBus = QDBusConnection::sessionBus();
-    sessionBus.unregisterService (QGV_CM_SERVICE_PATH);
-    sessionBus.unregisterObject(QGV_CM_OBJECT_PATH);
+    sessionBus.unregisterService (QGV_CM_SP);
+    sessionBus.unregisterObject(QGV_CM_OP);
 }//QGVConnectionManager::unregisterObject
 
 Qt_Type_a_susv
@@ -62,9 +62,12 @@ QGVConnectionManager::GetParameters(const QString &Protocol)
 {
     Qt_Type_a_susv rv;
     Struct_susv susv;
+    QString errMsg;
 
     if (Protocol != QGV_ProtocolName) {
-        Q_WARN(QString("Invalid protocol: %1").arg(Protocol));
+        errMsg = QString("Invalid protocol: %1").arg(Protocol);
+        Q_WARN(errMsg);
+        sendErrorReply (ofdT_Err_NotImplemented, errMsg);
         return rv;
     }
 
@@ -102,15 +105,17 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
     QString rv;
     QGVConnection *conn = NULL;
     bool newConn = false;
+    QString errName, errMsg;
 
     do { // Begin cleanup block
         if (Protocol != QGV_ProtocolName) {
-            Q_WARN(QString("Invalid protocol: %1").arg(Protocol));
+            errMsg = QString("Invalid protocol: %1").arg(Protocol);
+            errName = ofdT_Err_NotImplemented;
+            Q_WARN(errMsg);
             break;
         }
 
         QString username, password;
-
         foreach (QString key, Parameters.keys()) {
             if (key == "account") {
                 username = Parameters[key].toString();
@@ -122,21 +127,43 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
             }
         }
 
-        if (m_connectionMap.contains (username)) {
-            conn = m_connectionMap[username];
+        if (username.isEmpty () || password.isEmpty ()) {
+            errMsg = "Username or password is empty";
+            errName = ofdT_Err_InvalidArgument;
+            Q_WARN(errMsg);
             break;
+        }
+
+        if (m_connectionMap.contains (username)) {
+            errMsg = QString("Connection already exists for username: %1")
+                        .arg(username);
+            errName = ofdT_Err_NotAvailable;
+            Q_WARN(errMsg);
+            break;
+
+            // DO NOT RETURN THE EXISTING CONNECTION!!!!
+            //conn = m_connectionMap[username];
+            //break;
         }
 
         // Create the connection objects and associate them together
         conn = new QGVConnection(username, password, this);
         if (NULL == conn) {
-            Q_WARN("Failed to create connection object");
+            errMsg = QString("Failed to allocate connection for username: %1")
+                        .arg(username);
+            errName = ofdT_Err_NetworkError;
+            Q_WARN(errMsg);
             break;
         }
 
         if (!conn->registerObject ()) {
             delete conn;
             conn = NULL;
+
+            errMsg = QString("Failed to register connection for username: %1")
+                        .arg(username);
+            errName = ofdT_Err_NetworkError;
+            Q_WARN(errMsg);
             break;
         }
 
@@ -153,6 +180,10 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
 
         if (newConn) {
             emit NewConnection(rv, Object_Path, QGV_ProtocolName);
+        }
+    } else {
+        if (!errName.isEmpty ()) {
+            sendErrorReply (errName, errMsg);
         }
     }
 

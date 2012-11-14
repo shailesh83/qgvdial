@@ -6,6 +6,7 @@ QGVConnection::QGVConnection(const QString &u, const QString &p,
 : QObject(parent)
 , m_user(u)
 , m_pass(p)
+, m_hasImmortalHandle(false)
 , m_connStatus(QGVCS_Disconnected)
 {
 }//QGVConnection::QGVConnection
@@ -170,3 +171,9 @@ QGVConnection::unregisterObject()
     sessionBus.unregisterObject (m_dbusObjectPath);
     sessionBus.unregisterService (m_dbusBusName);
 }//QGVConnection::unregisterObject
+
+bool
+QGVConnection::hasImmortalHandles() const
+{
+    return m_hasImmortalHandle;
+}//QGVConnection::hasImmortalHandles
