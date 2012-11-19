@@ -32,15 +32,25 @@ QGVConnectionManager::registerObject()
     }
 
     QDBusConnection sessionBus = QDBusConnection::sessionBus();
-    bool rv = sessionBus.registerObject(QGV_CM_OP, this);
-    if (!rv) {
-        Q_WARN("Couldn't register CM object");
-        return rv;
-    }
+    bool rv;
+
     rv = sessionBus.registerService (QGV_CM_SP);
     if (!rv) {
-        Q_WARN("Couldn't register CM object");
-        sessionBus.unregisterObject (QGV_CM_OP);
+        QDBusError err = sessionBus.lastError ();
+        QString eStr = QString("Couldn't register CM service " QGV_CM_SP
+                               ": %1 : %2").arg (err.name (), err.message ());
+        Q_WARN(eStr);
+        return rv;
+    }
+
+    rv = sessionBus.registerObject(QGV_CM_OP, this);
+    if (!rv) {
+        QDBusError err = sessionBus.lastError ();
+        QString eStr = QString("Couldn't register CM object " QGV_CM_OP
+                               ": %1 : %2").arg (err.name (), err.message ());
+        Q_WARN(eStr);
+
+        sessionBus.unregisterService (QGV_CM_SP);
         return rv;
     }
 

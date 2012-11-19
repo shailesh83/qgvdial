@@ -3,12 +3,6 @@
 
 #include "global.h"
 
-enum QGVConnectionStatus {
-    QGVCS_Connected = 0,
-    QGVCS_Connecting = 1,
-    QGVCS_Disconnected = 2
-};
-
 class QGVConnection : public QObject, protected QDBusContext
 {
     Q_OBJECT
@@ -20,6 +14,22 @@ class QGVConnection : public QObject, protected QDBusContext
                READ getSelfHandle
                WRITE setSelfHandle)
 
+public:
+    enum ConnectionStatus {
+        Connected       = 0,
+        Connecting      = 1,
+        Disconnected    = 2
+    };
+    enum ConnectionStatusReason {
+        NoneSpecified           = 0,
+        Requested               = 1,
+        NetworkError            = 2,
+        AuthenticationFailed    = 3,
+        EncryptionError         = 4,
+        NameInUse               = 5
+        // There are more, but I don't care about them right now.
+    };
+
 public: // DBus Interface properties
     Q_PROPERTY(bool HasImmortalHandles  READ hasImmortalHandles)
     bool hasImmortalHandles() const;
@@ -29,6 +39,8 @@ public: // DBus Interface properties
     Q_PROPERTY(uint         Status      READ GetStatus)
 
 public Q_SLOTS: // METHODS
+////////////////////////////////////////////////////////////////////////////////
+// Connection interface methods
     void AddClientInterest(const QStringList &Tokens);
     void Connect();
     void Disconnect();
@@ -44,13 +56,24 @@ public Q_SLOTS: // METHODS
     QDBusObjectPath RequestChannel(const QString &Type, uint Handle_Type,
                                    uint Handle, bool Suppress_Handler);
     Qt_Type_au RequestHandles(uint Handle_Type, const QStringList &Identifiers);
+////////////////////////////////////////////////////////////////////////////////
+// Connection.Request interface methods
+    QDBusObjectPath CreateChannel(const QVariantMap &Request, QVariantMap &Properties);
+    bool EnsureChannel(const QVariantMap &Request, QDBusObjectPath &Channel, QVariantMap &Properties);
 
 Q_SIGNALS: // SIGNALS
+////////////////////////////////////////////////////////////////////////////////
+// Connection interface signals
     void ConnectionError(const QString &in0, const QVariantMap &in1);
     void NewChannel(const QDBusObjectPath &in0, const QString &in1, uint in2,
                     uint in3, bool in4);
     void SelfHandleChanged(uint in0);
-    void StatusChanged(uint in0, uint in1);
+    void StatusChanged(uint status, uint reason);
+
+////////////////////////////////////////////////////////////////////////////////
+// Connection.Request interface signals
+    void ChannelClosed(const QDBusObjectPath &in0);
+    void NewChannels(const Qt_Type_a_o_dict_sv &in0);
 
 public:
     QGVConnection(const QString &u, const QString &p, QObject *parent = NULL);
@@ -72,7 +95,7 @@ private:
     QString m_dbusBusName;
     bool    m_hasImmortalHandle;
 
-    QGVConnectionStatus m_connStatus;
+    ConnectionStatus m_connStatus;
 };
 
 #endif//_QGV_CONNECTION_H_

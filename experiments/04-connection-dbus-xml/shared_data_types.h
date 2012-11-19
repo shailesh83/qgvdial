@@ -11,7 +11,7 @@
 // a(susv)
 struct Struct_susv {
     QString     s1;
-    unsigned    u;
+    uint        u;
     QString     s2;
     QVariant    v;
 };
@@ -22,7 +22,7 @@ Q_DECLARE_METATYPE(Qt_Type_a_susv)
 
 ////////////////////////////////////////////////////////////////////////////////
 // au
-typedef QList<unsigned> Qt_Type_au;
+typedef QList<uint> Qt_Type_au;
 Q_DECLARE_METATYPE(Qt_Type_au)
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ Q_DECLARE_METATYPE(Qt_Type_dict_us)
 // a(su)
 struct Struct_su {
     QString     s;
-    unsigned    u;
+    uint        u;
 };
 Q_DECLARE_METATYPE(Struct_su)
 
@@ -44,7 +44,7 @@ Q_DECLARE_METATYPE(Qt_Type_a_su)
 ////////////////////////////////////////////////////////////////////////////////
 // a(us)
 struct Struct_us {
-    unsigned    u;
+    uint        u;
     QString     s;
 };
 Q_DECLARE_METATYPE(Struct_us)
@@ -135,7 +135,7 @@ Q_DECLARE_METATYPE(Qt_Type_dict_ss)
 
 // 2: (ubb$1) = (ubba{ss})
 struct Struct_ubb_dict_ss {
-    unsigned    u;
+    uint        u;
     bool        b1;
     bool        b2;
     Qt_Type_dict_ss dict_ss;

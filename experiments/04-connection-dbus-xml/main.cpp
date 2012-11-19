@@ -74,7 +74,7 @@ initLogging ()
     OsDependent &osd = Singletons::getRef().getOSD ();
     strLogfile = osd.getAppDirectory ();
     */
-    
+
     strLogfile = "~/logs";
     strLogfile += QDir::separator ();
     strLogfile += "qgvtp.log";
@@ -107,7 +107,7 @@ int
 main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    
+
     initLogging();
 
     QGVConnectionManager *cm = new QGVConnectionManager;
@@ -116,9 +116,15 @@ main(int argc, char *argv[])
         return -1;
     }
 
+    if (!cm->registerObject ()) {
+        delete cm;
+        Q_WARN("Failed to register connection manager");
+        return -1;
+    }
+
     int rv = a.exec();
-    
+
     deinitLogging();
-    
+
     return rv;
 }

@@ -21,7 +21,7 @@
 #define QGV_ProtocolName "qgv"
 
 // OP = Object path
-#define ofdT_OP                 "org/freedesktop/Telepathy"
+#define ofdT_OP                 "/org/freedesktop/Telepathy"
 // org/freedesktop/Telepathy/ConnectionManager
 #define ofDT_CM_OP      ofdT_OP "/ConnectionManager"
 // org/freedesktop/Telepathy/Connection
@@ -62,12 +62,15 @@
 #define ofdT_Err_NotAvailable "org.freedesktop.Telepathy.Error.NotAvailable"
 #define ofdT_Err_InvalidArgument "org.freedesktop.Telepathy.Error.InvalidArgument"
 #define ofdT_Err_NetworkError "org.freedesktop.Telepathy.Error.NetworkError"
+#define ofdT_Err_Disconnected "org.freedesktop.Telepathy.Error.Disconnected"
+// The most important error: Not implemented!
+#define ofdT_Err_NotImplemented "org.freedesktop.Telepathy.Error.NotImplemented"
 ////////////////////////////////////////////////////////////////////////////////
 
 #define QGV_CM_OP   ofDT_CM_OP "/qgvtp"
 #define QGV_CM_SP   ofdT_CM_SP ".qgvtp"
-#define QGV_CONN_OBJECT_PREFIX  ofdT_CONN_OP "/qgvtp/qgv/"
-#define QGV_CONN_SERVICE_PREFIX ofdT_CONN_SP ".qgvtp.qgv/"
+#define QGV_CONN_OP ofdT_CONN_OP "/qgvtp/qgv/"
+#define QGV_CONN_SP ofdT_CONN_SP ".qgvtp.qgv/"
 
 #endif //__cplusplus
 #endif //__GLOBAL_H__
