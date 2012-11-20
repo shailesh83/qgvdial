@@ -145,12 +145,12 @@ QGVConnection::ReleaseHandles(uint /*Handle_Type*/, const Qt_Type_au & /*Handles
 }//QGVConnection::ReleaseHandles
 
 void
-QGVConnection::RemoveClientInterest(const QStringList &Tokens)
+QGVConnection::RemoveClientInterest(const QStringList & /*Tokens*/)
 {
 }//QGVConnection::RemoveClientInterest
 
 QDBusObjectPath
-QGVConnection::RequestChannel(const QString &Type, uint /*Handle_Type*/,
+QGVConnection::RequestChannel(const QString & /*Type*/, uint /*Handle_Type*/,
                               uint /*Handle*/, bool /*Suppress_Handler*/)
 {
     QDBusObjectPath rv;

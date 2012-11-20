@@ -2,8 +2,8 @@
 #define _QGVCONNECTIONMANAGER_H_
 
 #include "global.h"
-#include "QGVConnection.h"
 
+class QGVConnection;
 typedef QMap<QString, QGVConnection *> QGVConnectionMap;
 
 class QGVConnectionManager: public QObject, protected QDBusContext

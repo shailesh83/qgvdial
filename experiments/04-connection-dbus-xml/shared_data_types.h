@@ -182,4 +182,7 @@ Q_DECLARE_METATYPE(Struct_dict_sv_as)
 typedef QList<Struct_dict_sv_as> Qt_Type_a_dict_sv_as;
 Q_DECLARE_METATYPE(Qt_Type_a_dict_sv_as)
 
+#include "QGVConnection.h"
+#include "QGVConnectionManager.h"
+
 #endif//__SHARED_DATA_TYPES__
