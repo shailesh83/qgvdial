@@ -16,7 +16,7 @@ QGVConnection::~QGVConnection()
 }//QGVConnection::~QGVConnection
 
 void
-QGVConnection::AddClientInterest(const QStringList &Tokens)
+QGVConnection::AddClientInterest(const QStringList & /*Tokens*/)
 {
 }//QGVConnection::AddClientInterest
 
@@ -48,16 +48,8 @@ QStringList
 QGVConnection::GetInterfaces()
 {
     QStringList rv;
-
-    if (m_connStatus != QGVConnection::Connected) {
-        sendErrorReply (ofdT_Err_Disconnected,
-                        "Connection object not connected");
-        Q_WARN("Not connected");
-    } else {
-        rv << ofdT_Conn_Iface_Requests;
-        Q_DEBUG("Returning interfaces");
-    }
-
+    rv << ofdT_Conn_Iface_Requests;
+    Q_DEBUG("Returning interfaces");
     return rv;
 }//QGVConnection::GetInterfaces
 
@@ -88,7 +80,7 @@ QGVConnection::GetStatus()
 }//QGVConnection::GetStatus
 
 void
-QGVConnection::HoldHandles(uint Handle_Type, const Qt_Type_au &Handles)
+QGVConnection::HoldHandles(uint /*Handle_Type*/, const Qt_Type_au & /*Handles*/)
 {
     if (m_connStatus != QGVConnection::Connected) {
         sendErrorReply (ofdT_Err_Disconnected,
@@ -100,7 +92,7 @@ QGVConnection::HoldHandles(uint Handle_Type, const Qt_Type_au &Handles)
 }//QGVConnection::HoldHandles
 
 QStringList
-QGVConnection::InspectHandles(uint Handle_Type, const Qt_Type_au &Handles)
+QGVConnection::InspectHandles(uint /*Handle_Type*/, const Qt_Type_au & /*Handles*/)
 {
     QStringList rv;
 
@@ -138,7 +130,7 @@ QGVConnection::ListChannels()
 }//QGVConnection::ListChannels
 
 void
-QGVConnection::ReleaseHandles(uint Handle_Type, const Qt_Type_au &Handles)
+QGVConnection::ReleaseHandles(uint /*Handle_Type*/, const Qt_Type_au & /*Handles*/)
 {
     do {
         if (m_connStatus != QGVConnection::Connected) {
@@ -158,8 +150,8 @@ QGVConnection::RemoveClientInterest(const QStringList &Tokens)
 }//QGVConnection::RemoveClientInterest
 
 QDBusObjectPath
-QGVConnection::RequestChannel(const QString &Type, uint Handle_Type,
-                              uint Handle, bool Suppress_Handler)
+QGVConnection::RequestChannel(const QString &Type, uint /*Handle_Type*/,
+                              uint /*Handle*/, bool /*Suppress_Handler*/)
 {
     QDBusObjectPath rv;
 
@@ -179,7 +171,8 @@ QGVConnection::RequestChannel(const QString &Type, uint Handle_Type,
 }//QGVConnection::RequestChannel
 
 Qt_Type_au
-QGVConnection::RequestHandles(uint Handle_Type, const QStringList &Identifiers)
+QGVConnection::RequestHandles(uint /*Handle_Type*/,
+                              const QStringList & /*Identifiers*/)
 {
     Qt_Type_au rv;
 
@@ -293,19 +286,112 @@ QGVConnection::hasImmortalHandles() const
     return m_hasImmortalHandle;
 }//QGVConnection::hasImmortalHandles
 
+bool
+QGVConnection::processChannel(const QVariantMap &request)
+{
+    QVariant val;
+
+    if (!request.contains (ofdT_Channel_TargetID)) {
+        sendErrorReply (ofdT_Err_InvalidArgument,
+                        "Target ID not present in request");
+        Q_WARN("Target ID not present in request");
+        return false;
+    }
+
+    val = request[ofdT_Channel_TargetID];
+    QString strNum = val.toString ();
+    if ((!val.isValid ()) || (strNum.isEmpty ())) {
+        sendErrorReply (ofdT_Err_InvalidArgument,
+                        "Target ID in request is not valid");
+        Q_WARN("Target ID in request is not valid");
+        return false;
+    }
+
+    if (!request.contains (ofdT_Channel_ChannelType)) {
+        sendErrorReply (ofdT_Err_InvalidArgument,
+                        "Channel type not present in request");
+        Q_WARN("Target ID not present in request");
+        return false;
+    }
+
+    val = request[ofdT_Channel_ChannelType];
+    QString strType = val.toString ();
+    if ((!val.isValid ()) || (strType.isEmpty ())) {
+        sendErrorReply (ofdT_Err_InvalidArgument,
+                        "Channel type in request is not valid");
+        Q_WARN("Target ID in request is not valid");
+        return false;
+    }
+
+    if (strType == ofdT_ChannelType_StreamedMedia) {
+        Q_DEBUG(QString("Call to %1").arg (strNum));
+    } else if (strType == ofdT_ChannelType_Text) {
+        Q_DEBUG(QString("Text to %1. Request fields:").arg (strNum));
+
+        QStringList keys = request.keys ();
+        foreach (QString key, keys) {
+            Q_DEBUG(QString("[%1] = %2").arg(key, request[key].toString()));
+        }
+    } else {
+        sendErrorReply (ofdT_Err_UnsupportedMedia,
+                        "Channel type in request is not valid");
+        Q_WARN(QString("Unsupported channel type %1").arg(strType));
+        return false;
+    }
+
+    return true;
+}//QGVConnection::processChannel
+
 QDBusObjectPath
 QGVConnection::CreateChannel(const QVariantMap &Request,    // IN
-                             QVariantMap &Properties)       // OUT
+                             QVariantMap & /*Properties*/)  // OUT
 {
+    if (processChannel (Request)) {
+        sendErrorReply (ofdT_Err_Disconnected, "Channel created successfully");
+    }
+
     QDBusObjectPath rv;
     return rv;
 }//QGVConnection::CreateChannel
 
 bool
 QGVConnection::EnsureChannel(const QVariantMap &Request,    // IN
-                             QDBusObjectPath &Channel,      // OUT
-                             QVariantMap &Properties)       // OUT
+                             QDBusObjectPath & /*Channel*/, // OUT
+                             QVariantMap & /*Properties*/)  // OUT
 {
+    if (processChannel (Request)) {
+        sendErrorReply (ofdT_Err_Disconnected, "Channel ensured successfully");
+    }
+
     bool rv = false;
     return rv;
 }//QGVConnection::EnsureChannel
+
+Qt_Type_a_o_dict_sv
+QGVConnection::channels() const
+{
+    Qt_Type_a_o_dict_sv rv;
+    // Always return an empty channels list
+    return rv;
+}//QGVConnection::channels
+
+Qt_Type_a_dict_sv_as
+QGVConnection::requestableChannelClasses() const
+{
+    uint hType(1);  // Handle type : Contact
+    Struct_dict_sv_as r1, r2;
+
+    r1.sv.insert (ofdT_Channel_TargetHandleType, hType);
+    r1.sv.insert (ofdT_Channel_ChannelType, ofdT_ChannelType_StreamedMedia);
+    r1.as.append (ofdT_Channel_TargetHandle);
+    r1.as.append (ofdT_StreamedMedia_InitialAudio);
+
+    r2.sv.insert (ofdT_Channel_TargetHandleType, hType);
+    r2.sv.insert (ofdT_Channel_ChannelType, ofdT_ChannelType_Text);
+    r2.as.append (ofdT_Channel_TargetHandle);
+
+    Qt_Type_a_dict_sv_as rv;
+    rv.append (r1);
+    rv.append (r2);
+    return rv;
+}//QGVConnection::requestableChannelClasses

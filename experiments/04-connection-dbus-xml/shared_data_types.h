@@ -157,6 +157,7 @@ Q_DECLARE_METATYPE(Struct_o_dict_sv)
 
 // 2: a$1
 typedef QList<Struct_o_dict_sv> Qt_Type_a_o_dict_sv;
+Q_DECLARE_METATYPE(Qt_Type_a_o_dict_sv)
 
 ////////////////////////////////////////////////////////////////////////////////
 // a{u(uss)}
@@ -169,5 +170,16 @@ Q_DECLARE_METATYPE(Struct_uss)
 
 typedef QMap<unsigned, Struct_uss> Qt_Type_dict_u_uss;
 Q_DECLARE_METATYPE(Qt_Type_dict_u_uss)
+
+////////////////////////////////////////////////////////////////////////////////
+// a(a{sv}as)
+struct Struct_dict_sv_as {
+    QVariantMap sv;
+    QStringList as;
+};
+Q_DECLARE_METATYPE(Struct_dict_sv_as)
+
+typedef QList<Struct_dict_sv_as> Qt_Type_a_dict_sv_as;
+Q_DECLARE_METATYPE(Qt_Type_a_dict_sv_as)
 
 #endif//__SHARED_DATA_TYPES__

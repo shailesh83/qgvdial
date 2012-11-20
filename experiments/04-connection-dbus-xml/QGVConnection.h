@@ -30,13 +30,22 @@ public:
         // There are more, but I don't care about them right now.
     };
 
-public: // DBus Interface properties
+public:
+    // DBus Interface properties for Connection
     Q_PROPERTY(bool HasImmortalHandles  READ hasImmortalHandles)
     bool hasImmortalHandles() const;
 
     Q_PROPERTY(QStringList  Interfaces  READ GetInterfaces)
     Q_PROPERTY(uint         SelfHandle  READ GetSelfHandle)
     Q_PROPERTY(uint         Status      READ GetStatus)
+
+    // DBus Interface properties for Connection.Interface.Requests
+    Q_PROPERTY(Qt_Type_a_o_dict_sv Channels READ channels)
+    Qt_Type_a_o_dict_sv channels() const;
+
+    Q_PROPERTY(Qt_Type_a_dict_sv_as RequestableChannelClasses READ requestableChannelClasses)
+    Qt_Type_a_dict_sv_as requestableChannelClasses() const;
+
 
 public Q_SLOTS: // METHODS
 ////////////////////////////////////////////////////////////////////////////////
@@ -87,6 +96,9 @@ public:
 
     QString getDBusObjectPath();
     QString getDBusBusName();
+
+private:
+    bool processChannel(const QVariantMap &request);
 
 private:
     uint    m_selfHandle;

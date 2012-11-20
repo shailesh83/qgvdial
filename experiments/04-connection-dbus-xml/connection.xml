@@ -288,6 +288,12 @@
       <arg type="a(oa{sv})"/>
       <annotation name="com.trolltech.QtDBus.QtTypeName.In0" value="Qt_Type_a_o_dict_sv"/>
     </signal>
+    <property name="Channels" type="a(oa{sv})" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="Qt_Type_a_o_dict_sv"/>
+    </property>
+    <property name="RequestableChannelClasses" type="a(a{sv}as)" access="read">
+      <annotation name="org.qtproject.QtDBus.QtTypeName" value="Qt_Type_a_dict_sv_as"/>
+    </property>
   </interface>
   <interface name="org.freedesktop.Telepathy.Connection">
     <method name="Connect">

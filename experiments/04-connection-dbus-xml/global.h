@@ -63,9 +63,31 @@
 #define ofdT_Err_InvalidArgument "org.freedesktop.Telepathy.Error.InvalidArgument"
 #define ofdT_Err_NetworkError "org.freedesktop.Telepathy.Error.NetworkError"
 #define ofdT_Err_Disconnected "org.freedesktop.Telepathy.Error.Disconnected"
+#define ofdT_Err_UnsupportedMedia "org.freedesktop.Telepathy.Error.Media.UnsupportedType"
 // The most important error: Not implemented!
 #define ofdT_Err_NotImplemented "org.freedesktop.Telepathy.Error.NotImplemented"
 ////////////////////////////////////////////////////////////////////////////////
+// "org.freedesktop.Telepathy.Channel"
+#define ofdT_Channel ofdT_SP ".Channel"
+// "org.freedesktop.Telepathy.Channel.TargetID"
+#define ofdT_Channel_TargetID           ofdT_Channel ".TargetID"
+
+// "org.freedesktop.Telepathy.Channel.ChannelType"
+#define ofdT_Channel_ChannelType        ofdT_Channel ".ChannelType"
+// "org.freedesktop.Telepathy.Channel.Type"
+#define ofdT_ChannelType_Value_Base     ofdT_Channel ".Type"
+// "org.freedesktop.Telepathy.Channel.Type.StreamedMedia"
+#define ofdT_ChannelType_StreamedMedia  ofdT_ChannelType_Value_Base ".StreamedMedia"
+// "org.freedesktop.Telepathy.Channel.Type.Text"
+#define ofdT_ChannelType_Text           ofdT_ChannelType_Value_Base ".Text"
+
+// "org.freedesktop.Telepathy.Channel.TargetHandle"
+#define ofdT_Channel_TargetHandle       ofdT_Channel ".TargetHandle"
+// "org.freedesktop.Telepathy.Channel.TargetHandleType"
+#define ofdT_Channel_TargetHandleType   ofdT_Channel ".TargetHandleType"
+// "org.freedesktop.Telepathy.Channel.Type.StreamedMedia.InitialAudio"
+#define ofdT_StreamedMedia_InitialAudio ofdT_ChannelType_StreamedMedia  ".InitialAudio"
+
 
 #define QGV_CM_OP   ofDT_CM_OP "/qgvtp"
 #define QGV_CM_SP   ofdT_CM_SP ".qgvtp"
