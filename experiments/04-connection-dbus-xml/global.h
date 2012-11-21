@@ -19,6 +19,7 @@
 #define Q_CRIT(_s) qCritical() << QString("%1(%2): %3").arg(__FULLFUNC__).arg(__LINE__).arg(_s)
 
 #define QGV_ProtocolName "qgv"
+#define QGV_CMName       "qgvtp"
 
 // OP = Object path
 #define ofdT_OP                 "/org/freedesktop/Telepathy"
@@ -89,10 +90,10 @@
 #define ofdT_StreamedMedia_InitialAudio ofdT_ChannelType_StreamedMedia  ".InitialAudio"
 
 
-#define QGV_CM_OP   ofDT_CM_OP "/qgvtp"
-#define QGV_CM_SP   ofdT_CM_SP ".qgvtp"
-#define QGV_CONN_OP ofdT_CONN_OP "/qgvtp/qgv/"
-#define QGV_CONN_SP ofdT_CONN_SP ".qgvtp.qgv/"
+#define QGV_CM_OP   ofDT_CM_OP "/" QGV_CMName
+#define QGV_CM_SP   ofdT_CM_SP "." QGV_CMName
+#define QGV_CONN_OP ofdT_CONN_OP "/" QGV_CMName "/" QGV_ProtocolName "/"
+#define QGV_CONN_SP ofdT_CONN_SP "." QGV_CMName "." QGV_ProtocolName
 
 #endif //__cplusplus
 #endif //__GLOBAL_H__
