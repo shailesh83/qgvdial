@@ -35,7 +35,9 @@ SOURCES += gen/cm_proxy.cpp             \
            protocol_proxy.cpp
 }
 
-OTHER_FILES += \
-    protocol.xml \
-    connection.xml \
-    cm.xml
+OTHER_FILES +=              \
+    protocol.xml            \
+    connection.xml          \
+    cm.xml                  \
+    connection-ifaces.xml   \
+    channel.xml

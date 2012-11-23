@@ -12,6 +12,8 @@ qdbusxml2cpp -v -a connection_adapter -v -i shared_data_types.h -l QGVConnection
 echo connection.xml done.
 qdbusxml2cpp -v -a protocol_adapter -v -i shared_data_types.h protocol.xml
 echo protocol.xml done.
+qdbusxml2cpp -v -a channel_adapter -v -i shared_data_types.h channel.xml
+echo channel.xml done.
 
 mv *_adapter* gen
 
