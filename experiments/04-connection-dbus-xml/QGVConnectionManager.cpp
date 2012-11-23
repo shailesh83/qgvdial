@@ -1,6 +1,7 @@
 #include "QGVConnectionManager.h"
 #include "gen/cm_adapter.h"
 
+#define CM_Param_Flags_None           0
 #define CM_Param_Flags_Required       1
 #define CM_Param_Flags_Register       2
 #define CM_Param_Flags_Has_Default    4
@@ -75,6 +76,8 @@ QGVConnectionManager::GetParameters(const QString &Protocol)
     Struct_susv susv;
     QString errMsg;
 
+    Q_DEBUG(QString("Parameters requested for protocol %1").arg (Protocol));
+
     if (Protocol != QGV_ProtocolName) {
         errMsg = QString("Invalid protocol: %1").arg(Protocol);
         Q_WARN(errMsg);
@@ -85,16 +88,15 @@ QGVConnectionManager::GetParameters(const QString &Protocol)
     // I could have used "username", but "account" is the well known name for
     // this parameter
     susv.s1 = "account";
-    susv.u  = CM_Param_Flags_Required | CM_Param_Flags_Register;
-    susv.s2 = "s";          // signature
-    susv.v.setVariant(QString());    // default value
+    susv.u  = CM_Param_Flags_None;
+    susv.s2 = "s";                  // DBus signature
+    susv.v.setVariant(QString());   // default value
     rv.append(susv);
 
-    susv.s1 = "password";   // name
-    susv.u  = CM_Param_Flags_Required | CM_Param_Flags_Register |
-              CM_Param_Flags_Secret;
-    susv.s2 = "s";          // signature
-    susv.v.setVariant(QString());    // default value
+    susv.s1 = "password";
+    susv.u  = CM_Param_Flags_None;
+    susv.s2 = "s";                  // DBus signature
+    susv.v.setVariant(QString());   // default value
     rv.append(susv);
 
     return rv;
@@ -103,7 +105,7 @@ QGVConnectionManager::GetParameters(const QString &Protocol)
 QStringList
 QGVConnectionManager::ListProtocols()
 {
-    Q_DEBUG("List protocols");
+    Q_DEBUG("Request to list protocols");
     return QStringList(QGV_ProtocolName);
 }//QGVConnectionManager::ListProtocols
 
@@ -116,6 +118,8 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
     QGVConnection *conn = NULL;
     bool newConn = false;
     QString errName, errMsg;
+
+    Q_DEBUG(QString("Connection requested to protocol %1").arg (Protocol));
 
     do { // Begin cleanup block
         if (Protocol != QGV_ProtocolName) {

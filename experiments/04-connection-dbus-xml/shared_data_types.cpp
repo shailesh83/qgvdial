@@ -36,10 +36,11 @@ registerDBusTypes()
 */
 }//registerDBusTypes
 
-
 const QDBusArgument &
 operator>>(const QDBusArgument &argument, Struct_susv &param)
 {
+    // I don't know how this works or why without it there are compiler errors.
+    // I just copied it from the Qt documentation for QDBusArgument
     argument.beginStructure();
     argument >> param.s1 >> param.u >> param.s2 >> param.v;
     argument.endStructure();

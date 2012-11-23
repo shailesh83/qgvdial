@@ -59,14 +59,20 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Errors
-#define ofdT_Err_NotImplemented "org.freedesktop.Telepathy.Error.NotImplemented"
-#define ofdT_Err_NotAvailable "org.freedesktop.Telepathy.Error.NotAvailable"
-#define ofdT_Err_InvalidArgument "org.freedesktop.Telepathy.Error.InvalidArgument"
-#define ofdT_Err_NetworkError "org.freedesktop.Telepathy.Error.NetworkError"
-#define ofdT_Err_Disconnected "org.freedesktop.Telepathy.Error.Disconnected"
-#define ofdT_Err_UnsupportedMedia "org.freedesktop.Telepathy.Error.Media.UnsupportedType"
-// The most important error: Not implemented!
-#define ofdT_Err_NotImplemented "org.freedesktop.Telepathy.Error.NotImplemented"
+#define ofdTE   ofdT_SP ".Error"
+// "org.freedesktop.Telepathy.Error.NotImplemented"
+#define ofdT_Err_NotImplemented     ofdTE ".Error.NotImplemented"
+// "org.freedesktop.Telepathy.Error.NotAvailable"
+#define ofdT_Err_NotAvailable       ofdTE ".NotAvailable"
+// "org.freedesktop.Telepathy.Error.InvalidArgument"
+#define ofdT_Err_InvalidArgument    ofdTE ".InvalidArgument"
+// "org.freedesktop.Telepathy.Error.NetworkError"
+#define ofdT_Err_NetworkError       ofdTE ".NetworkError"
+// "org.freedesktop.Telepathy.Error.Disconnected"
+#define ofdT_Err_Disconnected       ofdTE ".Disconnected"
+// "org.freedesktop.Telepathy.Error.Media.UnsupportedType"
+#define ofdT_Err_UnsupportedMedia   ofdTE ".Media.UnsupportedType"
+
 ////////////////////////////////////////////////////////////////////////////////
 // "org.freedesktop.Telepathy.Channel"
 #define ofdT_Channel ofdT_SP ".Channel"
