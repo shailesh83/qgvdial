@@ -328,11 +328,46 @@ QGVConnection::processChannel(const QVariantMap &request)
         Q_DEBUG(QString("[%1] = %2").arg(key, request[key].toString()));
     }
 
+    bool success = false;
     if (strType == ofdT_ChannelType_StreamedMedia) {
         Q_DEBUG(QString("Call to %1").arg(strNum));
-        sendErrorReply (ofdT_Err_Disconnected, "Channel created successfully");
+
+        QDBusInterface iface("org.QGVDial.CallServer",
+                             "/org/QGVDial/CallServer",
+                             "",
+                             QDBusConnection::sessionBus());
+        if (!iface.isValid()) {
+            sendErrorReply(ofdT_Err_NotAvailable,
+                           "qgvtp - QGVDial call interface is not ready");
+            Q_WARN("QGVDial call interface is not ready");
+            return false;
+        }
+        iface.call("Call", strNum);
+
+        Q_DEBUG("Call started successfully");
+        sendErrorReply (ofdT_Err_NetworkError, "Channel created successfully");
+        success = true;
     } else if (strType == ofdT_ChannelType_Text) {
         Q_DEBUG(QString("Text to %1. Request fields:").arg(strNum));
+
+        QDBusInterface iface("org.QGVDial.TextServer",
+                             "/org/QGVDial/TextServer",
+                             "",
+                             QDBusConnection::sessionBus());
+        if (!iface.isValid()) {
+            sendErrorReply(ofdT_Err_NotAvailable,
+                           "qgvtp - QGVDial text interface is not ready");
+            Q_WARN("QGVDial text interface is not ready");
+            return false;
+        }
+
+        QStringList listNumbers;
+        listNumbers += strNum;
+        iface.call("TextWithoutData", listNumbers);
+
+        Q_DEBUG("Text initiated successfully");
+        sendErrorReply (ofdT_Err_NetworkError, "Channel created successfully");
+        success = true;
     } else {
         sendErrorReply (ofdT_Err_UnsupportedMedia,
                         "Channel type in request is not valid");
@@ -340,16 +375,14 @@ QGVConnection::processChannel(const QVariantMap &request)
         return false;
     }
 
-    return true;
+    return success;
 }//QGVConnection::processChannel
 
 QDBusObjectPath
 QGVConnection::CreateChannel(const QVariantMap &Request,    // IN
                              QVariantMap & /*Properties*/)  // OUT
 {
-    if (processChannel (Request)) {
-        sendErrorReply (ofdT_Err_Disconnected, "Channel created successfully");
-    }
+    bool success = processChannel (Request);
 
     QDBusObjectPath rv;
     return rv;
@@ -360,12 +393,7 @@ QGVConnection::EnsureChannel(const QVariantMap &Request,    // IN
                              QDBusObjectPath & /*Channel*/, // OUT
                              QVariantMap & /*Properties*/)  // OUT
 {
-    if (processChannel (Request)) {
-        sendErrorReply (ofdT_Err_Disconnected, "Channel ensured successfully");
-    }
-
-    bool rv = false;
-    return rv;
+    return processChannel (Request);
 }//QGVConnection::EnsureChannel
 
 Qt_Type_a_o_dict_sv
