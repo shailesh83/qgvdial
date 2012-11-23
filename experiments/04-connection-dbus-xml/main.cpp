@@ -112,7 +112,7 @@ main(int argc, char *argv[])
 
     registerDBusTypes();
 
-    QGVConnectionManager *cm = new QGVConnectionManager;
+    QGVConnectionManager *cm = new QGVConnectionManager(&a);
     if (NULL == cm) {
         Q_WARN("Failed to allocate connection manager");
         return -1;
@@ -123,6 +123,7 @@ main(int argc, char *argv[])
         Q_WARN("Failed to register connection manager");
         return -1;
     }
+    Q_DEBUG("CM object and service registered. Start event loop");
 
     int rv = a.exec();
 

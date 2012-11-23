@@ -21,6 +21,7 @@ QGVConnectionManager::~QGVConnectionManager()
     }
 
     m_connectionMap.clear();
+    Q_DEBUG("Destroyed CM");
 }//QGVConnectionManager::~QGVConnectionManager
 
 bool
@@ -102,6 +103,7 @@ QGVConnectionManager::GetParameters(const QString &Protocol)
 QStringList
 QGVConnectionManager::ListProtocols()
 {
+    Q_DEBUG("List protocols");
     return QStringList(QGV_ProtocolName);
 }//QGVConnectionManager::ListProtocols
 
@@ -163,6 +165,7 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
             Q_WARN(errMsg);
             break;
         }
+        Q_DEBUG("New connection object created");
 
         if (!conn->registerObject ()) {
             delete conn;
@@ -174,6 +177,7 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
             Q_WARN(errMsg);
             break;
         }
+        Q_DEBUG("New connection object registered");
 
         conn->setSelfHandle(++m_connectionHandleCounter);
         m_connectionMap[username] = conn;
