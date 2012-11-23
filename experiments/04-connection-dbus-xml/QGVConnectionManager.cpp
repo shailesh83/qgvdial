@@ -102,9 +102,7 @@ QGVConnectionManager::GetParameters(const QString &Protocol)
 QStringList
 QGVConnectionManager::ListProtocols()
 {
-    QStringList rv;
-    rv.append(QGV_ProtocolName);
-    return rv;
+    return QStringList(QGV_ProtocolName);
 }//QGVConnectionManager::ListProtocols
 
 QString
@@ -190,10 +188,12 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
 
         if (newConn) {
             emit NewConnection(rv, Object_Path, QGV_ProtocolName);
+            Q_DEBUG(QString("New connection. OP = %1").arg(Object_Path.path()));
         }
     } else {
         if (!errName.isEmpty ()) {
             sendErrorReply (errName, errMsg);
+            Q_WARN(QString("errName = %1, errMsg = %2").arg(errName, errMsg));
         }
     }
 
