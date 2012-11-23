@@ -17,7 +17,8 @@ HEADERS += global.h                     \
            QGVConnectionManager.h       \
            QGVConnection.h
 
-SOURCES += gen/cm_adapter.cpp           \
+SOURCES += shared_data_types.cpp        \
+           gen/cm_adapter.cpp           \
            gen/connection_adapter.cpp   \
            gen/protocol_adapter.cpp     \
            main.cpp                     \

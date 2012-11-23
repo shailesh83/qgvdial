@@ -13,7 +13,7 @@ struct Struct_susv {
     QString     s1;
     uint        u;
     QString     s2;
-    QVariant    v;
+    QDBusVariant    v;
 };
 Q_DECLARE_METATYPE(Struct_susv)
 
@@ -184,5 +184,11 @@ Q_DECLARE_METATYPE(Qt_Type_a_dict_sv_as)
 
 #include "QGVConnection.h"
 #include "QGVConnectionManager.h"
+    
+void registerDBusTypes();
+const QDBusArgument &
+operator>>(const QDBusArgument &argument, Struct_susv &param);
+QDBusArgument &
+operator<<(QDBusArgument &argument, const Struct_susv &param);
 
 #endif//__SHARED_DATA_TYPES__

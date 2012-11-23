@@ -6,7 +6,7 @@ QtMsgHandler    pOldHandler = NULL;
 QFile fLogfile;       //! Logfile
 int   logLevel = 5;   //! Log level
 int   logCounter = 0; //! Number of log entries since the last log flush
-#define LOG_FLUSH_LEVEL 50
+#define LOG_FLUSH_LEVEL 0 // 50
 
 QStringList arrLogFiles;
 
@@ -109,6 +109,8 @@ main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     initLogging();
+
+    registerDBusTypes();
 
     QGVConnectionManager *cm = new QGVConnectionManager;
     if (NULL == cm) {

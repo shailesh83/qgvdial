@@ -86,14 +86,14 @@ QGVConnectionManager::GetParameters(const QString &Protocol)
     susv.s1 = "account";
     susv.u  = CM_Param_Flags_Required | CM_Param_Flags_Register;
     susv.s2 = "s";          // signature
-    susv.v  = QString();    // default value
+    susv.v.setVariant(QString());    // default value
     rv.append(susv);
 
     susv.s1 = "password";   // name
     susv.u  = CM_Param_Flags_Required | CM_Param_Flags_Register |
               CM_Param_Flags_Secret;
     susv.s2 = "s";          // signature
-    susv.v  = QString();    // default value
+    susv.v.setVariant(QString());    // default value
     rv.append(susv);
 
     return rv;
