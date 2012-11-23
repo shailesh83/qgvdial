@@ -332,12 +332,12 @@ QGVConnection::processChannel(const QVariantMap &request)
     if (strType == ofdT_ChannelType_StreamedMedia) {
         Q_DEBUG(QString("Call to %1").arg(strNum));
 
-        QDBusInterface iface("org.QGVDial.CallServer",
+        QDBusInterface iface("org.QGVDial.APIServer",
                              "/org/QGVDial/CallServer",
                              "",
                              QDBusConnection::sessionBus());
         if (!iface.isValid()) {
-            sendErrorReply(ofdT_Err_NotAvailable,
+            sendErrorReply(ofdT_Err_NetworkError,
                            "qgvtp - QGVDial call interface is not ready");
             Q_WARN("QGVDial call interface is not ready");
             return false;
@@ -350,7 +350,7 @@ QGVConnection::processChannel(const QVariantMap &request)
     } else if (strType == ofdT_ChannelType_Text) {
         Q_DEBUG(QString("Text to %1. Request fields:").arg(strNum));
 
-        QDBusInterface iface("org.QGVDial.TextServer",
+        QDBusInterface iface("org.QGVDial.APIServer",
                              "/org/QGVDial/TextServer",
                              "",
                              QDBusConnection::sessionBus());
