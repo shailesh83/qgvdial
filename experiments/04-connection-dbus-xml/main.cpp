@@ -75,9 +75,7 @@ initLogging ()
     strLogfile = osd.getAppDirectory ();
     */
 
-    strLogfile = "~/logs";
-    strLogfile += QDir::separator ();
-    strLogfile += "qgvtp.log";
+    strLogfile = QDir::homePath() + "/.qgvdial/qgv-tp.log";
 
     for (int i = 4; i >= 0; i--) {
         arrLogFiles.append (QString("%1.%2").arg(strLogfile).arg(i));

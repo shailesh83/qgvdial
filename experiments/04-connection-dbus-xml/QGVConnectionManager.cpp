@@ -141,12 +141,14 @@ QGVConnectionManager::RequestConnection(const QString &Protocol,
             }
         }
 
+        /* With our CM, the username is going to necessarily going to be empty.
         if (username.isEmpty () || password.isEmpty ()) {
             errMsg = "Username or password is empty";
             errName = ofdT_Err_InvalidArgument;
             Q_WARN(errMsg);
             break;
         }
+        */
 
         if (m_connectionMap.contains (username)) {
             errMsg = QString("Connection already exists for username: %1")

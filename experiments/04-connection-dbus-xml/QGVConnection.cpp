@@ -26,7 +26,7 @@ QGVConnection::Connect()
     if (m_connStatus != QGVConnection::Connected) {
         m_connStatus = QGVConnection::Connected;
         emit StatusChanged (m_connStatus, QGVConnection::Requested);
-        Q_DEBUG(QString("Connect requested for user %1").arg (m_user));
+        Q_DEBUG(QString("Connect requested for user %1").arg(m_user));
     } else {
         Q_WARN(QString("Duplicate connect for user %1").arg(m_user));
     }
@@ -38,7 +38,7 @@ QGVConnection::Disconnect()
     if (m_connStatus != QGVConnection::Disconnected) {
         m_connStatus = QGVConnection::Disconnected;
         emit StatusChanged (m_connStatus, QGVConnection::Requested);
-        Q_DEBUG(QString("Disconnect requested for user %1").arg (m_user));
+        Q_DEBUG(QString("Disconnect requested for user %1").arg(m_user));
     } else {
         Q_WARN(QString("Duplicate disconnect for user %1").arg(m_user));
     }
@@ -67,7 +67,7 @@ QGVConnection::GetSelfHandle()
                         "Connection object not connected");
         Q_WARN("Not connected");
     } else {
-        Q_DEBUG("Returning self handle ") << QString("%d").arg (m_selfHandle);
+        Q_DEBUG(QString("Returning self handle %1").arg(m_selfHandle));
     }
     return m_selfHandle;
 }//QGVConnection::GetSelfHandle
@@ -75,7 +75,7 @@ QGVConnection::GetSelfHandle()
 uint
 QGVConnection::GetStatus()
 {
-    Q_DEBUG("Returning connection status ") << QString("%d").arg (m_connStatus);
+    Q_DEBUG(QString("Returning connection status %1").arg(m_connStatus));
     return m_connStatus;
 }//QGVConnection::GetStatus
 
@@ -323,15 +323,16 @@ QGVConnection::processChannel(const QVariantMap &request)
         return false;
     }
 
-    if (strType == ofdT_ChannelType_StreamedMedia) {
-        Q_DEBUG(QString("Call to %1").arg (strNum));
-    } else if (strType == ofdT_ChannelType_Text) {
-        Q_DEBUG(QString("Text to %1. Request fields:").arg (strNum));
+    QStringList keys = request.keys ();
+    foreach (QString key, keys) {
+        Q_DEBUG(QString("[%1] = %2").arg(key, request[key].toString()));
+    }
 
-        QStringList keys = request.keys ();
-        foreach (QString key, keys) {
-            Q_DEBUG(QString("[%1] = %2").arg(key, request[key].toString()));
-        }
+    if (strType == ofdT_ChannelType_StreamedMedia) {
+        Q_DEBUG(QString("Call to %1").arg(strNum));
+        sendErrorReply (ofdT_Err_Disconnected, "Channel created successfully");
+    } else if (strType == ofdT_ChannelType_Text) {
+        Q_DEBUG(QString("Text to %1. Request fields:").arg(strNum));
     } else {
         sendErrorReply (ofdT_Err_UnsupportedMedia,
                         "Channel type in request is not valid");
