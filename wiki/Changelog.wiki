@@ -1,5 +1,9 @@
 #summary Change log
 
+*2013-04-16*
+ * GV login mechanism changed. Adapted to it.
+ * GV dial out mechanism changed. Adapted to it.
+
 *2012-10-31*
  * Buttons for Meego are different from generic
  * When the NW configuratio changes, recreate the access manager so that the default connection is re-created.
