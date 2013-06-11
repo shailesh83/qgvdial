@@ -7,3 +7,8 @@
 
 *R&D:*
  * Find out how to use the telepathy observer component to auto-accept a call
+
+*Unsorted TTD:*
+ * Test the code to play voice mail with the MMKit on BB10
+ * Find out why the BB10 binary doesn't work
+ * Fix the notification code to terminate when Inbox update fails
