@@ -1,0 +1,24 @@
+<node>
+  <interface name="org.freedesktop.Telepathy.Channel">
+    <method name="Close" />
+    <method name="GetChannelType">
+      <arg name="Channel_Type" type="s" direction="out"/>
+    </method>
+    <method name="GetHandle">
+      <arg name="Target_Handle_Type" type="u" direction="out"/>
+      <arg name="Target_Handle" type="u" direction="out"/>
+    </method>
+    <method name="GetInterfaces">
+      <arg name="Interfaces" type="as" direction="out"/>
+    </method>
+    <signal name="Closed" />
+    <property name="ChannelType" type="s" access="read" />
+    <property name="Interfaces" type="as" access="read" />
+    <property name="TargetHandle" type="u" access="read" />
+    <property name="TargetID" type="s" access="read" />
+    <property name="TargetHandleType" type="u" access="read" />
+    <property name="Requested" type="b" access="read" />
+    <property name="InitiatorHandle" type="u" access="read" />
+    <property name="InitiatorID" type="s" access="read" />
+  </interface>
+</node>
