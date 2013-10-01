@@ -14,7 +14,6 @@
  * Fix the notification code to terminate when Inbox update fails
 
 *TTD for the new incarnation:*
- * maemo: reg numbers list: pull out into main.qml and tie back button to close
  * bb10: increase font size in contacts list and inbox list
  * bb10: tie click on contact -> cpp. Follow the same pattern as harmattan to show details.
  * bb10: contact details page design
