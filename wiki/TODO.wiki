@@ -14,10 +14,7 @@
  * Fix the notification code to terminate when Inbox update fails
 
 *TTD for the new incarnation:*
- * maemo: Make the close button act like the harmattan commonTools back button
  * maemo: reg numbers list: pull out into main.qml and tie back button to close
- * maemo: contact details page: put into main.qml, tie back button, plumb QML->cpp->QML to show contacts.
- * maemo: main.qml: tie the contact details page output to number display textfield
  * bb10: increase font size in contacts list and inbox list
  * bb10: tie click on contact -> cpp. Follow the same pattern as harmattan to show details.
  * bb10: contact details page design
