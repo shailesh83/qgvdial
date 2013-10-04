@@ -14,7 +14,6 @@
  * Fix the notification code to terminate when Inbox update fails
 
 *TTD for the new incarnation:*
- * bb10: increase font size in contacts list and inbox list
  * bb10: tie click on contact -> cpp. Follow the same pattern as harmattan to show details.
  * bb10: contact details page design
  * bb10: long press on number -> number display text
