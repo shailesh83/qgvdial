@@ -16,4 +16,3 @@
 *TTD for the new incarnation:*
  * bb10: tie click on contact -> cpp. Follow the same pattern as harmattan to show details.
  * bb10: contact details page design
- * bb10: long press on number -> number display text
