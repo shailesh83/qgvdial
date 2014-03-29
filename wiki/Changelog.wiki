@@ -1,5 +1,10 @@
 #summary Change log
 
+*2014-03-28*
+ * Nearly a year later and a lot has changed
+ * UI is totally rewritten
+ * GV Api updated to latest
+
 *2013-04-16*
  * GV login mechanism changed. Adapted to it.
  * GV dial out mechanism changed. Adapted to it.
