@@ -1,6 +1,4 @@
-QT += core gui script
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += core gui script widgets webkitwidgets
 
 TARGET = 05-contacts
 TEMPLATE = app

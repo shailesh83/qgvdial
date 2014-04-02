@@ -8,6 +8,7 @@ class MainWindow;
 }
 
 class O2;
+class QWebView;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -26,6 +27,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     O2  *o2;
+    QWebView *webView;
 };
 
 #endif // MAINWINDOW_H

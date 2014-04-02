@@ -1,6 +1,6 @@
 #include <QtCore>
 #include <QtScript>
-#include <QDesktopServices>
+#include <QtWebKitWidgets/QWebView>
 
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , ui(new Ui::MainWindow)
 , o2(new O2(this))
+, webView(NULL)
 {
     ui->setupUi(this);
 
@@ -39,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     o2->setGrantFlow (O2::GrantFlowAuthorizationCode);
     o2->setScope ("https://www.google.com/m8/feeds");
+    o2->setTokenUrl ("https://accounts.google.com/o/oauth2/token");
 
     o2->link ();
 
@@ -73,11 +75,21 @@ void
 MainWindow::onOpenBrowser(const QUrl &url)
 {
     QString dest = "https://accounts.google.com/o/oauth2/auth" + url.toString();
-    QDesktopServices::openUrl (dest);
+    webView = new QWebView (this);
+    webView->setUrl (dest);
+    webView->show();
+
+    this->setCentralWidget (webView);
 }//MainWindow::onOpenBrowser
 
 void
 MainWindow::onCloseBrowser()
 {
     qDebug("Close browser");
+    if (webView) {
+        webView->deleteLater ();
+    }
+
+    webView = new QWebView (this);
+    this->setCentralWidget (webView);
 }//MainWindow::onCloseBrowser
