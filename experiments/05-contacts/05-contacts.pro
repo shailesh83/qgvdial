@@ -13,4 +13,4 @@ FORMS    += MainWindow.ui
 
 RESOURCES += 05_contacts.qrc
 
-include(../../trunk/qgvdial/features/o2/o2.pri)
+include(../../trunk/api/o2/o2.pri)
