@@ -1,4 +1,4 @@
-QT += core gui script widgets webkitwidgets
+QT += core gui script widgets webkit webkitwidgets
 
 TARGET = 05-contacts
 TEMPLATE = app

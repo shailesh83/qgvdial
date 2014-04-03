@@ -41,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent)
     o2->setGrantFlow (O2::GrantFlowAuthorizationCode);
     o2->setScope ("https://www.google.com/m8/feeds");
     o2->setTokenUrl ("https://accounts.google.com/o/oauth2/token");
+    o2->setRequestUrl ("https://accounts.google.com/o/oauth2/auth");
+    o2->setClientEmailHint ("someone@gmail.com");
 
     o2->link ();
 
@@ -74,9 +76,8 @@ MainWindow::onLinkingSucceeded()
 void
 MainWindow::onOpenBrowser(const QUrl &url)
 {
-    QString dest = "https://accounts.google.com/o/oauth2/auth" + url.toString();
     webView = new QWebView (this);
-    webView->setUrl (dest);
+    webView->setUrl (url);
     webView->show();
 
     this->setCentralWidget (webView);
