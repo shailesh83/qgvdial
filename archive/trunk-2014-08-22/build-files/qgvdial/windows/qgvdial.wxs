@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="cdee8386-b061-4cbb-b79c-40b5e1da0325" Name="QGVDial" Language="1033" Version="__QGVDIAL_VERSION__" Manufacturer="QGVDial" UpgradeCode="4b428abe-1451-4de6-aae2-e13e96aebde5">
+        <Package InstallerVersion="300" Compressed="yes" />
+
+        <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <!-- Directory structure under program files -->
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLLOCATION" Name="QGVDial">
+                    <Directory Id="appbins" Name="bin" />
+                    <Directory Id="qtbins" Name="qt">
+                        <Directory Id="pluginsdir" Name="plugins">
+                            <Directory Id="plugins_bearer" Name="bearer" />
+                            <Directory Id="plugins_imageformats" Name="imageformats" />
+                            <Directory Id="plugins_mediaservice" Name="mediaservice" />
+                            <Directory Id="plugins_playlistformats" Name="playlistformats" />
+                            <Directory Id="plugins_sqldrivers" Name="sqldrivers" />
+                            <Directory Id="plugins_platforms" Name="platforms" />
+                        </Directory>
+                    </Directory>
+                </Directory>
+            </Directory>
+            
+            <!-- Directory structure for the shortcut -->
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ApplicationProgramsFolder" Name="QGVDial" />
+            </Directory>
+        </Directory>
+        
+        <!-- Specify the files that need to go to the install location -->
+        <DirectoryRef Id="appbins">
+            <Component Id="qgvdial.exe" Guid="003F7582-3B03-4FED-8B3B-A21E6AB07D34">
+                <File Id="qgvdial.exe" Source="..\..\..\qgvdial\qt-not-qml\desktop_windows\release\qgvdial.exe" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="libeay32.dll" Guid="85006557-DB29-43E1-B60D-D42457E2293F">
+                <File Id="libeay32.dll" Source="__QTDIR__\bin\libeay32.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="ssleay32.dll" Guid="5A660879-F547-49C0-A7D8-F93BFBF92E5C">
+                <File Id="ssleay32.dll" Source="__QTDIR__\bin\ssleay32.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qt.conf" Guid="F5AA101C-FD8B-4525-9E72-4E32641C11A7">
+                <File Id="qt.conf" Source="..\..\..\build-files\qgvdial\windows\qt.conf" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="run.bat" Guid="E1642775-4701-48CA-B12F-292EA621DF24">
+                <File Id="run.bat" Source="..\..\..\build-files\qgvdial\windows\run.bat" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="qtbins">
+            <Component Id="Qt5Core.dll" Guid="E35D7C13-FE4E-4BFD-A112-8E040D03469D">
+                <File Id="Qt5Core.dll" Source="__QTDIR__\bin\Qt5Core.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="Qt5Gui.dll" Guid="774C1356-53CF-4F65-94BF-A6B4C4755E41">
+                <File Id="Qt5Gui.dll" Source="__QTDIR__\bin\Qt5Gui.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="Qt5Widgets.dll" Guid="12B851E1-165D-4C25-8D6F-CEB6C446DC37">
+                <File Id="Qt5Widgets.dll" Source="__QTDIR__\bin\Qt5Widgets.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="Qt5Network.dll" Guid="5986CCCC-B1DD-462C-8866-0EF57136928B">
+                <File Id="Qt5Network.dll" Source="__QTDIR__\bin\Qt5Network.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <!-- <Component Id="Qt5OpenGL.dll" Guid="5E2E7628-ECB7-41DC-8A9C-CFEEDF9826DD">
+                <File Id="Qt5OpenGL.dll" Source="__QTDIR__\bin\Qt5OpenGL.dll" KeyPath="yes" Checksum="yes"/>
+            </Component> -->
+            <Component Id="Qt5Script.dll" Guid="321104F1-FE22-4176-9D8C-5B842394E17E">
+                <File Id="Qt5Script.dll" Source="__QTDIR__\bin\Qt5Script.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="Qt5Sql.dll" Guid="BEACF7C2-1BFD-44FC-AB2D-6B0A71BF99B5">
+                <File Id="Qt5Sql.dll" Source="__QTDIR__\bin\Qt5Sql.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="Qt5Svg.dll" Guid="AC5A10A7-A92F-4C4B-B058-B89EA0AE086E">
+                <File Id="Qt5Svg.dll" Source="__QTDIR__\bin\Qt5Svg.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="Qt5Xml.dll" Guid="9D13C144-B2DD-4073-8FCA-48A46928ED8C">
+                <File Id="Qt5Xml.dll" Source="__QTDIR__\bin\Qt5Xml.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="Qt5XmlPatterns.dll" Guid="27574D0D-D570-40AB-A248-CEE276C6F05F">
+                <File Id="Qt5XmlPatterns.dll" Source="__QTDIR__\bin\Qt5XmlPatterns.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="Qt5Multimedia.dll" Guid="CDD1458E-9824-4ECC-960F-E81078317EFB">
+                <File Id="Qt5Multimedia.dll" Source="__QTDIR__\bin\Qt5Multimedia.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="libGLESv2.dll" Guid="66F18195-A4CD-4AB2-95C6-643D58FF6D36">
+                <File Id="libGLESv2.dll" Source="__QTDIR__\bin\libGLESv2.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="icuin51.dll" Guid="BEB57FA1-456B-4F1D-B29C-756755684E61">
+                <File Id="icuin51.dll" Source="__QTDIR__\bin\icuin51.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="icuuc51.dll" Guid="46B23389-419C-48E1-98BD-567A72148635">
+                <File Id="icuuc51.dll" Source="__QTDIR__\bin\icuuc51.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="icudt51.dll" Guid="EEC290F1-90A4-4839-955A-35A7A57665EA">
+                <File Id="icudt51.dll" Source="__QTDIR__\bin\icudt51.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="libEGL.dll" Guid="6764CFD3-3079-4CBA-A066-A362D0658E97">
+                <File Id="libEGL.dll" Source="__QTDIR__\bin\libEGL.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="plugins_bearer">
+            <Component Id="qgenericbearer.dll" Guid="AABF8088-5E99-48EA-9BAE-D53A949D20EB">
+                <File Id="qgenericbearer.dll" Source="__QTDIR__\plugins\bearer\qgenericbearer.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qnativewifibearer.dll" Guid="B10D3DBB-2E41-412E-B23C-C0270C132996">
+                <File Id="qnativewifibearer.dll" Source="__QTDIR__\plugins\bearer\qnativewifibearer.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="plugins_imageformats">
+            <Component Id="qgif.dll" Guid="70A2D65E-7A40-43F3-B72A-07E6E9D4711F">
+                <File Id="qgif.dll" Source="__QTDIR__\plugins\imageformats\qgif.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qico.dll" Guid="ADF74286-E2C7-409E-B984-50C08F966C1D">
+                <File Id="qico.dll" Source="__QTDIR__\plugins\imageformats\qico.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qjpeg.dll" Guid="A11AA286-EB9C-4309-838F-080AAEF110EF">
+                <File Id="qjpeg.dll" Source="__QTDIR__\plugins\imageformats\qjpeg.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qmng.dll" Guid="040FB712-2FC1-4309-9BEE-95479407836E">
+                <File Id="qmng.dll" Source="__QTDIR__\plugins\imageformats\qmng.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qsvg.dll" Guid="9243B8C9-3FC5-433B-AA15-B9F5677D8DC9">
+                <File Id="qsvg.dll" Source="__QTDIR__\plugins\imageformats\qsvg.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qtga.dll" Guid="0D0F16F0-111C-44A3-BEB4-ABF96C201914">
+                <File Id="qtga.dll" Source="__QTDIR__\plugins\imageformats\qtga.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qtiff.dll" Guid="B69DC052-7A27-47BA-8C5A-7A58BBB290A4">
+                <File Id="qtiff.dll" Source="__QTDIR__\plugins\imageformats\qtiff.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+            <Component Id="qwbmp.dll" Guid="0F6CE2B6-92E9-42AC-AA31-3AFB1A56A21D">
+                <File Id="qwbmp.dll" Source="__QTDIR__\plugins\imageformats\qwbmp.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="plugins_mediaservice">
+            <Component Id="dsengine.dll" Guid="1DD7E0A9-026B-464C-9C06-016A856B04C7">
+                <File Id="dsengine.dll" Source="__QTDIR__\plugins\mediaservice\dsengine.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="plugins_playlistformats">
+            <Component Id="qtmultimedia_m3u.dll" Guid="BF946856-E76F-4331-9F1B-6213170D52FD">
+                <File Id="qtmultimedia_m3u.dll" Source="__QTDIR__\plugins\playlistformats\qtmultimedia_m3u.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="plugins_sqldrivers">
+            <Component Id="qsqlite.dll" Guid="FBA288D6-CAE4-4594-898B-F313C4FB436F">
+                <File Id="qsqlite.dll" Source="__QTDIR__\plugins\sqldrivers\qsqlite.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <DirectoryRef Id="plugins_platforms">
+            <Component Id="qwindows.dll" Guid="7AE6234B-0BA7-4381-9F85-1A47D269D644">
+                <File Id="qwindows.dll" Source="__QTDIR__\plugins\platforms\qwindows.dll" KeyPath="yes" Checksum="yes"/>
+            </Component>
+        </DirectoryRef>
+
+        <!-- Install binaries to the install location -->
+        <Feature Id="Binaries" Title="QGVDial binaries" Level="1">
+            <ComponentRef Id="qgvdial.exe" />
+            <ComponentRef Id="libeay32.dll" />
+            <ComponentRef Id="ssleay32.dll" />
+            <ComponentRef Id="qt.conf" />
+            <ComponentRef Id="run.bat" />
+            <ComponentRef Id="Qt5Core.dll" />
+            <ComponentRef Id="Qt5Gui.dll" />
+            <ComponentRef Id="Qt5Widgets.dll" />
+            <ComponentRef Id="Qt5Network.dll" />
+            <!-- <ComponentRef Id="Qt5OpenGL.dll" /> -->
+            <ComponentRef Id="Qt5Script.dll" />
+            <ComponentRef Id="Qt5Sql.dll" />
+            <ComponentRef Id="Qt5Svg.dll" />
+            <ComponentRef Id="Qt5Xml.dll" />
+            <ComponentRef Id="Qt5XmlPatterns.dll" />
+            <ComponentRef Id="Qt5Multimedia.dll" />
+            <ComponentRef Id="libGLESv2.dll" />
+            <ComponentRef Id="icuin51.dll" />
+            <ComponentRef Id="icuuc51.dll" />
+            <ComponentRef Id="icudt51.dll" />
+            <ComponentRef Id="libEGL.dll" />
+            <ComponentRef Id="qgenericbearer.dll" />
+            <ComponentRef Id="qnativewifibearer.dll" />
+            <ComponentRef Id="qgif.dll" />
+            <ComponentRef Id="qico.dll" />
+            <ComponentRef Id="qjpeg.dll" />
+            <ComponentRef Id="qmng.dll" />
+            <ComponentRef Id="qsvg.dll" />
+            <ComponentRef Id="qtga.dll" />
+            <ComponentRef Id="qtiff.dll" />
+            <ComponentRef Id="qwbmp.dll" />
+            <ComponentRef Id="dsengine.dll" />
+            <ComponentRef Id="qtmultimedia_m3u.dll" />
+            <ComponentRef Id="qsqlite.dll" />
+            <ComponentRef Id="qwindows.dll" />
+
+            <!-- Tell WiX to install the shortcut -->
+            <ComponentRef Id="ApplicationShortcut" />   
+        </Feature>
+
+        <DirectoryRef Id="TARGETDIR">
+            <Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC100_CRT_x86.msm" DiskId="1" Language="0"/>
+        </DirectoryRef>
+        <Feature Id="VCRedist" Title="Visual C++ 10.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+            <MergeRef Id="VCRedist"/>
+        </Feature>
+
+        <DirectoryRef Id="ApplicationProgramsFolder">
+            <Component Id="ApplicationShortcut" Guid="5C62B2E3-F7BF-4392-A7B8-F372A9939C59">
+                <Shortcut Id="ApplicationStartMenuShortcut" 
+                          Name="QGVDial"
+                          Description="Qt Google Voice Dialer"
+                          Target="[appbins]qgvdial.exe"
+                          WorkingDirectory="qtbins"/>
+                <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+                <RegistryValue Root="HKCU" Key="Software\Microsoft\QGVDial" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+            </Component>
+        </DirectoryRef>
+
+    </Product>
+</Wix>
